@@ -1,0 +1,1 @@
+import"./chunk-2NFLSA4Y.js";var n=()=>import("./chunk-R4EO6OGL.js").then(o=>o.SignInForm),t=()=>import("./chunk-HSH4AWJM.js").then(o=>o.SignUpForm),i=[{path:"sign-in",loadComponent:n},{path:"sign-up",loadComponent:t}];export{i as iamRoutes};
