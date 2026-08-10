@@ -68,5 +68,15 @@
       "description-required": "La descripción es obligatoria",
       "category-required": "La categoría es obligatoria"
     }
+  },
+  "sellers": {
+    "quoting":  { "title": "Proyectos & Cotizador" },
+    "quotes":   { "title": "Ventas & CRM" },
+    "sales":    { "title": "Stock & Retazos" },
+    "cash":     { "title": "Caja y Cobranzas" },
+    "orders":   { "title": "Estado de Taller" },
+    "agenda":   { "title": "Agenda & Visitas" },
+    "profile":  { "title": "Mi Perfil & Metas" },
+    "placeholder": { "content": "Esta sección está en construcción y estará disponible pronto." }
   }
 }
