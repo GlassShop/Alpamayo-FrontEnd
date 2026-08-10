@@ -5,5 +5,6 @@ export const environment = {
   platformProviderCoursesEndpointPath: '/courses',
   platformProviderSignInEndpointPath: '/authentication/sign-in',
   platformProviderSignUpEndpointPath: '/authentication/sign-up',
+  platformProviderSellersDashboardEndpointPath: '/sellers-dashboard-summaries',
   logoProviderApiBaseUrl: 'https://img.logo.dev'
 };
