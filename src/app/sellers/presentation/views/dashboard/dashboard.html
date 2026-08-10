@@ -1,0 +1,145 @@
+<div class="dv-page">
+  <div class="dv-header">
+    <div>
+      <h1 class="dv-title">Dashboard Ventas</h1>
+      <p class="dv-subtitle">Resumen del Día</p>
+    </div>
+    <a mat-flat-button routerLink="/sellers/quoting/new" class="btn-new-sale">
+      <mat-icon>add</mat-icon> Nueva Venta / Cotización
+    </a>
+  </div>
+
+  <!-- Metrics + Top Products -->
+  <div class="dv-top-row">
+    <div class="dv-metrics">
+      <mat-card class="metric-card">
+        <mat-card-content>
+          <div class="metric-top">
+            <span class="metric-label">Ventas Totales Hoy</span>
+            <div class="metric-icon metric-icon--blue"><mat-icon>shopping_cart</mat-icon></div>
+          </div>
+          <div class="metric-value">{{ store.summary().todaySalesTotal | currency:'PEN':'S/ ':'1.2-2' }}</div>
+          <div class="metric-footer metric-footer--up"><mat-icon>arrow_upward</mat-icon>+{{ store.summary().percentageVsYesterday }}% vs ayer</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="metric-card">
+        <mat-card-content>
+          <div class="metric-top">
+            <span class="metric-label">Meta Mensual</span>
+            <div class="metric-icon metric-icon--violet"><mat-icon>flag</mat-icon></div>
+          </div>
+          <div class="metric-value goal-value">{{ store.summary().salesGoalPercentage }}%</div>
+          <mat-progress-bar mode="determinate" [value]="store.summary().salesGoalPercentage" class="goal-bar"/>
+          <div class="metric-footer metric-footer--muted">S/ {{ store.summary().salesGoalCurrent/1000|number:'1.0-0' }}k / {{ store.summary().salesGoalTarget/1000|number:'1.0-0' }}k</div>
+          <div class="goal-days">{{ store.summary().daysRemainingInMonth }} días restantes</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="metric-card">
+        <mat-card-content>
+          <div class="metric-top">
+            <span class="metric-label">Clientes Mayoristas Activos</span>
+            <div class="metric-icon metric-icon--green"><mat-icon>groups</mat-icon></div>
+          </div>
+          <div class="metric-value">{{ store.summary().activeClientsCount }}</div>
+          <div class="metric-footer metric-footer--up"><mat-icon>arrow_upward</mat-icon>+{{ store.summary().newClientsThisMonth }} nuevos este mes</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <mat-card class="top-products-card">
+      <mat-card-header><mat-card-title>Top Productos Vendidos (Mes)</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <div class="top-product-list">
+          @for (p of store.summary().topProducts; track p.id; let i = $index) {
+            <div class="top-product-row">
+              <span class="top-product-rank">{{ i+1 }}</span>
+              <div class="top-product-info">
+                <span class="top-product-name">{{ p.name }}</span>
+                @if (p.detail) { <span class="top-product-detail">{{ p.detail }}</span> }
+              </div>
+              <span class="top-product-qty">{{ p.quantitySold|number }} {{ p.unit }}</span>
+            </div>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Actividad + Stock -->
+  <div class="dv-bottom-row">
+    <mat-card class="activity-card">
+      <mat-card-header>
+        <mat-card-title>Actividad Reciente</mat-card-title>
+        <div class="card-action-link"><a routerLink="/sellers/quotes">Ver todo</a></div>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="store.summary().recentActivities" class="activity-table">
+          <ng-container matColumnDef="document">
+            <th mat-header-cell *matHeaderCellDef>Documento</th>
+            <td mat-cell *matCellDef="let a"><span class="doc-name">{{ a.document }}</span><span class="doc-time">{{ a.timeAgo }}</span></td>
+          </ng-container>
+          <ng-container matColumnDef="client">
+            <th mat-header-cell *matHeaderCellDef>Cliente</th>
+            <td mat-cell *matCellDef="let a"><span class="client-name">{{ a.client }}</span><span class="client-detail">{{ a.clientDetail }}</span></td>
+          </ng-container>
+          <ng-container matColumnDef="total">
+            <th mat-header-cell *matHeaderCellDef>Monto Total</th>
+            <td mat-cell *matCellDef="let a" class="col-total">
+              @if (a.total !== null) { {{ a.total|currency:'PEN':'S/ ':'1.2-2' }} } @else { <span class="no-amount">—</span> }
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let a">
+              <span class="badge" [ngClass]="getStatusConfig(a.status).css">
+                <span class="badge-dot"></span>{{ getStatusConfig(a.status).label }}
+              </span>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="activityColumns"></tr>
+          <tr mat-row *matRowDef="let _row; columns: activityColumns;"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stock-card">
+      <mat-card-header><mat-card-title>Consulta Rápida Stock</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="stock-search-field">
+          <mat-label>Buscar producto...</mat-label>
+          <input matInput (input)="onStockSearch($event)" placeholder="Incoloro 6mm..."/>
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        <div class="stock-results">
+          @for (item of store.filteredStockItems(); track item.id) {
+            <div class="stock-row">
+              <div class="stock-item-info">
+                <div class="stock-item-name-row">
+                  @if (item.isLow) { <mat-icon class="low-stock-icon">warning_amber</mat-icon> }
+                  <span class="stock-item-name">{{ item.name }}</span>
+                </div>
+                <span class="stock-item-detail">{{ item.detail }}</span>
+              </div>
+              <div class="stock-item-qty">
+                <span class="qty-number" [ngClass]="{'qty--low': item.isLow}">{{ item.quantity }}</span>
+                <span class="qty-unit">{{ item.unit }}</span>
+              </div>
+            </div>
+          } @empty { <p class="stock-empty">Sin resultados</p> }
+        </div>
+        @if (store.summary().stockAlerts.length > 0) {
+          <mat-divider class="alert-divider"/>
+          @for (alert of store.summary().stockAlerts; track alert.id) {
+            <div class="stock-alert">
+              <mat-icon class="alert-icon">warning_amber</mat-icon>
+              <div><p class="alert-title">Alerta de Stock Crítico</p><p class="alert-body">{{ alert.productName }} (Quedan {{ alert.remaining }} {{ alert.unit }})</p></div>
+            </div>
+          }
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
