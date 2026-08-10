@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "learning-center": {
+    "alpamayo": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -17,6 +17,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "outputPath": "dist/alpamayo",
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
@@ -61,10 +62,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "learning-center:build:production"
+              "buildTarget": "alpamayo:build:production"
             },
             "development": {
-              "buildTarget": "learning-center:build:development"
+              "buildTarget": "alpamayo:build:development"
             }
           },
           "defaultConfiguration": "development"
