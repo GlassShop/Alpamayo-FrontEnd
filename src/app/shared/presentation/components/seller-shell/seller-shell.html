@@ -1,0 +1,24 @@
+<div class="seller-layout">
+  <aside class="seller-sidebar-wrapper" [style.width]="collapsed() ? '64px' : '240px'">
+    <app-seller-sidebar [collapsed]="collapsed()"/>
+  </aside>
+  <div class="seller-main">
+    <header class="top-bar">
+      <button mat-icon-button class="toggle-btn" (click)="toggleSidebar()"
+              [matTooltip]="collapsed() ? 'Expandir menú' : 'Comprimir menú'">
+        <mat-icon>{{ collapsed() ? 'menu' : 'menu_open' }}</mat-icon>
+      </button>
+      <div class="top-bar-search">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input class="search-input" type="text" placeholder="Buscar facturas, clientes, productos..."/>
+      </div>
+      <div class="top-bar-actions">
+        <button mat-icon-button class="action-btn" title="Notificaciones"><mat-icon>notifications</mat-icon></button>
+        <button mat-icon-button class="action-btn" title="Configuración"><mat-icon>settings</mat-icon></button>
+        <button mat-icon-button class="action-btn" title="Ayuda"><mat-icon>help_outline</mat-icon></button>
+      </div>
+    </header>
+    <div class="seller-content"><router-outlet/></div>
+  </div>
+</div>
+
