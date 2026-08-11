@@ -1,0 +1,197 @@
+<div class="sp-page">
+
+  <!-- ══ HEADER ══ -->
+  <div class="sp-header">
+    <div class="sp-header-left">
+      <div class="sp-header-icon-wrap"><mat-icon>table_chart</mat-icon></div>
+      <div>
+        <h2 class="sp-title">Sprint de Proyectos</h2>
+        <p class="sp-subtitle">Vidrieria Alpamayo — Gestión de Tareas y Cronograma</p>
+      </div>
+    </div>
+    <div class="sp-header-right">
+      <button mat-stroked-button class="btn-filter">
+        <mat-icon>filter_alt</mat-icon> Filtros
+      </button>
+      <button mat-flat-button class="btn-new-task" (click)="openNuevaTarea()">
+        <mat-icon>add</mat-icon> Nueva Tarea
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ STATS ROW ══ -->
+  <div class="sp-stats">
+    <div class="sp-stat sp-stat--tasks">
+      <mat-icon>task_alt</mat-icon>
+      <span class="sp-stat-num">{{ store.totalTasks() }}</span>
+      <span class="sp-stat-lbl">Tareas</span>
+    </div>
+    <div class="sp-stat sp-stat--progress">
+      <mat-icon>trending_up</mat-icon>
+      <span class="sp-stat-num">{{ store.inProgressTaskCount() }}</span>
+      <span class="sp-stat-lbl">En Curso</span>
+    </div>
+    <div class="sp-stat sp-stat--blocked">
+      <mat-icon>block</mat-icon>
+      <span class="sp-stat-num">{{ store.blockedCount() }}</span>
+      <span class="sp-stat-lbl">Bloqueadas</span>
+    </div>
+    <div class="sp-stat sp-stat--workers">
+      <mat-icon>group</mat-icon>
+      <span class="sp-stat-num">{{ store.workers.length }}</span>
+      <span class="sp-stat-lbl">Trabajadores</span>
+    </div>
+  </div>
+
+  <!-- ══ TABLE + GANTT ══ -->
+  <div class="sp-body">
+
+    <!-- LEFT TABLE -->
+    <div class="sp-table-wrap">
+      <table class="sp-table">
+        <thead>
+          <tr class="sp-thead">
+            <th class="col-chk"><input type="checkbox"/></th>
+            <th class="col-code">
+              Tarea <mat-icon class="th-sort">unfold_more</mat-icon>
+            </th>
+            <th class="col-title">
+              Título de tarea <mat-icon class="th-sort">unfold_more</mat-icon>
+            </th>
+            <th class="col-worker">
+              Trabajador <mat-icon class="th-sort">unfold_more</mat-icon>
+            </th>
+            <th class="col-pri">
+              Prioridad <mat-icon class="th-sort">unfold_more</mat-icon>
+            </th>
+            <th class="col-status">
+              Estado <mat-icon class="th-sort">unfold_more</mat-icon>
+            </th>
+            <th class="col-date">
+              F. Inicio <mat-icon class="th-sort">unfold_more</mat-icon>
+            </th>
+            <th class="col-date">
+              F. Final <mat-icon class="th-sort">unfold_more</mat-icon>
+            </th>
+            <th class="col-files">
+              Archivos
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Group row -->
+          <tr class="sp-group-row">
+            <td colspan="9">
+              <div class="group-label">
+                <div class="group-dot"></div>
+                <mat-icon class="group-chevron">expand_more</mat-icon>
+                <span>Vidrieria_Alpamayo</span>
+                <mat-icon class="group-grid">grid_view</mat-icon>
+              </div>
+            </td>
+          </tr>
+
+          @for (task of store.sprintTasks(); track task.id) {
+            <tr class="sp-row" [class.sp-row--empty]="!task.title">
+              <td class="col-chk"><input type="checkbox"/></td>
+              <td class="col-code">
+                <span class="cell-code">{{ task.code ?? 'Tarea' }}</span>
+              </td>
+              <td class="col-title">
+                <span class="cell-title">{{ task.title }}</span>
+              </td>
+              <td class="col-worker">
+                @if (task.worker) {
+                  <div class="cell-worker-chip">
+                    <span class="worker-dot">{{ task.worker.slice(0,2) }}</span>
+                    <span class="worker-name">{{ task.worker }}</span>
+                  </div>
+                } @else {
+                  <span class="cell-empty-worker">Trabajador</span>
+                }
+              </td>
+              <td class="col-pri">
+                @if (task.priority > 0) {
+                  <span class="cell-priority"
+                        [style.background]="priorityBg(task.priority)"
+                        [style.color]="priorityColor(task.priority)">
+                    {{ task.priority }}
+                    <mat-icon>arrow_drop_down</mat-icon>
+                  </span>
+                } @else {
+                  <span class="cell-pri-empty"><mat-icon>arrow_drop_down</mat-icon></span>
+                }
+              </td>
+              <td class="col-status">
+                @if (task.title) {
+                  <span [class]="'cell-status cell-status--' + task.status">
+                    {{ statusLabel[task.status] }}
+                    <mat-icon>arrow_drop_down</mat-icon>
+                  </span>
+                } @else {
+                  <span class="cell-status-empty"><mat-icon>arrow_drop_down</mat-icon></span>
+                }
+              </td>
+              <td class="col-date">
+                <span class="cell-date">{{ task.startDate ?? '—' }}</span>
+              </td>
+              <td class="col-date">
+                <span class="cell-date">{{ task.endDate ?? '—' }}</span>
+              </td>
+              <td class="col-files">
+                @if (task.fileInfo) {
+                  <span class="cell-file" [class.cell-file--link]="task.fileInfo !== 'Archivos' && task.fileInfo !== ''">
+                    <mat-icon>attach_file</mat-icon>{{ task.fileInfo || 'Archivos' }}
+                  </span>
+                }
+              </td>
+            </tr>
+          }
+
+          <!-- Add task row -->
+          <tr class="sp-add-row">
+            <td colspan="9">
+              <button class="btn-add-task" (click)="openNuevaTarea()">
+                <mat-icon>add</mat-icon> Agregar tarea
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- RIGHT GANTT -->
+    <div class="sp-gantt">
+      <!-- Gantt header -->
+      <div class="gantt-header">
+        @for (day of store.ganttDays; track day; let i = $index) {
+          <div class="gantt-day" [class.gantt-day--today]="i === 2">{{ day }}</div>
+        }
+      </div>
+
+      <!-- Group spacer -->
+      <div class="gantt-spacer gantt-spacer--group"></div>
+
+      @for (task of store.sprintTasks(); track task.id) {
+        <div class="gantt-row" [class.gantt-row--empty]="!task.title">
+          @for (day of store.ganttDays; track day; let i = $index) {
+            <div class="gantt-cell" [class.gantt-cell--today]="i === 2"></div>
+          }
+          @if (task.ganttDay !== undefined && task.ganttSpan) {
+            <div class="gantt-bar"
+                 [style.left.px]="task.ganttDay * CELL_W + 4"
+                 [style.width.px]="task.ganttSpan * CELL_W - 8"
+                 [style.background]="task.ganttColor ?? '#86efac'">
+              <span class="gantt-bar-label">{{ task.worker }}</span>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Add row spacer -->
+      <div class="gantt-spacer gantt-spacer--add"></div>
+    </div>
+
+  </div>
+
+</div>

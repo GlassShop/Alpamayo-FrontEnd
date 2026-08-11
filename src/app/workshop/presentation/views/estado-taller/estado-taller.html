@@ -1,0 +1,165 @@
+<div class="et-page">
+
+  <!-- ══ HEADER ══ -->
+  <div class="et-header">
+    <div class="et-header-left">
+      <div class="et-header-icon-wrap">
+        <mat-icon>view_kanban</mat-icon>
+      </div>
+      <div>
+        <h2 class="et-title">Estado de Taller</h2>
+        <p class="et-subtitle">Trazabilidad en Tiempo Real de Pedidos Activos</p>
+      </div>
+    </div>
+    <div class="et-header-right">
+      <button mat-stroked-button class="btn-filter">
+        <mat-icon>filter_alt</mat-icon> Filtros Avanzados
+      </button>
+      <button mat-flat-button class="btn-new-order" (click)="openNuevoPedido()">
+        <mat-icon>add</mat-icon> Nuevo Pedido
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ STATS BAR ══ -->
+  <div class="et-stats">
+    <div class="stat-card stat-card--total">
+      <mat-icon>receipt_long</mat-icon>
+      <div class="stat-info">
+        <span class="stat-num">{{ store.totalOrders() }}</span>
+        <span class="stat-lbl">Total Pedidos</span>
+      </div>
+    </div>
+    <div class="stat-card stat-card--process">
+      <mat-icon>manufacturing</mat-icon>
+      <div class="stat-info">
+        <span class="stat-num">{{ store.inProcessCount() }}</span>
+        <span class="stat-lbl">En Producción</span>
+      </div>
+    </div>
+    <div class="stat-card stat-card--done">
+      <mat-icon>check_circle</mat-icon>
+      <div class="stat-info">
+        <span class="stat-num">{{ store.completedCount() }}</span>
+        <span class="stat-lbl">Completados</span>
+      </div>
+    </div>
+    <div class="stat-card stat-card--delayed">
+      <mat-icon>warning</mat-icon>
+      <div class="stat-info">
+        <span class="stat-num">{{ store.delayedCount() }}</span>
+        <span class="stat-lbl">Demorados</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ KANBAN BOARD ══ -->
+  <div class="et-board">
+
+    @for (stage of store.stages; track stage.key) {
+      <div class="et-column">
+
+        <!-- Column Header -->
+        <div class="et-col-header" [style.--col-color]="stage.color">
+          <div class="col-header-top">
+            <span class="col-title">{{ stage.label }}</span>
+            <span class="col-badge" [style.background]="stage.color">
+              {{ store.getOrdersByStage(stage.key).length }}
+            </span>
+          </div>
+          <div class="col-underline" [style.background]="stage.color"></div>
+        </div>
+
+        <!-- Cards -->
+        <div class="et-cards">
+          @for (order of store.getOrdersByStage(stage.key); track order.id) {
+            <div class="et-card"
+                 [class.et-card--delayed]="order.status === 'delayed'"
+                 [class.et-card--completed]="order.status === 'completed'"
+                 [class.et-card--finishing]="order.status === 'finishing'"
+                 [style.--card-accent]="stage.color">
+
+              <!-- Top row: ID + badge -->
+              <div class="card-top">
+                <span class="card-order-id">{{ order.orderId }}</span>
+                @if (order.status === 'delayed') {
+                  <span class="card-badge card-badge--delayed">
+                    <mat-icon>warning</mat-icon>Demorado
+                  </span>
+                } @else if (order.status === 'completed') {
+                  <span class="card-badge card-badge--completed">
+                    <mat-icon>check_circle</mat-icon>Completado
+                  </span>
+                } @else if (order.status === 'finishing') {
+                  <span class="card-badge card-badge--finishing">Finalizando</span>
+                } @else if (order.status === 'in-process') {
+                  <span class="card-badge card-badge--process">En proceso</span>
+                } @else {
+                  <span class="card-time">{{ order.timeLabel }}</span>
+                }
+              </div>
+
+              <!-- Client & product -->
+              <div class="card-client">{{ order.clientName }}</div>
+              <div class="card-product">{{ order.productDesc }}</div>
+
+              <!-- Worker + progress -->
+              <div class="card-meta">
+                @if (order.worker) {
+                  <span class="card-worker" [matTooltip]="order.worker">
+                    <span class="worker-avatar">{{ workerInitials(order.worker) }}</span>
+                    {{ order.worker }}
+                  </span>
+                }
+                @if (order.extraBadge) {
+                  <span class="card-extra">{{ order.extraBadge }}</span>
+                }
+              </div>
+
+              <!-- Progress bar -->
+              <div class="card-progress-wrap">
+                <div class="card-progress-track">
+                  <div class="card-progress-fill"
+                       [class]="progressClass[order.status]"
+                       [style.width.%]="order.progressPct">
+                  </div>
+                </div>
+                <span class="card-pct">{{ order.progressPct }}%</span>
+              </div>
+
+              <!-- Footer actions -->
+              <div class="card-footer">
+                <a class="card-link">
+                  <mat-icon>info_outline</mat-icon>Ver Detalles
+                </a>
+                @if (order.actionBtn) {
+                  <button class="card-action-btn"
+                          [class.card-action-btn--primary]="order.status === 'completed'"
+                          [class.card-action-btn--warning]="order.status === 'delayed'">
+                    {{ order.actionBtn }}
+                  </button>
+                }
+              </div>
+
+            </div>
+          }
+
+          @if (store.getOrdersByStage(stage.key).length === 0) {
+            <div class="col-empty">
+              <mat-icon>inbox</mat-icon>
+              <span>Sin pedidos</span>
+            </div>
+          }
+
+          <!-- Add to column -->
+          <button class="col-add-btn" (click)="openNuevoPedido()">
+            <mat-icon>add</mat-icon> Agregar Pedido
+          </button>
+        </div>
+
+      </div>
+    }
+
+  </div>
+
+</div>

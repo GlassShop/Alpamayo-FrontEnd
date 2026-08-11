@@ -38,7 +38,13 @@ export class SellerSidebar implements OnInit {
         { link: '/sellers/quotes/adelantos',    label: 'Registro de Adelantos',            icon: 'payments' },
       ]
     },
-    { link: '/sellers/orders',  label: 'Estado de Taller',  icon: 'precision_manufacturing' },
+    {
+      key: 'workshop', label: 'Taller de Producción', icon: 'precision_manufacturing',
+      children: [
+        { link: '/sellers/workshop/estado-taller', label: 'Estado de Taller',    icon: 'view_kanban' },
+        { link: '/sellers/workshop/sprint',         label: 'Sprint de Proyectos', icon: 'table_chart' },
+      ]
+    },
     { link: '/sellers/agenda',  label: 'Agenda & Visitas',  icon: 'calendar_month' },
     { link: '/sellers/sales',   label: 'Stock & Retazos',   icon: 'inventory_2' },
     { link: '/sellers/profile', label: 'Mi Perfil & Metas', icon: 'manage_accounts' }

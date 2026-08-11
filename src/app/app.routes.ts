@@ -17,6 +17,11 @@ const salesCotizaciones    = () => import('./sales/presentation/views/cotizacion
 const salesAdelantos       = () => import('./sales/presentation/views/adelantos/adelantos').then(m => m.Adelantos);
 const salesContractViewer  = () => import('./sales/presentation/views/digital-contract-viewer/digital-contract-viewer').then(m => m.DigitalContractViewer);
 
+// Workshop BC sub-routes
+const workshopShell   = () => import('./workshop/presentation/views/workshop-shell/workshop-shell').then(m => m.WorkshopShell);
+const estadoTaller    = () => import('./workshop/presentation/views/estado-taller/estado-taller').then(m => m.EstadoTaller);
+const sprintProyectos = () => import('./workshop/presentation/views/sprint-proyectos/sprint-proyectos').then(m => m.SprintProyectos);
+
 // IAM is temporarily disabled while the Sellers bounded context is built.
 // const iamRoutes = () => import('./iam/presentation/iam.routes').then(m => m.iamRoutes);
 
@@ -40,6 +45,14 @@ export const routes: Routes = [
       },
       { path: 'sales',       loadComponent: directSales },
       { path: 'cash',        loadComponent: cashRegister },
+      {
+        path: 'workshop', loadComponent: workshopShell,
+        children: [
+          { path: 'estado-taller', loadComponent: estadoTaller },
+          { path: 'sprint',        loadComponent: sprintProyectos },
+          { path: '',              redirectTo: 'estado-taller', pathMatch: 'full' }
+        ]
+      },
       { path: 'orders',      loadComponent: orderTracking },
       { path: 'agenda',      loadComponent: agenda },
       { path: 'profile',     loadComponent: profile },
