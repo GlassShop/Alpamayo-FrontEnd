@@ -1,0 +1,185 @@
+<div class="ds-layout" [class.ds-layout--active]="store.saleItems().length > 0">
+
+  <!-- LEFT: CATALOGUE -->
+  <div class="ds-catalogue">
+
+    <div class="ds-toolbar">
+      <div class="ds-search-wrapper">
+        <mat-icon class="ds-search-icon">search</mat-icon>
+        <input
+          class="ds-search-input"
+          type="text"
+          placeholder="Buscar producto por nombre o SKU (ej. TEM-6MM-CL)..."
+          [value]="store.searchQuery()"
+          (input)="onCatalogSearch($event)"
+        />
+      </div>
+    </div>
+
+    <div class="ds-categories">
+      @for (cat of categories; track cat.key) {
+        <button
+          class="cat-tab"
+          [class.cat-tab--active]="store.selectedCategory() === cat.key"
+          (click)="setCategory(cat.key)">
+          <mat-icon>{{ cat.icon }}</mat-icon>
+          {{ cat.label }}
+        </button>
+      }
+    </div>
+
+    <div class="ds-grid">
+      @for (product of store.filteredProducts(); track product.id) {
+        <div class="product-card">
+          <div class="product-img-wrapper">
+            <span class="stock-badge">
+              STOCK: <strong>{{ product.stock }} {{ product.stockUnit }}</strong>
+            </span>
+            @if (product.imageUrl) {
+              <img [src]="product.imageUrl" [alt]="product.name" class="product-img"/>
+            } @else {
+              <div class="product-img-placeholder">
+                <mat-icon>{{ product.category === 'glass' ? 'window' : product.category === 'profiles' ? 'view_column' : 'settings' }}</mat-icon>
+              </div>
+            }
+          </div>
+          <div class="product-body">
+            <div class="product-header-row">
+              <span class="product-name">{{ product.name }}</span>
+              <span class="product-price">S/ {{ product.price | number:'1.2-2' }}</span>
+            </div>
+            <span class="product-sku">SKU: {{ product.sku }}</span>
+          </div>
+          <div class="product-actions">
+            <button class="btn-details" mat-stroked-button (click)="openDetailDialog(product)">
+              <mat-icon>info_outline</mat-icon>
+              DETALLES
+            </button>
+            <button class="btn-add" mat-flat-button (click)="addToSale(product)">
+              <mat-icon>add_shopping_cart</mat-icon>
+              AGREGAR
+            </button>
+          </div>
+        </div>
+      }
+      @if (store.filteredProducts().length === 0) {
+        <div class="ds-empty">
+          <mat-icon>search_off</mat-icon>
+          <p>No se encontraron productos</p>
+        </div>
+      }
+    </div>
+
+  </div>
+
+  <!-- RIGHT: SALE PANEL (solo si hay items) -->
+  @if (store.saleItems().length > 0) {
+    <aside class="ds-panel">
+
+      <div class="panel-section panel-customer">
+        <div class="panel-section-header">
+          <span class="panel-section-title">
+            <mat-icon>person</mat-icon>
+            CLIENTE
+          </span>
+          <button class="btn-add-new" mat-button (click)="openAddCustomerDialog()">
+            <mat-icon>person_add</mat-icon>
+            Agregar Nuevo
+          </button>
+        </div>
+        @if (store.selectedCustomer(); as cust) {
+          <div class="customer-chip">
+            <div class="customer-chip-icon"><mat-icon>business</mat-icon></div>
+            <div class="customer-chip-info">
+              <span class="customer-chip-name">{{ cust.name }}</span>
+              <span class="customer-chip-doc">{{ cust.docType }}: {{ cust.docNumber }}</span>
+            </div>
+            <button class="customer-chip-remove" mat-icon-button (click)="removeCustomer()" matTooltip="Quitar cliente">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        } @else {
+          <div class="customer-search-wrapper">
+            <mat-icon class="customer-search-icon">search</mat-icon>
+            <input
+              class="customer-search-input"
+              type="text"
+              placeholder="DNI / RUC o Nombre..."
+              [value]="store.customerQuery()"
+              (input)="onCustomerSearch($event)"
+            />
+            @if (store.showCustomerDropdown() && store.filteredCustomers().length > 0) {
+              <div class="customer-dropdown">
+                @for (c of store.filteredCustomers(); track c.id) {
+                  <button class="customer-dropdown-item" (click)="pickCustomer(c)">
+                    <span class="cdi-name">{{ c.name }}</span>
+                    <span class="cdi-doc">{{ c.docType }}: {{ c.docNumber }}</span>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="panel-section panel-sale">
+        <div class="panel-section-header">
+          <span class="panel-section-title">
+            <mat-icon>receipt_long</mat-icon>
+            VENTA ACTUAL
+          </span>
+          <button class="btn-clear-sale" mat-button (click)="store.clearSale()" matTooltip="Limpiar venta">
+            <mat-icon>delete_sweep</mat-icon>
+          </button>
+        </div>
+        <div class="sale-items-list">
+          @for (item of store.saleItems(); track item.product.id) {
+            <div class="sale-item">
+              <div class="sale-item-header">
+                <span class="sale-item-name">{{ item.product.name }}</span>
+                <button class="sale-item-remove" mat-icon-button (click)="removeItem(item.product.id)" matTooltip="Eliminar">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+              <span class="sale-item-ref">REF: {{ item.product.sku }} | {{ item.product.stockUnit }}</span>
+              <div class="sale-item-controls">
+                <div class="qty-control">
+                  <button class="qty-btn" (click)="decrement(item.product.id, item.quantity)">&#8722;</button>
+                  <input class="qty-input" type="number" min="1" [value]="item.quantity" (change)="onQtyChange(item.product.id, $event)"/>
+                  <button class="qty-btn" (click)="increment(item.product.id, item.quantity)">+</button>
+                </div>
+                <div class="price-control">
+                  <span class="price-symbol">S/</span>
+                  <input class="price-input" type="number" min="0" step="0.01" [value]="item.unitPrice" (change)="onPriceChange(item.product.id, $event)"/>
+                </div>
+                <span class="sale-item-subtotal">S/ {{ (item.quantity * item.unitPrice) | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="sale-totals">
+          <div class="total-row"><span>Subtotal</span><span>S/ {{ store.subtotal() | number:'1.2-2' }}</span></div>
+          <div class="total-row"><span>Impuestos (IGV 18%)</span><span>S/ {{ store.taxes() | number:'1.2-2' }}</span></div>
+          <div class="total-row total-row--grand"><span>TOTAL A PAGAR</span><span>S/ {{ store.total() | number:'1.2-2' }}</span></div>
+        </div>
+      </div>
+
+      <div class="panel-actions">
+        <button class="btn-invoice" mat-flat-button [disabled]="!canGenerate()" (click)="generateInvoice()">
+          <mat-icon>receipt</mat-icon>
+          GENERAR VENTA (FACTURA)
+        </button>
+        <div class="panel-actions-row">
+          <button class="btn-boleta" mat-stroked-button (click)="generateBoleta()">
+            <mat-icon>description</mat-icon>BOLETA
+          </button>
+          <button class="btn-quote" mat-stroked-button (click)="generateQuote()">
+            <mat-icon>request_quote</mat-icon>COTIZACIÓN
+          </button>
+        </div>
+      </div>
+
+    </aside>
+  }
+
+</div>
