@@ -1,0 +1,31 @@
+<div class="ss-container">
+
+  <!-- Sub-route Tabs -->
+  <nav class="ss-tabs">
+    <a class="ss-tab"
+       routerLink="productos"
+       routerLinkActive="ss-tab--active">
+      <mat-icon>inventory_2</mat-icon>
+      Productos
+    </a>
+    <a class="ss-tab"
+       routerLink="cotizaciones"
+       routerLinkActive="ss-tab--active">
+      <mat-icon>receipt_long</mat-icon>
+      Mis Cotizaciones &amp; Proformas PDF
+    </a>
+    <a class="ss-tab"
+       routerLink="adelantos"
+       routerLinkActive="ss-tab--active">
+      <mat-icon>payments</mat-icon>
+      Registro de Adelantos
+    </a>
+  </nav>
+
+  <!-- Sub-route Content -->
+  <div class="ss-content">
+    <router-outlet/>
+  </div>
+
+</div>
+

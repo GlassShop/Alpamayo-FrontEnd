@@ -1,0 +1,88 @@
+<div class="cot-container">
+
+  <!-- Header -->
+  <div class="cot-header">
+    <div class="cot-header-left">
+      <mat-icon class="cot-header-icon">receipt_long</mat-icon>
+      <div>
+        <h2 class="cot-title">Mis Cotizaciones &amp; Proformas PDF</h2>
+        <p class="cot-subtitle">Historial de cotizaciones, facturas y boletas generadas</p>
+      </div>
+    </div>
+    <div class="cot-badge-count">
+      <span>{{ store.savedQuotes().length }}</span> documento(s)
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  @if (store.savedQuotes().length === 0) {
+    <div class="cot-empty">
+      <mat-icon>description</mat-icon>
+      <p>Aún no hay cotizaciones guardadas.</p>
+      <span>Ve a <strong>Productos</strong>, agrega artículos y genera tu primera cotización.</span>
+    </div>
+  }
+
+  <!-- Quotes List -->
+  @if (store.savedQuotes().length > 0) {
+    <div class="cot-list">
+      @for (quote of store.savedQuotes(); track quote.id) {
+        <div class="cot-card">
+          <div class="cot-card-left">
+            <div class="cot-contract-num">
+              <span class="cot-label">Nº</span>
+              <span class="cot-num">{{ quote.number }}</span>
+            </div>
+            <div [class]="'cot-type-badge ' + typeBadgeClass[quote.type]">
+              {{ typeLabelMap[quote.type] }}
+            </div>
+          </div>
+
+          <div class="cot-card-center">
+            <div class="cot-client">
+              <mat-icon>business</mat-icon>
+              <span>{{ quote.customer.name }}</span>
+            </div>
+            <div class="cot-meta">
+              <span class="cot-meta-item">
+                <mat-icon>calendar_today</mat-icon>
+                {{ quote.date | date:'dd/MM/yyyy HH:mm' }}
+              </span>
+              <span class="cot-meta-item">
+                <mat-icon>person</mat-icon>
+                {{ quote.sellerName }}
+              </span>
+              <span class="cot-meta-item">
+                <mat-icon>payments</mat-icon>
+                {{ quote.paymentMethod }}
+              </span>
+              <span class="cot-meta-item">
+                <mat-icon>inventory_2</mat-icon>
+                {{ quote.items.length }} producto(s)
+              </span>
+            </div>
+          </div>
+
+          <div class="cot-card-right">
+            <div class="cot-total-block">
+              <span class="cot-total-label">TOTAL</span>
+              <span class="cot-total-amount">S/ {{ quote.total | number:'1.2-2' }}</span>
+            </div>
+            @if (quote.partialPayment > 0) {
+              <div class="cot-saldo-block">
+                <span class="cot-saldo-label">SALDO</span>
+                <span class="cot-saldo-amount">S/ {{ (quote.total - quote.partialPayment) | number:'1.2-2' }}</span>
+              </div>
+            }
+            <button mat-flat-button class="btn-view" (click)="viewQuote(quote)">
+              <mat-icon>visibility</mat-icon>
+              Ver / Imprimir
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>
+

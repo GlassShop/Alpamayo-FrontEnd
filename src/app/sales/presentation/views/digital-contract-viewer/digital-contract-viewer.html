@@ -1,0 +1,258 @@
+<div class="dcv-page">
+
+  <!-- ══ PAGE HEADER ══ -->
+  <div class="dcv-page-header">
+    <div class="dcv-breadcrumb">
+      <button mat-icon-button class="btn-back" (click)="cancel()" matTooltip="Volver a Productos">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <span class="breadcrumb-text">Contratos</span>
+      <mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
+      <span class="breadcrumb-current">Nº {{ contractNumber() }}</span>
+    </div>
+
+    <div class="dcv-page-actions">
+      <button mat-stroked-button class="btn-print" (click)="printTicket()">
+        <mat-icon>print</mat-icon>
+        Print Ticket
+      </button>
+      <button mat-flat-button class="btn-pdf" (click)="printTicket()">
+        <mat-icon>picture_as_pdf</mat-icon>
+        Generate PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ MAIN CONTENT ══ -->
+  <div class="dcv-content">
+
+    <!-- LEFT: Contract Document -->
+    <div class="dcv-document-wrapper">
+      <div class="contract-doc">
+
+        <!-- Company header -->
+        <div class="contract-top">
+          <div class="company-block">
+            <div class="company-logo">A</div>
+            <div class="company-info">
+              <div class="company-name">VIDRERIA ALPAMAYO</div>
+              <div class="company-legal">VIDRERIA ALPAMAYO E.I.R.L.</div>
+              <div class="company-ruc">RUC: 20605230213</div>
+              <div class="company-desc">
+                Empresa dedicada a vidrios, aluminios y variantes.<br>
+                Muro cortina, puertas de ducha y cristal templado.
+              </div>
+            </div>
+          </div>
+
+          <div class="contract-num-block">
+            <div class="contract-type-label">CONTRACT / VOUCHER</div>
+            <div class="contract-number">Nº {{ contractNumber() }}</div>
+            <div class="contract-sede">
+              <strong>Sede Principal:</strong> Jr. Lucari y Torre Nº 418<br>
+              Ancash – Huaraz<br>
+              Email: vidreriaalpamayo&#64;gmail.com
+            </div>
+          </div>
+
+          <div class="contract-badge">
+            <div class="badge-text">CONTRATO</div>
+            <div class="badge-sub">VALIDEZ DIGITAL</div>
+          </div>
+        </div>
+
+        <!-- Customer info -->
+        <div class="contract-info">
+          <div class="info-row">
+            <div class="info-cell info-cell--lg">
+              <span class="info-label">CLIENTE</span>
+              <span class="info-value">{{ store.selectedCustomer()?.name || '—' }}</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">TELÉFONO</span>
+              <span class="info-value">—</span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-cell info-cell--lg">
+              <span class="info-label">DIRECCIÓN</span>
+              <span class="info-value">—</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">DNI/RUC</span>
+              <span class="info-value">
+                {{ store.selectedCustomer()?.docType }}: {{ store.selectedCustomer()?.docNumber }}
+              </span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-cell">
+              <span class="info-label">VENDEDOR</span>
+              <span class="info-value">{{ sellerName() }}</span>
+            </div>
+            <div class="info-cell">
+              <span class="info-label">MONEDA</span>
+              <span class="info-value">{{ currency() }}</span>
+            </div>
+            <div class="info-cell info-cell--lg">
+              <span class="info-label">MEDIO DE PAGO</span>
+              <span class="info-value">{{ paymentMethod() }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Items table -->
+        <table class="contract-table">
+          <thead>
+            <tr>
+              <th class="col-item">Item</th>
+              <th class="col-desc">Descripción</th>
+              <th class="col-num">Cant.</th>
+              <th class="col-num">M2</th>
+              <th class="col-price">Unitario</th>
+              <th class="col-price">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of store.saleItems(); track item.product.id; let i = $index) {
+              <tr>
+                <td class="col-item tc">{{ i + 1 }}</td>
+                <td class="col-desc">{{ item.product.name }}</td>
+                <td class="col-num tc">{{ item.quantity }}</td>
+                <td class="col-num tc">{{ item.product.stockUnit === 'm²' ? (item.quantity | number:'1.2-2') : '–' }}</td>
+                <td class="col-price tr">S/ {{ item.unitPrice | number:'1.2-2' }}</td>
+                <td class="col-price tr fw">S/ {{ (item.quantity * item.unitPrice) | number:'1.2-2' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <!-- Bottom: BCP + totals -->
+        <div class="contract-bottom">
+          <div class="contract-bottom-left">
+            <div class="bcp-card">
+              <div class="bcp-badge">BCP</div>
+              <div class="bcp-details">
+                <div class="bcp-title">CUENTA CORRIENTE BCP SOLES</div>
+                <div class="bcp-num">375-2293641-0-67</div>
+                <div class="bcp-cci">CCI: 00237500229364106743</div>
+              </div>
+            </div>
+            <div class="contract-note">
+              <strong>Despacho:</strong> Sucursal Alpamayo: Los Libertadores Nº 235.<br>
+              Este documento es una representación digital del contrato físico original.
+              La veracidad de los datos puede ser consultada mediante el código QR lateral.
+            </div>
+          </div>
+
+          <div class="contract-totals">
+            <div class="totals-row"><span>OP. GRAVADA</span><span>S/ {{ store.subtotal() | number:'1.2-2' }}</span></div>
+            <div class="totals-row igv-row"><span>IGV (18.0%)</span><span>S/ {{ store.taxes() | number:'1.2-2' }}</span></div>
+            <div class="totals-row grand-total">
+              <span>IMP. TOTAL</span><span>S/ {{ store.total() | number:'1.2-2' }}</span>
+            </div>
+            <div class="totals-divider"></div>
+            <div class="totals-row pay-row">
+              <span>PAGO A CUENTA</span><span>S/ {{ partialPayment() | number:'1.2-2' }}</span>
+            </div>
+            <div class="totals-row saldo-row">
+              <span>SALDO A PAGAR</span><span>S/ {{ saldoPagar | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="contract-footer">
+          <span>VitroPro Systems v2.4.1</span>
+          <span>Security Protocol: TLS 1.3</span>
+          <span>⚙ System Online</span>
+          <span>2024 © Vidrería Alpamayo</span>
+        </div>
+
+      </div><!-- /contract-doc -->
+    </div>
+
+    <!-- RIGHT: Form Panel -->
+    <aside class="dcv-form-panel">
+
+      <div class="form-panel-header">
+        <mat-icon>edit_document</mat-icon>
+        <h3>Datos del Documento</h3>
+      </div>
+
+      <div class="form-section">
+        <div class="form-label">Tipo de Documento</div>
+        <div class="form-type-badge">{{ typeLabel }}</div>
+      </div>
+
+      <div class="form-section">
+        <label class="form-label">Vendedor</label>
+        <input class="form-input" [value]="sellerName()" (input)="sellerName.set($any($event.target).value)" placeholder="Nombre del vendedor"/>
+      </div>
+
+      <div class="form-section">
+        <label class="form-label">Moneda</label>
+        <select class="form-input" [value]="currency()" (change)="currency.set($any($event.target).value)">
+          <option>Soles (PEN)</option>
+          <option>Dólares (USD)</option>
+        </select>
+      </div>
+
+      <div class="form-section">
+        <label class="form-label">Medio de Pago</label>
+        <select class="form-input" [value]="paymentMethod()" (change)="paymentMethod.set($any($event.target).value)">
+          <option>Efectivo</option>
+          <option>Efectivo / Transferencia BCP</option>
+          <option>Transferencia Bancaria</option>
+          <option>Depósito Bancario</option>
+          <option>Yape / Plin</option>
+          <option>Tarjeta de Crédito / Débito</option>
+        </select>
+      </div>
+
+      <div class="form-section">
+        <label class="form-label">Pago a Cuenta (S/)</label>
+        <div class="form-price-input">
+          <span class="form-currency">S/</span>
+          <input class="form-input form-input--price" type="number" min="0" step="0.01"
+                 [value]="partialPayment()"
+                 (input)="partialPayment.set(+$any($event.target).value || 0)"
+                 placeholder="0.00"/>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="form-summary">
+        <div class="summary-row"><span>Subtotal</span><span>S/ {{ store.subtotal() | number:'1.2-2' }}</span></div>
+        <div class="summary-row"><span>IGV (18%)</span><span>S/ {{ store.taxes() | number:'1.2-2' }}</span></div>
+        <div class="summary-row summary-total"><span>Total</span><span>S/ {{ store.total() | number:'1.2-2' }}</span></div>
+        @if (partialPayment() > 0) {
+          <div class="summary-row summary-saldo"><span>Saldo a Pagar</span><span>S/ {{ saldoPagar | number:'1.2-2' }}</span></div>
+        }
+        <div class="summary-items">{{ store.saleItems().length }} producto(s)</div>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button mat-flat-button class="btn-save" (click)="confirm()" [disabled]="!store.selectedCustomer()">
+          <mat-icon>save</mat-icon>
+          Guardar {{ typeLabel }}
+        </button>
+        <button mat-stroked-button class="btn-cancel" (click)="cancel()">
+          <mat-icon>arrow_back</mat-icon>
+          Volver
+        </button>
+      </div>
+
+      @if (!store.selectedCustomer()) {
+        <div class="form-warning">
+          <mat-icon>warning</mat-icon>
+          <span>Debes seleccionar un cliente para guardar.</span>
+        </div>
+      }
+
+    </aside>
+  </div>
+
+</div>
+

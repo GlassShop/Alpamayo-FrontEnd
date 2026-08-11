@@ -1,0 +1,71 @@
+/* ── host ─────────────────────────────────────────────────────────────────── */
+:host {
+  display: block;
+  height: 100%;
+}
+
+/* ── container ────────────────────────────────────────────────────────────── */
+.ss-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── tabs ─────────────────────────────────────────────────────────────────── */
+.ss-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 16px 0;
+  background: #ffffff;
+  border-bottom: 2px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.ss-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid transparent;
+  border-bottom: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all .15s ease;
+  margin-bottom: -2px;
+  white-space: nowrap;
+}
+.ss-tab mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+.ss-tab:hover {
+  color: #3b82f6;
+  background: #f0f9ff;
+}
+.ss-tab--active {
+  color: #2563eb;
+  background: #eff6ff;
+  border-color: #e2e8f0;
+  border-bottom-color: #eff6ff;
+  font-weight: 700;
+}
+.ss-tab--active mat-icon {
+  color: #2563eb;
+}
+
+/* ── content ──────────────────────────────────────────────────────────────── */
+.ss-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 16px;
+  background: #f8fafc;
+}
+
