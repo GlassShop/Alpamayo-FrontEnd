@@ -4,7 +4,8 @@ const pageNotFound = () => import('./shared/presentation/views/page-not-found/pa
 const sellerShell  = () => import('./shared/presentation/components/seller-shell/seller-shell').then(m => m.SellerShell);
 const dashboard    = () => import('./sellers/presentation/views/dashboard/dashboard').then(m => m.Dashboard);
 const quotingNew   = () => import('./sellers/presentation/views/quoting-new/quoting-new').then(m => m.QuotingNew);
-const quotesList   = () => import('./sellers/presentation/views/quotes-list/quotes-list').then(m => m.QuotesList);
+// Ventas & CRM → Sales bounded context
+const salesView    = () => import('./sales/presentation/views/direct-sales/direct-sales').then(m => m.DirectSales);
 const directSales  = () => import('./sellers/presentation/views/direct-sales/direct-sales').then(m => m.DirectSales);
 const cashRegister = () => import('./sellers/presentation/views/cash-register/cash-register').then(m => m.CashRegister);
 const orderTracking = () => import('./sellers/presentation/views/order-tracking/order-tracking').then(m => m.OrderTracking);
@@ -22,7 +23,7 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard',   loadComponent: dashboard },
       { path: 'quoting/new', loadComponent: quotingNew },
-      { path: 'quotes',      loadComponent: quotesList },
+      { path: 'quotes',      loadComponent: salesView },
       { path: 'sales',       loadComponent: directSales },
       { path: 'cash',        loadComponent: cashRegister },
       { path: 'orders',      loadComponent: orderTracking },
