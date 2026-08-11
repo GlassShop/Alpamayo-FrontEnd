@@ -2,6 +2,7 @@ import {computed, Injectable, signal} from '@angular/core';
 import {Product, ProductCategory} from '../domain/model/product.entity';
 import {Customer} from '../domain/model/customer.entity';
 import {SaleItem} from '../domain/model/sale-item.entity';
+import {Quote} from '../domain/model/quote.entity';
 
 const MOCK_PRODUCTS: Product[] = [
   { id: 'p1', name: 'TEMPERED GLASS 10MM', sku: 'TG-10MM-CLR', category: 'glass',      price: 145.00, stock: 248, stockUnit: 'm²' },
@@ -110,6 +111,21 @@ export class SalesStore {
   }
 
   clearSale(): void { this.saleItems.set([]); }
+
+  // ── saved quotes ───────────────────────────────────────────────────────────
+  readonly savedQuotes = signal<Quote[]>([]);
+  readonly pendingContractType = signal<import('../domain/model/quote.entity').QuoteType | null>(null);
+
+  setPendingContractType(type: import('../domain/model/quote.entity').QuoteType): void {
+    this.pendingContractType.set(type);
+  }
+
+  saveQuote(quote: Quote): void {
+    this.savedQuotes.update(list => [quote, ...list]);
+    this.pendingContractType.set(null);
+    this.clearSale();
+    this.clearCustomer();
+  }
 
   // ── customer actions ───────────────────────────────────────────────────────
   setCustomerQuery(q: string): void {

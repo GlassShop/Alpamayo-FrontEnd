@@ -1,9 +1,14 @@
 /* ── layout ─────────────────────────────────────────────────────────────── */
+:host {
+  display: block;
+  height: 100%;
+}
+
 .ds-layout {
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
-  height: calc(100vh - 64px);
+  height: 100%;
   overflow: hidden;
   transition: grid-template-columns .3s ease;
 }

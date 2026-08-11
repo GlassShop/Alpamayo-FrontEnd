@@ -1,6 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {DecimalPipe} from '@angular/common';
 import {FormsModule} from '@angular/forms';
+import {Router, ActivatedRoute} from '@angular/router';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {MatTooltipModule} from '@angular/material/tooltip';
@@ -8,6 +9,7 @@ import {MatDialogModule, MatDialog} from '@angular/material/dialog';
 import {SalesStore} from '../../../application/sales.store';
 import {Product, ProductCategory} from '../../../domain/model/product.entity';
 import {Customer} from '../../../domain/model/customer.entity';
+import {QuoteType} from '../../../domain/model/quote.entity';
 import {AddCustomerDialogComponent} from './add-customer-dialog/add-customer-dialog';
 import {ProductDetailDialogComponent} from './product-detail-dialog/product-detail-dialog';
 
@@ -26,6 +28,8 @@ interface CategoryTab { key: CategoryFilter; label: string; icon: string; }
 export class DirectSales {
   readonly store  = inject(SalesStore);
   readonly dialog = inject(MatDialog);
+  readonly router = inject(Router);
+  readonly route  = inject(ActivatedRoute);
 
   readonly categories: CategoryTab[] = [
     { key: 'all',         label: 'ALL',        icon: 'apps' },
@@ -95,22 +99,14 @@ export class DirectSales {
     return this.store.saleItems().length > 0 && this.store.selectedCustomer() !== null;
   }
 
-  generateInvoice(): void {
-    if (!this.canGenerate()) return;
-    alert(`FACTURA generada – Total: S/ ${this.store.total().toFixed(2)}`);
-    this.store.clearSale();
+  private navigateToContract(type: QuoteType): void {
+    if (this.store.saleItems().length === 0) return;
+    this.store.setPendingContractType(type);
+    this.router.navigate(['../contrato'], { relativeTo: this.route });
   }
 
-  generateBoleta(): void {
-    if (this.store.saleItems().length === 0) return;
-    alert(`BOLETA generada – Total: S/ ${this.store.total().toFixed(2)}`);
-    this.store.clearSale();
-  }
-
-  generateQuote(): void {
-    if (this.store.saleItems().length === 0) return;
-    alert(`COTIZACIÓN guardada – Total: S/ ${this.store.total().toFixed(2)}`);
-    this.store.clearSale();
-  }
+  generateInvoice(): void { this.navigateToContract('factura'); }
+  generateBoleta(): void  { this.navigateToContract('boleta'); }
+  generateQuote(): void   { this.navigateToContract('cotizacion'); }
 }
 

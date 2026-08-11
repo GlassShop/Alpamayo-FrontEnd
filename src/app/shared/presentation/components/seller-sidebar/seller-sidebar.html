@@ -3,23 +3,70 @@
   @if (!collapsed) {
     <div class="brand-text">
       <span class="brand-sub">Vidrieria</span>
-        <span class="brand-name">Alpamayo</span>
-        <span class="brand-tagline">Ventas Mayoristas</span>
+      <span class="brand-name">Alpamayo</span>
+      <span class="brand-tagline">Ventas Mayoristas</span>
     </div>
   }
 </div>
+
 <nav class="sidebar-nav">
-  @for (option of options(); track option.link) {
-    <a class="nav-item" [routerLink]="option.link" routerLinkActive="nav-item--active"
-       [routerLinkActiveOptions]="{exact: false}"
-       [matTooltip]="collapsed ? option.label : ''" matTooltipPosition="right">
-      <mat-icon class="nav-icon">{{ option.icon }}</mat-icon>
-      @if (!collapsed) { <span class="nav-label">{{ option.label }}</span> }
-    </a>
+  @for (option of options(); track (option.key ?? option.link)) {
+
+    @if (option.children) {
+      <!-- ── Expandable group ── -->
+      <div class="nav-group"
+           [class.nav-group--active]="isChildActive(option.children)"
+           [class.nav-group--open]="isExpanded(option.key!)">
+
+        <button class="nav-item nav-item--parent"
+                [class.nav-item--parent-active]="isChildActive(option.children)"
+                (click)="onParentClick(option)"
+                [matTooltip]="collapsed ? option.label : ''"
+                matTooltipPosition="right">
+          <mat-icon class="nav-icon">{{ option.icon }}</mat-icon>
+          @if (!collapsed) {
+            <span class="nav-label">{{ option.label }}</span>
+            <mat-icon class="nav-chevron">
+              {{ isExpanded(option.key!) ? 'expand_less' : 'expand_more' }}
+            </mat-icon>
+          }
+        </button>
+
+        @if (!collapsed && isExpanded(option.key!)) {
+          <div class="nav-children">
+            @for (child of option.children; track child.link) {
+              <a class="nav-item nav-item--child"
+                 [routerLink]="child.link"
+                 routerLinkActive="nav-item--active"
+                 [routerLinkActiveOptions]="{exact: false}">
+                <mat-icon class="nav-icon nav-icon--child">{{ child.icon }}</mat-icon>
+                <span class="nav-label">{{ child.label }}</span>
+              </a>
+            }
+          </div>
+        }
+      </div>
+
+    } @else {
+      <!-- ── Regular item ── -->
+      <a class="nav-item"
+         [routerLink]="option.link!"
+         routerLinkActive="nav-item--active"
+         [routerLinkActiveOptions]="{exact: false}"
+         [matTooltip]="collapsed ? option.label : ''"
+         matTooltipPosition="right">
+        <mat-icon class="nav-icon">{{ option.icon }}</mat-icon>
+        @if (!collapsed) { <span class="nav-label">{{ option.label }}</span> }
+      </a>
+    }
+
   }
 </nav>
+
 <div class="sidebar-user">
-  <div class="user-avatar" [matTooltip]="collapsed ? 'Carlos M. · Activo' : ''" matTooltipPosition="right">CM</div>
+  <div class="user-avatar"
+       [matTooltip]="collapsed ? 'Carlos M. · Activo' : ''"
+       matTooltipPosition="right">CM</div>
   @if (!collapsed) {
     <div class="user-info">
       <span class="user-name">Carlos M.</span>
@@ -27,4 +74,3 @@
     </div>
   }
 </div>
-
