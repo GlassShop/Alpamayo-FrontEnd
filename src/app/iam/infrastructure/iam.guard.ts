@@ -1,57 +1,34 @@
-import {CanActivateFn, Router} from '@angular/router';
-import {IamStore} from '../application/iam.store';
 import {inject} from '@angular/core';
+import {CanActivateChildFn, CanActivateFn, Router} from '@angular/router';
+import {HOME_PATH, IamStore, SIGN_IN_PATH} from '../application/iam.store';
+import {Permission} from '../domain/model/permission';
 
 /**
- * Route guard protecting pages that require authentication.
- *
- * @remarks
- * In Angular, a guard is a service that controls whether a route can be activated.
- * This guard implements the CanActivateFn function type, which allows it to:
- * - Check if the user has an active authentication session
- * - Allow navigation if authenticated
- * - Redirect to sign-in page if not authenticated
- *
- * Use this guard on routes that should only be accessible to signed-in users:
- *
- * ```typescript
- * const routes: Routes = [
- *   { path: 'home', component: HomeComponent, canActivate: [iamGuard] },
- *   { path: 'profile', component: ProfileComponent, canActivate: [iamGuard] }
- * ];
- * ```
- *
- * @param route - The target route being activated
- * @param state - The current router state
- * @returns true if the user is authenticated (allow navigation), false otherwise
+ * Requires a valid session. Otherwise sends the user to the sign-in page and
+ * remembers the requested URL in `?volver=` to come back after signing in.
  *
  * @example
- * ```typescript
- * // In your routing configuration:
- * const routes: Routes = [
- *   {
- *     path: 'dashboard',
- *     component: DashboardComponent,
- *     canActivate: [iamGuard] // Protect this route
- *   },
- *   {
- *     path: 'iam',
- *     children: [
- *       { path: 'iniciar-sesion', component: SignInComponent }
- *     ]
- *   }
- * ];
- * ```
+ * { path: '', component: Shell, canActivate: [authGuard], canActivateChild: [permissionGuard], children: [...] }
  */
-export const iamGuard: CanActivateFn = () => {
+export const authGuard: CanActivateFn = (_route, state) => {
+  if (inject(IamStore).hasValidSession()) return true;
+  return inject(Router).createUrlTree([SIGN_IN_PATH], {queryParams: {volver: state.url}});
+};
+
+/**
+ * Checks the permission declared in the route's `data.permission`.
+ * Routes without a permission are allowed to any signed-in user.
+ * A user without the permission is sent to the quoter, which every role can use.
+ */
+export const permissionGuard: CanActivateChildFn = (childRoute, state) => {
   const store = inject(IamStore);
   const router = inject(Router);
-  if (store.isSignedIn()) {
-    // User is authenticated, allow navigation
-    return true;
-  } else {
-    // User is not authenticated, redirect to sign-in page
-    router.navigate(['/iniciar-sesion']).then();
-    return false;
-  }
-}
+  if (!store.hasValidSession()) return router.createUrlTree([SIGN_IN_PATH], {queryParams: {volver: state.url}});
+  const permission = childRoute.data?.['permission'] as Permission | undefined;
+  return !permission || store.can(permission) ? true : router.createUrlTree([HOME_PATH]);
+};
+
+/** Keeps signed-in users away from the sign-in page. */
+export const guestGuard: CanActivateFn = () => {
+  return inject(IamStore).hasValidSession() ? inject(Router).createUrlTree([HOME_PATH]) : true;
+};
