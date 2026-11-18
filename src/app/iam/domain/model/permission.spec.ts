@@ -7,6 +7,7 @@ const matrix: Record<Permission, Record<Role, boolean>> = {
   'catalog.add-product': {CEO: true, SELLER: true,  WAREHOUSE: true},
   'prices.manage':       {CEO: true, SELLER: false, WAREHOUSE: false},
   'users.manage':        {CEO: true, SELLER: false, WAREHOUSE: false},
+  'quotes.view-all':     {CEO: true, SELLER: false, WAREHOUSE: false},
   'settings':            {CEO: true, SELLER: true,  WAREHOUSE: true},
 };
 

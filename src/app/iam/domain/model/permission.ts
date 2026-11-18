@@ -11,6 +11,7 @@ export type Permission =
   | 'catalog.add-product' // add a new glass type (without price)
   | 'prices.manage'       // set prices and create price lists
   | 'users.manage'        // create accounts, change roles, reset passwords
+  | 'quotes.view-all'     // see and edit every seller's saved quotes
   | 'settings';           // interface preferences
 
 const EVERYONE: readonly Permission[] = ['quote', 'catalog.view', 'catalog.add-product', 'settings'];
@@ -20,7 +21,7 @@ const EVERYONE: readonly Permission[] = ['quote', 'catalog.view', 'catalog.add-p
  * role tells them apart. The CEO holds every permission.
  */
 export const ROLE_PERMISSIONS: Readonly<Record<Role, readonly Permission[]>> = {
-  CEO: [...EVERYONE, 'prices.manage', 'users.manage'],
+  CEO: [...EVERYONE, 'prices.manage', 'users.manage', 'quotes.view-all'],
   SELLER: EVERYONE,
   WAREHOUSE: EVERYONE,
 };
