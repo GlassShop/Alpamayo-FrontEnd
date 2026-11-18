@@ -94,6 +94,7 @@ server.use((req, res, next) => {
   const writes = req.method !== 'GET';
   const ceoOnly =
     req.path.startsWith('/users') ||
+    req.path.startsWith('/price-history') ||
     (writes && (req.path.startsWith('/prices') || req.path.startsWith('/price-lists'))) ||
     (writes && req.path.startsWith('/glass-types') && req.method !== 'POST');
   if (ceoOnly && !isCeo) return res.status(403).json({code: 'forbidden'});
@@ -145,10 +146,68 @@ server.patch('/users/:id', (req, res, next) => {
 server.all(['/users', '/users/:id'], (req, res, next) =>
   ['PUT', 'DELETE'].includes(req.method) ? res.status(405).json({code: 'not-allowed'}) : next());
 
+// ── prices and their history ─────────────────────────────────────────────
+// Price writes are handled here (not by json-server) so that every real
+// change leaves an immutable history entry with who, when and why.
+const MAX_REASON = 140;
+const round2 = (n) => Math.round((Number(n) + Number.EPSILON) * 100) / 100;
+const history = () => db.get('price-history');
+
+function recordPriceChange(price, previousPrice, user, rawReason) {
+  const reason = String(rawReason ?? '').trim().slice(0, MAX_REASON);
+  const id = history().value().reduce((max, h) => Math.max(max, h.id), 0) + 1;
+  history().push({
+    id, priceId: price.id, glassTypeId: price.glassTypeId, priceListId: price.priceListId,
+    previousPrice, newPrice: price.pricePerSqFt, ...(reason ? {reason} : {}),
+    changedAt: new Date().toISOString(), changedBy: {id: user.id, fullName: user.fullName},
+  }).write();
+}
+
+const validPrice = (v) => typeof v === 'number' && Number.isFinite(v) && v > 0;
+
+server.post('/prices', (req, res) => {
+  const {glassTypeId, priceListId, pricePerSqFt, changeReason} = req.body ?? {};
+  if (!validPrice(pricePerSqFt) || !db.get('glass-types').find({id: glassTypeId}).value() || !db.get('price-lists').find({id: priceListId}).value()) {
+    return res.status(400).json({code: 'invalid-price'});
+  }
+  if (db.get('prices').find({glassTypeId, priceListId}).value()) return res.status(409).json({code: 'price-exists'});
+  const id = db.get('prices').value().reduce((max, p) => Math.max(max, p.id), 0) + 1;
+  const price = {id, glassTypeId, priceListId, pricePerSqFt: round2(pricePerSqFt)};
+  db.get('prices').push(price).write();
+  recordPriceChange(price, null, req.currentUser, changeReason);
+  res.status(201).json(price);
+});
+
+server.all('/prices/:id', (req, res, next) => {
+  if (!['PUT', 'PATCH'].includes(req.method)) return next();
+  const existing = db.get('prices').find({id: Number(req.params.id)}).value();
+  if (!existing) return res.status(404).json({code: 'not-found'});
+  const {pricePerSqFt, changeReason} = req.body ?? {};
+  if (!validPrice(pricePerSqFt)) return res.status(400).json({code: 'invalid-price'});
+  const newPrice = round2(pricePerSqFt);
+  if (newPrice === existing.pricePerSqFt) return res.json(existing); // no change, no history entry
+  const previous = existing.pricePerSqFt;
+  const updated = {...existing, pricePerSqFt: newPrice};
+  db.get('prices').find({id: existing.id}).assign(updated).write();
+  recordPriceChange(updated, previous, req.currentUser, changeReason);
+  res.json(updated);
+});
+
+server.get('/price-history', (req, res) => {
+  const glassTypeId = req.query.glassTypeId ? Number(req.query.glassTypeId) : null;
+  const priceListId = req.query.priceListId ? Number(req.query.priceListId) : null;
+  res.json(history()
+    .filter(h => (glassTypeId === null || h.glassTypeId === glassTypeId) && (priceListId === null || h.priceListId === priceListId))
+    .orderBy(['changedAt', 'id'], ['desc', 'desc'])
+    .value());
+});
+
+// The history is append-only: it cannot be edited or deleted.
+server.all(['/price-history', '/price-history/:id'], (req, res) => res.status(405).json({code: 'not-allowed'}));
+
 // ── quotes ───────────────────────────────────────────────────────────────
 // Sellers and warehouse staff see only their own quotes; the CEO sees all.
 // Totals and glass prices are re-checked so a client cannot tamper with them.
-const round2 = (n) => Math.round((Number(n) + Number.EPSILON) * 100) / 100;
 const PAYMENT_METHODS = ['CASH', 'YAPE', 'PLIN', 'CARD'];
 const quotes = () => db.get('quotes');
 const canSee = (user, quote) => user.role === 'CEO' || quote.seller.id === user.id;
