@@ -1,0 +1,24 @@
+<header class="al-page-header">
+  <div>
+    <h1 class="al-page-title">{{ 'configuration.title' | translate }}</h1>
+    <p class="al-page-subtitle">{{ 'configuration.subtitle' | translate }}</p>
+  </div>
+  <a class="al-btn al-btn--secondary" routerLink="/cotizador">
+    <mat-icon>arrow_back</mat-icon> {{ 'configuration.back' | translate }}
+  </a>
+</header>
+
+<section class="al-card cfg-card">
+  <div class="al-card-header">
+    <h2 class="al-card-title"><mat-icon>language</mat-icon>{{ 'configuration.language.title' | translate }}</h2>
+  </div>
+  <div class="al-card-body">
+    <p class="al-muted cfg-desc">{{ 'configuration.language.description' | translate }}</p>
+    <mat-button-toggle-group [value]="configStore.activeLang()" appearance="standard"
+                             [attr.aria-label]="'configuration.language.title' | translate">
+      @for (lang of configStore.availableLangs; track lang) {
+        <mat-button-toggle [value]="lang" (click)="setLanguage(lang)">{{ lang.toUpperCase() }}</mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+  </div>
+</section>

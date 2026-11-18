@@ -2,8 +2,6 @@ import {Component, inject} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {TranslateModule} from '@ngx-translate/core';
 import {MatIconModule} from '@angular/material/icon';
-import {MatButtonModule} from '@angular/material/button';
-import {MatCardModule} from '@angular/material/card';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {ConfigurationStore} from '../../../application/configuration.store';
 
@@ -11,7 +9,7 @@ import {ConfigurationStore} from '../../../application/configuration.store';
   selector: 'app-configuration',
   imports: [
     RouterLink, TranslateModule,
-    MatIconModule, MatButtonModule, MatCardModule, MatButtonToggleModule
+    MatIconModule, MatButtonToggleModule
   ],
   templateUrl: './configuration.html',
   styleUrl: './configuration.css'

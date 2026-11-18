@@ -18,7 +18,7 @@ export class ConfigurationStore {
 
   setLanguage(lang: string): void {
     if (!this.availableLangs.includes(lang as 'es' | 'en')) return;
-    localStorage.setItem(LANG_KEY, lang);
+    try { globalThis.localStorage?.setItem(LANG_KEY, lang); } catch { /* storage unavailable: keep in memory only */ }
     this.activeLangSignal.set(lang);
     this.applyLang(lang);
   }
@@ -28,7 +28,8 @@ export class ConfigurationStore {
   }
 
   private resolveInitialLang(): string {
-    const stored = localStorage.getItem(LANG_KEY);
+    let stored: string | null = null;
+    try { stored = globalThis.localStorage?.getItem(LANG_KEY) ?? null; } catch { /* storage unavailable */ }
     if (stored && this.availableLangs.includes(stored as 'es' | 'en')) return stored;
     return 'es';
   }
