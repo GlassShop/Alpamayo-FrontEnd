@@ -1,24 +1,50 @@
-<div class="form">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>{{ 'iam.sign-in.title' | translate }}</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="form" (submit)="performSignIn()">
-        <mat-form-field>
-          <input matInput [placeholder]="'iam.sign-in.username' | translate" id="username" name="username" required formControlName="username" autocomplete="username">
-          @if (isInvalidControl(form,'username')) {
-            <mat-error>{{ errorMessagesForControl(form,'username')}}</mat-error>
-          }
-        </mat-form-field>
-        <mat-form-field>
-          <input matInput type="password" [placeholder]="'iam.sign-in.password' | translate" id="password" name="password" formControlName="password" autocomplete="current-password">
-          @if (isInvalidControl(form,'password')) {
-            <mat-error>{{ errorMessagesForControl(form,'password')}}</mat-error>
-          }
-        </mat-form-field>
-        <button mat-raised-button color="primary">{{ 'iam.sign-in.submit' | translate }}</button>
-      </form>
-    </mat-card-content>
-  </mat-card>
-</div>
+<main class="si-page">
+  <section class="al-card si-card" aria-labelledby="si-title">
+    <div class="si-brand">
+      <div class="si-mark" aria-hidden="true"><mat-icon>window</mat-icon></div>
+      <div>
+        <span class="si-name">Vidriería Alpamayo</span>
+        <span class="si-tagline">{{ 'iam.sign-in.tagline' | translate }}</span>
+      </div>
+    </div>
+
+    <h1 class="si-title" id="si-title">{{ 'iam.sign-in.title' | translate }}</h1>
+    <p class="al-muted si-subtitle">{{ 'iam.sign-in.subtitle' | translate }}</p>
+
+    @if (store.signInError(); as error) {
+      <div class="al-alert al-alert--error" role="alert">
+        <mat-icon>error_outline</mat-icon><span>{{ 'iam.sign-in.error.' + error | translate }}</span>
+      </div>
+    }
+
+    <form class="si-form" [formGroup]="form" (ngSubmit)="performSignIn()" novalidate>
+      <div class="al-field">
+        <label class="al-label" for="si-username">{{ 'iam.sign-in.username' | translate }}</label>
+        <input class="al-input" id="si-username" formControlName="username" autocomplete="username" autocapitalize="none"
+               spellcheck="false" aria-describedby="si-username-msg" (input)="store.clearSignInError()"/>
+        <span id="si-username-msg" class="al-error-text">@if (isInvalidControl(form, 'username')) { {{ errorMessagesForControl(form, 'username') }} }</span>
+      </div>
+
+      <div class="al-field">
+        <label class="al-label" for="si-password">{{ 'iam.sign-in.password' | translate }}</label>
+        <span class="si-password">
+          <input class="al-input" id="si-password" [type]="showPassword ? 'text' : 'password'" formControlName="password"
+                 autocomplete="current-password" aria-describedby="si-password-msg" (input)="store.clearSignInError()"/>
+          <button type="button" class="al-icon-btn si-eye" (click)="showPassword = !showPassword"
+                  [attr.aria-label]="(showPassword ? 'iam.sign-in.hide-password' : 'iam.sign-in.show-password') | translate"
+                  [attr.aria-pressed]="showPassword">
+            <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </span>
+        <span id="si-password-msg" class="al-error-text">@if (isInvalidControl(form, 'password')) { {{ errorMessagesForControl(form, 'password') }} }</span>
+      </div>
+
+      <button class="al-btn al-btn--primary al-btn--block" type="submit" [disabled]="store.signingIn()">
+        <mat-icon>{{ store.signingIn() ? 'hourglass_empty' : 'login' }}</mat-icon>
+        {{ (store.signingIn() ? 'iam.sign-in.signing-in' : 'iam.sign-in.submit') | translate }}
+      </button>
+    </form>
+
+    <p class="al-muted si-help">{{ 'iam.sign-in.help' | translate }}</p>
+  </section>
+</main>

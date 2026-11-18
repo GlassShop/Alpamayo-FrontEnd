@@ -1,56 +1,35 @@
 import {Component, inject} from '@angular/core';
-import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
-import {MatButton} from '@angular/material/button';
-import {MatInput} from '@angular/material/input';
-import {MatError, MatFormField} from '@angular/material/form-field';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {Router} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
+import {MatIconModule} from '@angular/material/icon';
+import {TranslatePipe} from '@ngx-translate/core';
 import {IamStore} from '../../../application/iam.store';
 import {SignInCommand} from '../../../domain/model/sign-in.command';
-import {TranslatePipe} from '@ngx-translate/core';
 import {BaseForm} from '../../../../shared/presentation/components/base-form/base-form';
 
 /**
- * Collects credentials and triggers IAM sign-in.
+ * Sign-in page. Accounts are created by the CEO, so there is no sign-up link.
+ * After signing in, the user returns to the page they asked for (`?volver=`).
  */
 @Component({
   selector: 'app-sign-in-form',
-  imports: [
-    MatCard,
-    MatCardHeader,
-    MatCardTitle,
-    MatCardContent,
-    MatFormField,
-    MatError,
-    MatButton,
-    MatInput,
-    ReactiveFormsModule,
-    TranslatePipe
-  ],
+  imports: [ReactiveFormsModule, TranslatePipe, MatIconModule],
   templateUrl: './sign-in-form.html',
   styleUrl: './sign-in-form.css'
 })
 export class SignInForm extends BaseForm {
-  private router = inject(Router);
-  private store = inject(IamStore);
+  readonly store = inject(IamStore);
+  private readonly route = inject(ActivatedRoute);
+  showPassword = false;
 
-  /**
-   * Form-group for the sign-in form.
-   */
-  form = new FormGroup({
+  readonly form = new FormGroup({
     username: new FormControl('', {nonNullable: true, validators: [Validators.required]}),
     password: new FormControl('', {nonNullable: true, validators: [Validators.required]})
   });
 
-  /**
-   * Performs the sign-in operation if the form is valid.
-   */
-  performSignIn() {
-    if (this.form.invalid) return;
-    const signInCommand = new SignInCommand({
-      username: this.form.value.username!,
-      password: this.form.value.password!
-    });
-    this.store.signIn(signInCommand, this.router);
+  performSignIn(): void {
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    const {username, password} = this.form.getRawValue();
+    this.store.signIn(new SignInCommand({username, password}), this.route.snapshot.queryParamMap.get('volver'));
   }
 }

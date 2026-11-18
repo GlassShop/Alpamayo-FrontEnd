@@ -1,7 +1,23 @@
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  max-width: 600px;
-  margin: 16px;
-}
+:host { display: block; min-height: 100dvh; background: var(--al-page); }
+
+.si-page { display: flex; align-items: center; justify-content: center; min-height: 100dvh; padding: 24px 16px; box-sizing: border-box; }
+.si-card { width: 100%; max-width: 420px; padding: 32px; box-sizing: border-box; gap: 0; border-top: 4px solid var(--al-primary); }
+
+.si-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+.si-brand > div:last-child { display: flex; flex-direction: column; gap: 2px; }
+.si-mark { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: var(--al-radius); background: var(--al-primary); }
+.si-mark mat-icon { color: #fff; }
+.si-name { font-size: 1.1rem; font-weight: 800; color: var(--al-primary-strong); }
+.si-tagline { font-size: .68rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--al-text-muted); }
+
+.si-title { margin: 0; font-size: 1.6rem; font-weight: 800; letter-spacing: -.01em; }
+.si-subtitle { margin: 6px 0 20px; font-size: .9rem; }
+
+.si-form { display: flex; flex-direction: column; gap: 16px; }
+.si-password { position: relative; display: block; }
+.si-password .al-input { padding-right: 44px; }
+.si-eye { position: absolute; right: 4px; top: 4px; }
+
+.si-help { margin: 20px 0 0; font-size: .8rem; text-align: center; }
+
+@media (max-width: 480px) { .si-card { padding: 24px 20px; } }

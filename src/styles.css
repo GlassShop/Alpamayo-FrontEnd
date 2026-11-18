@@ -87,6 +87,7 @@ body {
   background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%; background-size: 5px 5px; background-repeat: no-repeat; }
 .al-hint { font-size: .75rem; color: var(--al-text-muted); }
 .al-error-text { font-size: .75rem; color: var(--al-primary-strong); }
+.al-error-text:empty { display: none; }
 
 /* number input with − / + buttons */
 .al-stepper { display: flex; }
