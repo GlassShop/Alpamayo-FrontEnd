@@ -73,7 +73,9 @@ La API se configura en `src/environments/environment*.ts` (`apiBaseUrl`). En des
 | Ruta | Pantalla | Quién |
 | --- | --- | --- |
 | `/iniciar-sesion` | Inicio de sesión | Público |
-| `/cotizador` | Cotizador por pie² con la lista de precio elegida | Todos los roles |
+| `/cotizador` | Cotizador por pie² con la lista de precio elegida, conceptos adicionales y «Guardar cotización» | Todos los roles |
+| `/cotizaciones` | Mis cotizaciones (el CEO ve todas y filtra por vendedora) | Todos los roles |
+| `/cotizaciones/:id` | Cotización lista para imprimir o guardar como PDF | Quien la creó y el CEO |
 | `/catalogo` | Catálogo de vidrios y precios; agregar tipos de vidrio | Todos los roles |
 | `/catalogo/precios` | Precios por pie² y nuevas listas de precio | CEO |
 | `/usuarios` | Cuentas del personal: crear, rol, desactivar, restablecer contraseña | CEO |
@@ -85,3 +87,11 @@ La API se configura en `src/environments/environment*.ts` (`apiBaseUrl`). En des
 - Roles: **CEO** (todo, incluidos precios y usuarios), **Vendedora** y **Almacén** (cotizar, ver el catálogo y agregar tipos de vidrio). Los permisos están en `src/app/iam/domain/model/permission.ts`.
 - La sesión se mantiene al recargar y se cierra al pulsar «Cerrar sesión» o a las 8 horas.
 - En desarrollo, `npm run api` simula el login con contraseñas guardadas con hash; las cuentas de prueba están en `mock-api/README.md`.
+
+## Cotizaciones guardadas
+
+- Al guardar se pide el DNI (8 dígitos) o RUC (11, con dígito verificador): se busca al cliente y, si no se encuentra, se ingresa a mano. También se registran teléfono, forma de pago (Efectivo, Yape, Plin, Tarjeta), «a cuenta» y la aceptación de las condiciones de venta.
+- La cotización guarda una copia congelada de precios y totales: si el CEO cambia un precio, lo que se le dijo al cliente no cambia. Al editarla, el cotizador avisa si el total con los precios actuales es distinto.
+- Moneda: solo soles por ahora.
+- Los datos de la empresa del encabezado (RUC, dirección, teléfono), la validez y las condiciones de venta están en `src/app/shared/domain/model/company-profile.ts`. **Completa el RUC, la dirección y el teléfono reales.**
+- En desarrollo, la búsqueda por DNI/RUC usa un directorio ficticio (`mock-api/db.json`) y los clientes de cotizaciones anteriores; el servidor real consultará RENIEC/SUNAT.
