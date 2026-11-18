@@ -1,0 +1,256 @@
+<header class="al-page-header">
+  <div>
+    <h1 class="al-page-title">{{ 'quoting.title' | translate }}</h1>
+    <p class="al-page-subtitle">{{ 'quoting.subtitle' | translate }}</p>
+  </div>
+</header>
+
+@if (catalog.error() === 'catalog.error.load') {
+  <section class="al-card">
+    <div class="al-empty al-empty--error">
+      <mat-icon>cloud_off</mat-icon>
+      <span>{{ 'catalog.error.load' | translate }}</span>
+      <button class="al-btn al-btn--secondary" (click)="catalog.load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  </section>
+} @else if (!catalog.loaded()) {
+  <section class="al-card"><div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div></section>
+} @else if (catalog.glassTypes().length === 0 || catalog.priceLists().length === 0) {
+  <section class="al-card"><div class="al-empty"><mat-icon>window</mat-icon>{{ 'quoting.empty-catalog' | translate }}</div></section>
+} @else {
+  @if (importError(); as error) {
+    <div class="al-alert al-alert--error" role="alert">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ error | translate }}</span>
+      <button class="al-icon-btn" (click)="cancelImport()" [attr.aria-label]="'common.close' | translate"><mat-icon>close</mat-icon></button>
+    </div>
+  }
+
+  @if (importPreview(); as preview) {
+    <!-- Excel import preview: nothing changes until the seller confirms -->
+    <app-quote-import-preview
+      [fileName]="preview.fileName" [rows]="importViews()" [rejected]="preview.rejected"
+      [total]="importTotal()" [listName]="selectedListName()" [currentLines]="quoting.lines().length"
+      (confirm)="confirmImport()" (cancel)="cancelImport()"/>
+  }
+
+  <div class="qb-grid">
+
+    <!-- LEFT: line specification -->
+    <section class="al-card qb-spec">
+      <div class="al-card-header">
+        <h2 class="al-card-title">{{ (editingId() === null ? 'quoting.spec-title' : 'quoting.edit-title') | translate }}</h2>
+        <div class="qb-excel">
+          <button type="button" class="al-btn al-btn--secondary qb-excel-btn" (click)="downloadTemplate()" [disabled]="excelBusy()"
+                  [matTooltip]="'quoting.import.template-hint' | translate">
+            <mat-icon>download</mat-icon>{{ 'quoting.import.template' | translate }}
+          </button>
+          <label class="al-btn al-btn--secondary qb-excel-btn" [class.qb-excel-btn--busy]="excelBusy()"
+                 [matTooltip]="'quoting.import.import-hint' | translate">
+            <mat-icon>{{ excelBusy() ? 'hourglass_empty' : 'table_view' }}</mat-icon>{{ 'quoting.import.import' | translate }}
+            <input type="file" class="sr-only" [disabled]="excelBusy()"
+                   accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                   (change)="onImportFile($event)"/>
+          </label>
+        </div>
+      </div>
+
+      <form class="al-card-body" (submit)="$event.preventDefault(); submit()">
+        <div class="qb-row">
+          <label class="al-field">
+            <span class="al-label">{{ 'quoting.price-list' | translate }}</span>
+            <select class="al-select" (change)="onPriceList($event)">
+              @for (list of catalog.priceLists(); track list.id) {
+                <option [value]="list.id" [selected]="list.id === quoting.priceListId()">{{ list.name }}</option>
+              }
+            </select>
+          </label>
+          <label class="al-field">
+            <span class="al-label">{{ 'quoting.glass-type' | translate }}</span>
+            <select class="al-select" (change)="onGlassType($event)">
+              @for (glass of catalog.glassTypes(); track glass.id) {
+                <option [value]="glass.id" [selected]="glass.id === glassTypeId()">{{ label(glass) }}</option>
+              }
+            </select>
+          </label>
+        </div>
+
+        <div class="qb-price" [class.qb-price--none]="selectedGlassPrice() === null">
+          @if (selectedGlassPrice(); as price) {
+            <mat-icon>sell</mat-icon>
+            <span><strong>S/ {{ price | number:'1.2-2' }}</strong> / pie² · {{ 'quoting.list-label' | translate }} {{ selectedListName() }}</span>
+          } @else {
+            <mat-icon>warning_amber</mat-icon>
+            <span>{{ 'quoting.issue.no-price' | translate }} ({{ selectedListName() }})</span>
+          }
+        </div>
+
+        <hr class="qb-sep"/>
+
+        <div class="qb-row qb-row--measures">
+          <label class="al-field">
+            <span class="al-label">{{ 'quoting.width' | translate }} ({{ 'quoting.unit.' + unit() | translate }})</span>
+            <input class="al-input" type="number" min="0" step="any" inputmode="decimal"
+                   [placeholder]="'quoting.example.' + unit() + '.width' | translate"
+                   [value]="width() ?? ''" (input)="onNumber('width', $event)"/>
+          </label>
+          <label class="al-field">
+            <span class="al-label">{{ 'quoting.height' | translate }} ({{ 'quoting.unit.' + unit() | translate }})</span>
+            <input class="al-input" type="number" min="0" step="any" inputmode="decimal"
+                   [placeholder]="'quoting.example.' + unit() + '.height' | translate"
+                   [value]="height() ?? ''" (input)="onNumber('height', $event)"/>
+          </label>
+          <label class="al-field qb-unit">
+            <span class="al-label">{{ 'quoting.unit-label' | translate }}</span>
+            <select class="al-select" (change)="onUnit($event)">
+              @for (u of units; track u) {
+                <option [value]="u" [selected]="u === unit()">{{ 'quoting.unit.' + u | translate }}</option>
+              }
+            </select>
+          </label>
+        </div>
+
+        <div class="qb-row qb-row--extra">
+          <div class="al-field qb-qty">
+            <span class="al-label" id="qty-label">{{ 'quoting.quantity' | translate }}</span>
+            <div class="al-stepper">
+              <button type="button" class="al-step" (click)="stepQuantity(-1)" [attr.aria-label]="'quoting.less' | translate">−</button>
+              <input class="al-input" type="number" min="1" step="1" inputmode="numeric" aria-labelledby="qty-label"
+                     [value]="quantity()" (input)="onNumber('quantity', $event)"/>
+              <button type="button" class="al-step" (click)="stepQuantity(1)" [attr.aria-label]="'quoting.more' | translate">+</button>
+            </div>
+          </div>
+          <label class="al-field">
+            <span class="al-label">{{ 'quoting.reference' | translate }}</span>
+            <input class="al-input" type="text" maxlength="80" [placeholder]="'quoting.reference-example' | translate"
+                   [value]="reference()" (input)="onReference($event)"/>
+          </label>
+        </div>
+
+        @if (draftPreview(); as draft) {
+          <div class="qb-preview" aria-live="polite">
+            @if (draft.roundedWidthCm && draft.roundedHeightCm) {
+              <div class="qb-preview-head">
+                <span>
+                  @if (draft.line.unit !== 'cm') { {{ draft.line.width }} × {{ draft.line.height }} {{ 'quoting.unit.' + draft.line.unit | translate }} → }
+                  {{ 'quoting.billed-as' | translate }} <strong>{{ draft.roundedWidthCm }} × {{ draft.roundedHeightCm }} cm</strong>
+                </span>
+                @if (draft.total !== null) {
+                  <strong class="qb-preview-total">S/ {{ draft.total | number:'1.2-2' }}</strong>
+                }
+              </div>
+              @if (draft.total !== null) {
+                <!-- ((ancho × alto / 900) × precio pie²) × cantidad -->
+                <span class="qb-formula">(({{ draft.roundedWidthCm }} × {{ draft.roundedHeightCm }} ÷ 900) × S/ {{ draft.pricePerSqFt | number:'1.2-2' }}) × {{ draft.line.quantity }} = S/ {{ draft.total | number:'1.2-2' }}</span>
+              } @else if (submitted() && draft.issue) {
+                <span class="al-error-text">{{ 'quoting.issue.' + draft.issue | translate }}</span>
+              }
+            } @else {
+              <span class="al-muted">{{ 'quoting.rounding-hint' | translate }}</span>
+              @if (submitted() && draft.issue) {
+                <span class="al-error-text">{{ 'quoting.issue.' + draft.issue | translate }}</span>
+              }
+            }
+          </div>
+        }
+
+        <div class="qb-actions">
+          <button type="submit" class="al-btn al-btn--primary al-btn--block" [disabled]="submitted() && !canSubmit()">
+            <mat-icon>{{ editingId() === null ? 'add_box' : 'check' }}</mat-icon>
+            {{ (editingId() === null ? 'quoting.add' : 'quoting.update') | translate }}
+          </button>
+          @if (editingId() !== null) {
+            <button type="button" class="al-btn al-btn--secondary" (click)="resetForm()">{{ 'common.cancel' | translate }}</button>
+          }
+        </div>
+      </form>
+
+    </section>
+
+    <!-- RIGHT: summary -->
+    <section class="al-card qb-summary">
+      <div class="al-card-header">
+        <h2 class="al-card-title">{{ 'quoting.summary-title' | translate }}</h2>
+        <span class="qb-list-chip">{{ selectedListName() }}</span>
+      </div>
+
+      <div class="qb-metrics">
+        <div class="qb-metric qb-metric--primary">
+          <span class="qb-metric-label">{{ 'quoting.total-square-feet' | translate }}</span>
+          <span class="qb-metric-value">{{ quoting.totalSquareFeet() | number:'1.2-2' }} <small>pie²</small></span>
+        </div>
+        <div class="qb-metric qb-metric--slate">
+          <span class="qb-metric-label">{{ 'quoting.pieces' | translate }}</span>
+          <span class="qb-metric-value">{{ quoting.pieces() }} <small>{{ 'quoting.units' | translate }}</small></span>
+        </div>
+        <div class="qb-metric qb-metric--warm">
+          <span class="qb-metric-label">{{ 'quoting.subtotal' | translate }}</span>
+          <span class="qb-metric-value">S/ {{ quoting.subtotal() | number:'1.2-2' }}</span>
+          <span class="qb-metric-foot">{{ 'quoting.igv' | translate }}: S/ {{ quoting.igv() | number:'1.2-2' }}</span>
+        </div>
+        <div class="qb-total">
+          <span class="qb-metric-label">{{ 'quoting.total' | translate }}</span>
+          <span class="qb-total-value">S/ {{ quoting.total() | number:'1.2-2' }}</span>
+          <span class="qb-metric-foot">{{ 'quoting.igv-included' | translate }}</span>
+        </div>
+      </div>
+
+      <div class="al-card-footer">
+        <button class="al-btn al-btn--secondary" (click)="clearQuote()" [disabled]="quoting.lines().length === 0">
+          <mat-icon>delete_sweep</mat-icon>{{ 'quoting.clear' | translate }}
+        </button>
+      </div>
+    </section>
+
+
+    <!-- BOTTOM: quote lines -->
+    <section class="al-card qb-lines-card">
+      <div class="al-card-header">
+        <h2 class="al-card-title"><mat-icon>list_alt</mat-icon>{{ 'quoting.lines-title' | translate }}</h2>
+        <span class="al-muted qb-count">{{ quoting.lines().length }}</span>
+      </div>
+      <div class="qb-lines al-table-wrapper">
+        <table class="al-table">
+          <thead>
+            <tr>
+              <th>{{ 'quoting.col-glass' | translate }}</th>
+              <th>{{ 'quoting.col-size' | translate }}</th>
+              <th class="al-num">{{ 'quoting.col-qty' | translate }}</th>
+              <th class="al-num">pie²</th>
+              <th class="al-num">{{ 'quoting.col-total' | translate }}</th>
+              <th class="al-num"><span class="sr-only">{{ 'quoting.col-actions' | translate }}</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (view of quoting.lineViews(); track view.line.id) {
+              <tr [class.qb-line--editing]="editingId() === view.line.id">
+                <td>
+                  <span class="qb-line-glass">{{ view.glass ? label(view.glass) : ('quoting.unknown-glass' | translate) }}</span>
+                  @if (view.line.reference) { <span class="al-muted qb-ref">{{ view.line.reference }}</span> }
+                </td>
+                <td>
+                  {{ view.line.width }} × {{ view.line.height }} {{ 'quoting.unit.' + view.line.unit | translate }}
+                  @if (view.line.unit !== 'cm' || view.roundedWidthCm !== view.line.width || view.roundedHeightCm !== view.line.height) {
+                    <span class="al-muted qb-billed">→ {{ view.roundedWidthCm }} × {{ view.roundedHeightCm }} cm</span>
+                  }
+                </td>
+                <td class="al-num">{{ view.line.quantity }}</td>
+                <td class="al-num">{{ view.squareFeet | number:'1.2-2' }}</td>
+                <td class="al-num">
+                  @if (view.total !== null) { S/ {{ view.total | number:'1.2-2' }} }
+                  @else { <span class="al-pill al-pill--warning" [matTooltip]="'quoting.issue.' + view.issue | translate">{{ 'quoting.no-price-short' | translate }}</span> }
+                </td>
+                <td class="al-num qb-line-actions">
+                  <button class="al-icon-btn" (click)="edit(view)" [matTooltip]="'quoting.edit' | translate" [attr.aria-label]="'quoting.edit' | translate"><mat-icon>edit</mat-icon></button>
+                  <button class="al-icon-btn al-icon-btn--danger" (click)="remove(view.line.id)" [matTooltip]="'quoting.remove' | translate" [attr.aria-label]="'quoting.remove' | translate"><mat-icon>delete_outline</mat-icon></button>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="6" class="qb-lines-empty">{{ 'quoting.no-lines' | translate }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+}

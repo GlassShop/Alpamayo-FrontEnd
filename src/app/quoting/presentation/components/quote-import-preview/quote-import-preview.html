@@ -1,0 +1,79 @@
+<section class="al-card qb-import" aria-labelledby="import-title">
+  <div class="al-card-header">
+    <h2 class="al-card-title" id="import-title"><mat-icon>upload_file</mat-icon>{{ 'quoting.import.title' | translate }}</h2>
+    <span class="al-muted qb-file">{{ fileName() }}</span>
+  </div>
+  <div class="al-card-body">
+    <p class="qb-import-summary">
+      <span class="al-pill al-pill--success">{{ 'quoting.import.valid' | translate: { count: rows().length } }}</span>
+      @if (rejected().length > 0) {
+        <span class="al-pill al-pill--danger">{{ 'quoting.import.invalid' | translate: { count: rejected().length } }}</span>
+      }
+      @if (currentLines() > 0) {
+        <span class="qb-import-warning"><mat-icon>warning_amber</mat-icon>{{ 'quoting.import.replace-warning' | translate: { count: currentLines() } }}</span>
+      }
+    </p>
+
+    @if (rows().length > 0) {
+      <div class="al-table-wrapper qb-import-table">
+        <table class="al-table">
+          <thead>
+            <tr>
+              <th>{{ 'quoting.import.row' | translate }}</th>
+              <th>{{ 'quoting.col-glass' | translate }}</th>
+              <th>{{ 'quoting.col-size' | translate }}</th>
+              <th class="al-num">{{ 'quoting.col-qty' | translate }}</th>
+              <th class="al-num">pie²</th>
+              <th class="al-num">{{ 'quoting.col-total' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.rowNumber) {
+              <tr>
+                <td class="al-muted">{{ row.rowNumber }}</td>
+                <td>
+                  <span class="qb-line-glass">{{ row.view.glass ? label(row.view.glass) : '' }}</span>
+                  @if (row.view.line.reference) { <span class="al-muted qb-ref">{{ row.view.line.reference }}</span> }
+                </td>
+                <td>
+                  {{ row.view.line.width }} × {{ row.view.line.height }} {{ 'quoting.unit.' + row.view.line.unit | translate }}
+                  @if (row.unitAssumed) { <span class="al-pill al-pill--warning" [matTooltip]="'quoting.import.unit-assumed-hint' | translate">{{ 'quoting.import.unit-assumed' | translate }}</span> }
+                  <span class="al-muted qb-billed">→ {{ row.view.roundedWidthCm }} × {{ row.view.roundedHeightCm }} cm</span>
+                </td>
+                <td class="al-num">{{ row.view.line.quantity }}</td>
+                <td class="al-num">{{ row.view.squareFeet | number:'1.2-2' }}</td>
+                <td class="al-num">
+                  @if (row.view.total !== null) { S/ {{ row.view.total | number:'1.2-2' }} }
+                  @else { <span class="al-pill al-pill--warning">{{ 'quoting.no-price-short' | translate }}</span> }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    @if (rejected().length > 0) {
+      <div class="qb-rejected">
+        <h3>{{ 'quoting.import.rejected-title' | translate }}</h3>
+        <ul>
+          @for (row of rejected(); track row.rowNumber) {
+            <li>
+              <strong>{{ 'quoting.import.row' | translate }} {{ row.rowNumber }}:</strong>
+              @for (issue of row.issues; track issue; let last = $last) {
+                {{ 'quoting.import.issue.' + issue | translate }}{{ last ? '' : ', ' }}
+              }
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+  <div class="al-card-footer">
+    @if (rows().length > 0) { <span class="al-muted qb-import-total">{{ 'quoting.total' | translate }}: <strong>S/ {{ total() | number:'1.2-2' }}</strong> · {{ listName() }}</span> }
+    <button class="al-btn al-btn--secondary" (click)="cancel.emit()">{{ 'common.cancel' | translate }}</button>
+    <button class="al-btn al-btn--primary" (click)="confirm.emit()" [disabled]="rows().length === 0">
+      <mat-icon>check</mat-icon>{{ 'quoting.import.confirm' | translate: { count: rows().length } }}
+    </button>
+  </div>
+</section>

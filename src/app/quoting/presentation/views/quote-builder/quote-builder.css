@@ -1,0 +1,71 @@
+/* Layout adapted from the Figma "Proyectos & Cotizador" screen. */
+:host { display: block; max-width: 1280px; }
+
+.qb-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 24px; align-items: start; }
+
+/* ── specification form ── */
+.qb-row { display: flex; gap: 16px; }
+.qb-unit { flex: 0 0 96px !important; }
+.qb-qty { flex: 0 0 150px !important; }
+
+/* Excel actions in the card header (as in the Figma "Importar Excel" button) */
+.qb-excel { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.qb-excel-btn { height: 34px; padding: 0 12px; font-size: .78rem; position: relative; }
+.qb-excel-btn--busy { opacity: .6; pointer-events: none; }
+label.qb-excel-btn:focus-within { outline: 2px solid var(--al-primary); outline-offset: 2px; }
+
+.qb-price { display: flex; align-items: center; gap: 8px; font-size: .85rem; color: var(--al-text-muted); }
+.qb-price mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--al-success); }
+.qb-price strong { color: var(--al-text); }
+.qb-price--none, .qb-price--none mat-icon { color: var(--al-warning); }
+
+.qb-sep { border: none; border-top: 1px solid var(--al-border); margin: 0; }
+
+.qb-preview {
+  display: flex; flex-direction: column; gap: 6px;
+  min-height: 44px; box-sizing: border-box; padding: 10px 14px; font-size: .85rem;
+  background: var(--al-field); border: 1px dashed var(--al-border); border-radius: var(--al-radius);
+}
+.qb-preview-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.qb-formula { font-size: .75rem; color: var(--al-text-muted); font-variant-numeric: tabular-nums; }
+.qb-preview-total { font-size: 1.1rem; color: var(--al-text); font-variant-numeric: tabular-nums; }
+
+.qb-actions { display: flex; gap: 12px; }
+.qb-actions .al-btn--secondary { flex: 0 0 auto; }
+
+.qb-lines-card { grid-column: 1 / -1; }
+.qb-count { font-size: .8rem; font-weight: 700; }
+.qb-line-glass { font-weight: 600; }
+.qb-billed { display: block; font-size: .72rem; }
+.qb-ref { display: block; font-size: .75rem; }
+
+/* ── summary ── */
+.qb-list-chip {
+  font-size: .75rem; font-weight: 700; color: var(--al-primary-strong);
+  background: var(--al-primary-soft); padding: 4px 10px; border-radius: var(--al-radius);
+}
+.qb-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 32px 24px; padding: 24px; }
+.qb-metric { display: flex; flex-direction: column; gap: 4px; padding: 4px 0 8px 20px; border-left: 4px solid; }
+.qb-metric--primary { border-color: var(--al-primary); }
+.qb-metric--slate { border-color: var(--al-slate); }
+.qb-metric--warm { border-color: var(--al-warm); }
+.qb-metric-label { font-size: .75rem; letter-spacing: .05em; text-transform: uppercase; color: var(--al-text-muted); }
+.qb-metric-value { font-size: 1.5rem; font-weight: 700; color: var(--al-text); font-variant-numeric: tabular-nums; }
+.qb-metric-value small { font-size: 1rem; font-weight: 400; color: var(--al-text-muted); }
+.qb-metric-foot { font-size: .75rem; color: var(--al-text-muted); }
+
+.qb-total {
+  display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px;
+  padding: 16px; background: var(--al-surface-muted); border: 1px solid var(--al-border); border-radius: var(--al-radius);
+}
+.qb-total-value { font-size: 2rem; font-weight: 800; letter-spacing: -.01em; color: var(--al-primary); font-variant-numeric: tabular-nums; }
+
+@media (max-width: 1100px) {
+  .qb-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .qb-row { flex-direction: column; }
+  .qb-unit, .qb-qty { flex: 1 1 auto !important; }
+  .qb-metrics { grid-template-columns: 1fr; gap: 20px; }
+  .qb-total { align-items: flex-start; }
+}
