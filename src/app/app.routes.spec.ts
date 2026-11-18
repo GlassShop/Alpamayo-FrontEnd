@@ -47,8 +47,8 @@ describe('app routes', () => {
       await router.navigateByUrl('/'); // settle the post-sign-in navigation
     });
 
-    it('opens the quoter, the catalog and the settings', async () => {
-      for (const url of ['/cotizador', '/catalogo', '/configuracion']) {
+    it('opens the quoter, saved quotes, the catalog and the settings', async () => {
+      for (const url of ['/cotizador', '/cotizaciones', '/catalogo', '/configuracion']) {
         await router.navigateByUrl(url);
         expect(router.url).toBe(url);
       }

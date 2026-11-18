@@ -9,6 +9,8 @@ const quoteBuilder  = () => import('./quoting/presentation/views/quote-builder/q
 const glassCatalog  = () => import('./catalog/presentation/views/glass-catalog/glass-catalog').then(m => m.GlassCatalog);
 const priceEditor   = () => import('./catalog/presentation/views/price-editor/price-editor').then(m => m.PriceEditor);
 const usersAdmin    = () => import('./iam/presentation/views/users-admin/users-admin').then(m => m.UsersAdmin);
+const savedQuotes   = () => import('./quoting/presentation/views/saved-quotes/saved-quotes').then(m => m.SavedQuotes);
+const quotePrint    = () => import('./quoting/presentation/views/quote-print/quote-print').then(m => m.QuotePrint);
 const iamRoutes     = () => import('./iam/presentation/iam.routes').then(m => m.iamRoutes);
 
 const baseTitle = 'Vidriería Alpamayo';
@@ -32,6 +34,8 @@ export const routes: Routes = [
     canActivateChild: [permissionGuard],
     children: [
       { path: 'cotizador',        loadComponent: quoteBuilder,  title: `${baseTitle} - Cotizador`,     data: needs('quote') },
+      { path: 'cotizaciones',     loadComponent: savedQuotes,   title: `${baseTitle} - Cotizaciones`,  data: needs('quote') },
+      { path: 'cotizaciones/:id', loadComponent: quotePrint,    title: `${baseTitle} - Cotización`,    data: needs('quote') },
       { path: 'catalogo',         loadComponent: glassCatalog,  title: `${baseTitle} - Catálogo`,      data: needs('catalog.view'), pathMatch: 'full' },
       { path: 'catalogo/precios', loadComponent: priceEditor,   title: `${baseTitle} - Precios`,       data: needs('prices.manage') },
       { path: 'usuarios',         loadComponent: usersAdmin,    title: `${baseTitle} - Usuarios`,      data: needs('users.manage') },

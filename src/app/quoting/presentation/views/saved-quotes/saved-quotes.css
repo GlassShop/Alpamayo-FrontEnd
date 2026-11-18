@@ -1,0 +1,13 @@
+:host { display: block; max-width: 1280px; }
+a.al-btn, a.al-icon-btn { text-decoration: none; }
+.sl-toolbar { flex-wrap: wrap; align-items: flex-end; }
+.sl-search { position: relative; flex: 1 1 280px; display: block; }
+.sl-search mat-icon { position: absolute; left: 10px; top: 10px; color: var(--al-text-muted); font-size: 20px; width: 20px; height: 20px; }
+.sl-search .al-input { padding-left: 38px; background: var(--al-surface); }
+.sl-seller { display: flex; flex-direction: column; gap: 6px; min-width: 200px; }
+.sl-number { font-weight: 700; color: var(--al-primary-strong); text-decoration: none; font-variant-numeric: tabular-nums; }
+.sl-number:hover { text-decoration: underline; }
+.sl-customer { display: block; font-weight: 600; }
+.sl-doc { display: block; font-size: .75rem; }
+.sl-actions { white-space: nowrap; }
+.sl-empty { text-align: center; color: var(--al-text-muted); padding: 32px !important; }

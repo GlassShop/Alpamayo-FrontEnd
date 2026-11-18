@@ -1,0 +1,116 @@
+<div class="qp-toolbar no-print">
+  <a class="al-btn al-btn--secondary" routerLink="/cotizaciones"><mat-icon>arrow_back</mat-icon>{{ 'quotes.print-view.back' | translate }}</a>
+  @if (store.current()) {
+    <button class="al-btn al-btn--secondary" (click)="edit()"><mat-icon>edit</mat-icon>{{ 'quotes.list.edit' | translate }}</button>
+    <button class="al-btn al-btn--primary" (click)="print()"><mat-icon>print</mat-icon>{{ 'quotes.print' | translate }}</button>
+  }
+</div>
+
+@if (store.error(); as error) {
+  <div class="al-alert al-alert--error no-print" role="alert"><mat-icon>error_outline</mat-icon><span>{{ 'quotes.error.' + error | translate }}</span></div>
+} @else if (store.loading()) {
+  <section class="al-card no-print"><div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div></section>
+}
+
+@if (store.current(); as quote) {
+  <article class="qp-doc" [attr.aria-label]="quote.number">
+    <header class="qp-head">
+      <div class="qp-company">
+        <div class="qp-mark" aria-hidden="true"><mat-icon>window</mat-icon></div>
+        <div>
+          <h1>{{ company.name }}</h1>
+          <p>{{ company.tagline }} · {{ company.city }}</p>
+          <p>{{ company.ruc }} · {{ company.address }} · {{ company.phone }}</p>
+        </div>
+      </div>
+      <div class="qp-number">
+        <span>{{ 'quotes.print-view.quote' | translate }}</span>
+        <strong>{{ quote.number }}</strong>
+        <span>{{ quote.createdAt | date:'dd/MM/yyyy' }}</span>
+      </div>
+    </header>
+
+    <section class="qp-parties">
+      <dl>
+        <dt>{{ 'quotes.customer' | translate }}</dt><dd>{{ quote.customer.name }}</dd>
+        <dt>{{ quote.customer.docType }}</dt><dd>{{ quote.customer.docNumber }}</dd>
+        @if (quote.customer.phone) { <dt>{{ 'quotes.save.phone' | translate }}</dt><dd>{{ quote.customer.phone }}</dd> }
+        @if (quote.customer.address) { <dt>{{ 'quotes.save.address' | translate }}</dt><dd>{{ quote.customer.address }}</dd> }
+      </dl>
+      <dl>
+        <dt>{{ 'quotes.seller' | translate }}</dt><dd>{{ quote.seller.fullName }}</dd>
+        <dt>{{ 'quotes.save.method' | translate }}</dt><dd>{{ 'quotes.payment.' + quote.paymentMethod | translate }}</dd>
+        <dt>{{ 'quotes.currency' | translate }}</dt><dd>{{ 'quotes.currency-pen' | translate }}</dd>
+        <dt>{{ 'quoting.price-list' | translate }}</dt><dd>{{ quote.priceList.name }}</dd>
+        <dt>{{ 'quotes.print-view.valid-until' | translate }}</dt><dd>{{ validUntil() | date:'dd/MM/yyyy' }}</dd>
+      </dl>
+    </section>
+
+    <table class="qp-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>{{ 'quotes.print-view.description' | translate }}</th>
+          <th class="al-num">{{ 'quoting.col-qty' | translate }}</th>
+          <th class="al-num">{{ 'quotes.unit-price' | translate }}</th>
+          <th class="al-num">{{ 'quotes.print-view.line-total' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (line of quote.lines; track $index) {
+          <tr>
+            <td>{{ $index + 1 }}</td>
+            <td>
+              <strong>{{ line.description }}</strong>
+              <span class="qp-detail">
+                {{ line.width }} × {{ line.height }} {{ 'quoting.unit.' + line.unit | translate }}
+                → {{ line.billedWidthCm }} × {{ line.billedHeightCm }} cm · {{ line.squareFeet | number:'1.2-2' }} pie²
+                · S/ {{ line.pricePerSqFt | number:'1.2-2' }} / pie²
+                @if (line.reference) { · {{ line.reference }} }
+              </span>
+            </td>
+            <td class="al-num">{{ line.quantity }}</td>
+            <td class="al-num">{{ line.unitPrice | number:'1.2-2' }}</td>
+            <td class="al-num">{{ line.total | number:'1.2-2' }}</td>
+          </tr>
+        }
+        @for (extra of quote.extras; track $index) {
+          <tr>
+            <td>{{ quote.lines.length + $index + 1 }}</td>
+            <td><strong>{{ extra.description }}</strong></td>
+            <td class="al-num">{{ extra.quantity }}</td>
+            <td class="al-num">{{ extra.unitPrice | number:'1.2-2' }}</td>
+            <td class="al-num">{{ extra.total | number:'1.2-2' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <section class="qp-bottom">
+      <div class="qp-notes">
+        @if (quote.notes) { <p><strong>{{ 'quotes.save.notes' | translate }}:</strong> {{ quote.notes }}</p> }
+      </div>
+      <dl class="qp-totals">
+        <dt>{{ 'quoting.subtotal' | translate }}</dt><dd>S/ {{ quote.subtotal | number:'1.2-2' }}</dd>
+        <dt>IGV (18%)</dt><dd>S/ {{ quote.igv | number:'1.2-2' }}</dd>
+        <dt class="qp-grand">{{ 'quotes.total' | translate }}</dt><dd class="qp-grand">S/ {{ quote.total | number:'1.2-2' }}</dd>
+        <dt>{{ 'quotes.advance' | translate }}</dt><dd>S/ {{ quote.advance | number:'1.2-2' }}</dd>
+        <dt class="qp-due">{{ 'quotes.balance' | translate }}</dt><dd class="qp-due">S/ {{ quote.balance | number:'1.2-2' }}</dd>
+      </dl>
+    </section>
+
+    <footer class="qp-terms">
+      <h2>{{ 'quotes.conditions-title' | translate }}</h2>
+      <ol>
+        @for (condition of company.saleConditions; track $index) { <li>{{ condition }}</li> }
+      </ol>
+      <p class="qp-accepted">
+        {{ 'quotes.print-view.accepted' | translate }}: <strong>{{ (quote.termsAccepted ? 'quotes.print-view.yes' : 'quotes.print-view.no') | translate }}</strong>
+      </p>
+      <div class="qp-signatures">
+        <span>{{ 'quotes.print-view.customer-signature' | translate }}</span>
+        <span>{{ 'quotes.print-view.seller-signature' | translate }}</span>
+      </div>
+    </footer>
+  </article>
+}

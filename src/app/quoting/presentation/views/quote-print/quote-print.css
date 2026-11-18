@@ -1,0 +1,55 @@
+:host { display: block; max-width: 900px; }
+a.al-btn { text-decoration: none; }
+.qp-toolbar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+
+.qp-doc {
+  background: #fff; color: #111; border: 1px solid var(--al-border); padding: 32px;
+  font-size: .85rem; line-height: 1.45; display: flex; flex-direction: column; gap: 20px;
+}
+.qp-head { display: flex; justify-content: space-between; gap: 16px; padding-bottom: 16px; border-bottom: 3px solid var(--al-primary); }
+.qp-company { display: flex; gap: 12px; }
+.qp-mark { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: var(--al-primary); border-radius: var(--al-radius); flex-shrink: 0; }
+.qp-mark mat-icon { color: #fff; }
+.qp-company h1 { margin: 0; font-size: 1.3rem; color: var(--al-primary-strong); }
+.qp-company p { margin: 2px 0 0; color: #444; font-size: .78rem; }
+.qp-number { display: flex; flex-direction: column; align-items: flex-end; border: 1px solid var(--al-border); padding: 8px 14px; min-width: 150px; }
+.qp-number span { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: #555; }
+.qp-number strong { font-size: 1.15rem; color: var(--al-primary-strong); }
+
+.qp-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.qp-parties dl, .qp-totals { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0; }
+.qp-parties dt { font-weight: 700; color: #555; }
+.qp-parties dd { margin: 0; }
+
+.qp-table { width: 100%; border-collapse: collapse; }
+.qp-table th { background: #f2f4f6; text-align: left; font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; padding: 8px; border-bottom: 1px solid #ccc; }
+.qp-table td { padding: 8px; border-bottom: 1px solid #e5e5e5; vertical-align: top; font-variant-numeric: tabular-nums; }
+.qp-detail { display: block; font-size: .75rem; color: #555; }
+
+.qp-bottom { display: flex; justify-content: space-between; gap: 24px; }
+.qp-notes { flex: 1; }
+.qp-totals { min-width: 260px; }
+.qp-totals dt { text-align: right; color: #555; }
+.qp-totals dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.qp-grand { font-weight: 800; font-size: 1.05rem; color: var(--al-primary-strong) !important; border-top: 1px solid #ccc; padding-top: 4px; }
+.qp-due { font-weight: 700; color: #111 !important; }
+
+.qp-terms { border-top: 1px solid #ccc; padding-top: 12px; }
+.qp-terms h2 { margin: 0 0 6px; font-size: .78rem; letter-spacing: .06em; }
+.qp-terms ol { margin: 0; padding-left: 18px; font-size: .75rem; color: #333; }
+.qp-accepted { margin: 8px 0 0; font-size: .8rem; }
+.qp-signatures { display: flex; justify-content: space-around; gap: 24px; margin-top: 48px; }
+.qp-signatures span { flex: 1; max-width: 240px; text-align: center; border-top: 1px solid #333; padding-top: 6px; font-size: .75rem; }
+
+@media (max-width: 640px) {
+  .qp-doc { padding: 16px; }
+  .qp-head, .qp-bottom { flex-direction: column; }
+  .qp-number { align-items: flex-start; }
+  .qp-parties { grid-template-columns: 1fr; }
+}
+
+@media print {
+  :host { max-width: none; }
+  .qp-doc { border: none; padding: 0; }
+  .qp-doc * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

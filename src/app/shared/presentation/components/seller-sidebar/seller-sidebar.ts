@@ -20,6 +20,7 @@ interface NavOption {
 /** Every section of the app; each user only sees the ones their role allows. */
 const NAV_OPTIONS: readonly NavOption[] = [
   {link: '/cotizador',        labelKey: 'nav.quote',    icon: 'calculate',    permission: 'quote'},
+  {link: '/cotizaciones',     labelKey: 'nav.quotes',   icon: 'description',  permission: 'quote'},
   {link: '/catalogo',         labelKey: 'nav.catalog',  icon: 'window',       permission: 'catalog.view', exact: true},
   {link: '/catalogo/precios', labelKey: 'nav.prices',   icon: 'price_change', permission: 'prices.manage'},
   {link: '/usuarios',         labelKey: 'nav.users',    icon: 'group',        permission: 'users.manage'},

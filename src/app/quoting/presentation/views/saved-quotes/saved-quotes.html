@@ -1,0 +1,90 @@
+<header class="al-page-header">
+  <div>
+    <h1 class="al-page-title">{{ (iam.can('quotes.view-all') ? 'quotes.list.title-all' : 'quotes.list.title') | translate }}</h1>
+    <p class="al-page-subtitle">{{ (iam.can('quotes.view-all') ? 'quotes.list.subtitle-all' : 'quotes.list.subtitle') | translate }}</p>
+  </div>
+  <a class="al-btn al-btn--primary" routerLink="/cotizador"><mat-icon>add</mat-icon>{{ 'quotes.new-quote' | translate }}</a>
+</header>
+
+@if (store.error(); as error) {
+  <div class="al-alert al-alert--error" role="alert">
+    <mat-icon>error_outline</mat-icon><span>{{ 'quotes.error.' + error | translate }}</span>
+    <button class="al-btn al-btn--secondary" (click)="store.load()">{{ 'common.retry' | translate }}</button>
+  </div>
+}
+
+<section class="al-card">
+  <div class="al-card-header sl-toolbar">
+    <label class="sl-search">
+      <mat-icon aria-hidden="true">search</mat-icon>
+      <span class="sr-only">{{ 'quotes.list.search' | translate }}</span>
+      <input class="al-input" type="search" [value]="store.search()" (input)="onSearch($event)"
+             [placeholder]="'quotes.list.search' | translate"/>
+    </label>
+    @if (iam.can('quotes.view-all')) {
+      <label class="sl-seller">
+        <span class="al-label">{{ 'quotes.seller' | translate }}</span>
+        <select class="al-select" (change)="onSeller($event)">
+          <option value="">{{ 'quotes.list.all-sellers' | translate }}</option>
+          @for (seller of store.sellers(); track seller.id) {
+            <option [value]="seller.id" [selected]="store.sellerFilter() === seller.id">{{ seller.fullName }}</option>
+          }
+        </select>
+      </label>
+    }
+  </div>
+
+  @if (store.loading() && store.quotes().length === 0) {
+    <div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div>
+  } @else {
+    <div class="al-table-wrapper">
+      <table class="al-table">
+        <thead>
+          <tr>
+            <th>{{ 'quotes.number' | translate }}</th>
+            <th>{{ 'quotes.date' | translate }}</th>
+            <th>{{ 'quotes.customer' | translate }}</th>
+            @if (iam.can('quotes.view-all')) { <th>{{ 'quotes.seller' | translate }}</th> }
+            <th class="al-num">{{ 'quotes.total' | translate }}</th>
+            <th class="al-num">{{ 'quotes.advance' | translate }}</th>
+            <th class="al-num">{{ 'quotes.balance' | translate }}</th>
+            <th class="al-num"><span class="sr-only">{{ 'quoting.col-actions' | translate }}</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (quote of store.quotes(); track quote.id) {
+            <tr>
+              <td><a class="sl-number" [routerLink]="['/cotizaciones', quote.id]">{{ quote.number }}</a></td>
+              <td>{{ quote.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>
+                <span class="sl-customer">{{ quote.customer.name }}</span>
+                <span class="al-muted sl-doc">{{ quote.customer.docType }} {{ quote.customer.docNumber }}</span>
+              </td>
+              @if (iam.can('quotes.view-all')) { <td>{{ quote.seller.fullName }}</td> }
+              <td class="al-num">S/ {{ quote.total | number:'1.2-2' }}</td>
+              <td class="al-num">S/ {{ quote.advance | number:'1.2-2' }}</td>
+              <td class="al-num">
+                @if (quote.balance > 0) { <strong>S/ {{ quote.balance | number:'1.2-2' }}</strong> }
+                @else { <span class="al-pill al-pill--success">{{ 'quotes.list.paid' | translate }}</span> }
+              </td>
+              <td class="al-num sl-actions">
+                <a class="al-icon-btn" [routerLink]="['/cotizaciones', quote.id]"
+                   [matTooltip]="'quotes.print' | translate" [attr.aria-label]="('quotes.print' | translate) + ' ' + quote.number">
+                  <mat-icon>print</mat-icon>
+                </a>
+                <button class="al-icon-btn" (click)="edit(quote)"
+                        [matTooltip]="'quotes.list.edit' | translate" [attr.aria-label]="('quotes.list.edit' | translate) + ' ' + quote.number">
+                  <mat-icon>edit</mat-icon>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td [attr.colspan]="iam.can('quotes.view-all') ? 8 : 7" class="sl-empty">
+              {{ (store.search() ? 'quotes.list.no-results' : 'quotes.list.empty') | translate }}
+            </td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
