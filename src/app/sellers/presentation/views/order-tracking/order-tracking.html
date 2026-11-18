@@ -1,0 +1,41 @@
+<div class="ord-page">
+  <div class="ord-header">
+    <div>
+      <h1 class="ord-title">Seguimiento de Pedidos</h1>
+      <p class="ord-subtitle">Estado de producción sincronizado con el taller</p>
+    </div>
+    <a mat-flat-button routerLink="/sellers/workshop/estado-taller" class="ord-btn-primary">
+      <mat-icon>view_kanban</mat-icon> Abrir Taller
+    </a>
+  </div>
+
+  <div class="ord-metrics">
+    <mat-card class="ord-metric"><mat-card-content><span>Total</span><strong>{{ store.totalOrders() }}</strong></mat-card-content></mat-card>
+    <mat-card class="ord-metric"><mat-card-content><span>En proceso</span><strong>{{ store.inProcessCount() }}</strong></mat-card-content></mat-card>
+    <mat-card class="ord-metric"><mat-card-content><span>Completados</span><strong>{{ store.completedCount() }}</strong></mat-card-content></mat-card>
+    <mat-card class="ord-metric ord-metric--warn"><mat-card-content><span>Demorados</span><strong>{{ store.delayedCount() }}</strong></mat-card-content></mat-card>
+  </div>
+
+  <mat-card class="ord-card">
+    <mat-card-header>
+      <mat-card-title>Pedidos recientes</mat-card-title>
+      <a routerLink="/sellers/workshop/sprint" class="ord-link">Ver sprint de proyectos</a>
+    </mat-card-header>
+    <mat-card-content>
+      @for (order of recentOrders(); track order.id) {
+        <div class="ord-row">
+          <div class="ord-row-main">
+            <span class="ord-id">{{ order.orderId }}</span>
+            <span class="ord-client">{{ order.clientName }}</span>
+            <span class="ord-product">{{ order.productDesc }}</span>
+          </div>
+          <div class="ord-row-side">
+            <span class="ord-status">{{ statusLabel[order.status] }}</span>
+            <mat-progress-bar mode="determinate" [value]="order.progressPct"/>
+            <span class="ord-pct">{{ order.progressPct }}%</span>
+          </div>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -9,6 +9,7 @@ const cashRegister  = () => import('./sellers/presentation/views/cash-register/c
 const orderTracking = () => import('./sellers/presentation/views/order-tracking/order-tracking').then(m => m.OrderTracking);
 const agenda        = () => import('./sellers/presentation/views/agenda/agenda').then(m => m.Agenda);
 const profile       = () => import('./sellers/presentation/views/profile/profile').then(m => m.Profile);
+const configuration = () => import('./sellers/presentation/views/configuration/configuration').then(m => m.Configuration);
 
 // Sales BC sub-routes
 const salesShell    = () => import('./sales/presentation/views/sales-shell/sales-shell').then(m => m.SalesShell);
@@ -56,6 +57,7 @@ export const routes: Routes = [
       { path: 'orders',      loadComponent: orderTracking },
       { path: 'agenda',      loadComponent: agenda },
       { path: 'profile',     loadComponent: profile },
+      { path: 'configuration', loadComponent: configuration, title: `${baseTitle} - Configuración` },
       { path: '',            redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },

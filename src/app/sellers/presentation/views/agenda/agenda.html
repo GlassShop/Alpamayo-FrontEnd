@@ -1,0 +1,43 @@
+<div class="ag-page">
+  <div class="ag-header">
+    <div>
+      <h1 class="ag-title">Agenda &amp; Visitas</h1>
+      <p class="ag-subtitle">Citas vinculadas al dashboard y al flujo de cotización</p>
+    </div>
+    <a mat-flat-button routerLink="/sellers/quoting/new" class="ag-btn-primary">
+      <mat-icon>calculate</mat-icon> Nueva cotización
+    </a>
+  </div>
+
+  <mat-card class="ag-form-card">
+    <mat-card-header><mat-card-title>Agendar visita</mat-card-title></mat-card-header>
+    <mat-card-content class="ag-form">
+      <mat-form-field appearance="outline"><mat-label>Título</mat-label><input matInput [(ngModel)]="newTitle"/></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Cliente</mat-label><input matInput [(ngModel)]="newClient"/></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Ubicación</mat-label><input matInput [(ngModel)]="newLocation"/></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Fecha / hora</mat-label><input matInput [(ngModel)]="newScheduledAt" placeholder="Mañana 08:00"/></mat-form-field>
+      <button mat-flat-button class="ag-btn-primary" (click)="addVisit()">Agregar</button>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="ag-list-card">
+    <mat-card-header>
+      <mat-card-title>Próximas visitas ({{ store.upcomingVisits().length }})</mat-card-title>
+      <a routerLink="/sellers/dashboard" class="ag-link">Ver actividad en dashboard</a>
+    </mat-card-header>
+    <mat-card-content>
+      @for (visit of store.upcomingVisits(); track visit.id) {
+        <div class="ag-row">
+          <div>
+            <span class="ag-row-title">{{ visit.title }}</span>
+            <span class="ag-row-meta">{{ visit.client }} · {{ visit.location }}</span>
+            <span class="ag-row-time">{{ visit.scheduledAt }}</span>
+          </div>
+          <button mat-stroked-button (click)="completeVisit(visit.id)">Completar</button>
+        </div>
+      } @empty {
+        <p class="ag-empty">No hay visitas pendientes</p>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

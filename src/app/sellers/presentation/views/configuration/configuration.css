@@ -1,0 +1,10 @@
+.cfg-page { display:flex; flex-direction:column; gap:16px; max-width:720px; }
+.cfg-header { display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:12px; }
+.cfg-title { margin:0; font-size:1.5rem; font-weight:700; color:#0f172a; }
+.cfg-subtitle { margin:4px 0 0; font-size:0.85rem; color:#64748b; }
+.cfg-card { border:1px solid #e2e8f0!important; border-radius:12px!important; box-shadow:none!important; }
+.cfg-card mat-card-header { display:flex; align-items:center; gap:8px; }
+.cfg-card-icon { color:#3b82f6; }
+.cfg-desc { color:#64748b; font-size:0.85rem; margin:0 0 12px; }
+.cfg-links { display:flex; flex-direction:column; gap:8px; }
+.cfg-links a { color:#3b82f6; text-decoration:none; font-weight:600; font-size:0.85rem; }

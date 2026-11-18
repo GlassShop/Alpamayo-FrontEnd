@@ -1,0 +1,14 @@
+.prof-page { display:flex; flex-direction:column; gap:16px; }
+.prof-header { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+.prof-avatar { width:56px; height:56px; border-radius:50%; background:#3b82f6; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; }
+.prof-title { margin:0; font-size:1.5rem; font-weight:700; color:#0f172a; }
+.prof-subtitle { margin:4px 0 0; font-size:0.85rem; color:#64748b; }
+.prof-goal-card { border:1px solid #e2e8f0!important; border-radius:12px!important; box-shadow:none!important; }
+.prof-goal-value { font-size:2rem; font-weight:800; color:#8b5cf6; margin-bottom:8px; }
+.prof-goal-detail { font-size:0.85rem; color:#64748b; margin:8px 0; }
+.prof-link { font-size:0.78rem; color:#3b82f6; text-decoration:none; font-weight:600; }
+.prof-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.prof-stat { border:1px solid #e2e8f0!important; border-radius:12px!important; box-shadow:none!important; text-align:center; }
+.prof-stat mat-icon { color:#3b82f6; }
+.prof-stat span { display:block; font-size:0.72rem; color:#64748b; text-transform:uppercase; font-weight:700; margin:4px 0; }
+.prof-stat strong { display:block; font-size:1.5rem; color:#0f172a; margin-bottom:8px; }

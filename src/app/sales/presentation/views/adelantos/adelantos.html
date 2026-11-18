@@ -1,0 +1,56 @@
+<div class="adl-page">
+  <div class="adl-header">
+    <div class="adl-header-left">
+      <mat-icon>payments</mat-icon>
+      <div>
+        <h2>Registro de Adelantos</h2>
+        <p>Pagos a cuenta vinculados a cotizaciones y caja</p>
+      </div>
+    </div>
+    <div class="adl-actions">
+      <a mat-stroked-button routerLink="/sellers/cash">Ir a caja</a>
+      <a mat-flat-button routerLink="/sellers/quotes/productos" class="adl-btn-primary">Nueva venta</a>
+    </div>
+  </div>
+
+  <div class="adl-summary">
+    <div class="adl-sum-item">
+      <span>Total adelantado</span>
+      <strong>S/ {{ store.totalCollectedToday() | number:'1.2-2' }}</strong>
+    </div>
+    <div class="adl-sum-item adl-sum-item--pending">
+      <span>Saldo pendiente</span>
+      <strong>S/ {{ store.totalPendingBalance() | number:'1.2-2' }}</strong>
+    </div>
+    <div class="adl-sum-item">
+      <span>Documentos con adelanto</span>
+      <strong>{{ advances().length }}</strong>
+    </div>
+  </div>
+
+  @if (advances().length === 0) {
+    <div class="adl-empty">
+      <mat-icon>payments</mat-icon>
+      <p>No hay adelantos registrados.</p>
+      <span>Genera una cotización en <a routerLink="/sellers/quotes/productos">Productos</a> e indica un pago parcial.</span>
+    </div>
+  }
+
+  @for (quote of advances(); track quote.id) {
+    <div class="adl-card">
+      <div class="adl-card-left">
+        <span class="adl-num">Nº {{ quote.number }}</span>
+        <span class="adl-type">{{ typeLabelMap[quote.type] }}</span>
+      </div>
+      <div class="adl-card-center">
+        <span class="adl-client">{{ quote.customer.name }}</span>
+        <span class="adl-meta">{{ quote.date | date:'dd/MM/yyyy' }} · {{ quote.paymentMethod }}</span>
+      </div>
+      <div class="adl-card-right">
+        <div><span class="adl-label">Adelanto</span><strong>S/ {{ quote.partialPayment | number:'1.2-2' }}</strong></div>
+        <div><span class="adl-label">Saldo</span><strong class="adl-saldo">S/ {{ balance(quote) | number:'1.2-2' }}</strong></div>
+        <a mat-stroked-button routerLink="/sellers/quotes/cotizaciones">Ver documento</a>
+      </div>
+    </div>
+  }
+</div>

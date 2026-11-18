@@ -68,5 +68,31 @@
       "description-required": "Description is required",
       "category-required": "Category is required"
     }
+  },
+  "sellers": {
+    "quoting":  { "title": "Projects & Quoting Tool" },
+    "quotes":   { "title": "Sales & CRM" },
+    "sales":    { "title": "Stock & Remnants" },
+    "cash":     { "title": "Cash Register & Collections" },
+    "orders":   { "title": "Order Tracking" },
+    "agenda":   { "title": "Agenda & Visits" },
+    "profile":  { "title": "My Profile & Goals" },
+    "configuration": {
+      "title": "Settings",
+      "subtitle": "Application preferences for the seller",
+      "back": "Back to profile",
+      "language": {
+        "title": "Language",
+        "description": "Select the interface language. Your preference is saved in this browser."
+      },
+      "shortcuts": {
+        "title": "Quick links",
+        "dashboard": "Sales dashboard",
+        "sales": "Product catalogue",
+        "workshop": "Workshop status",
+        "cash": "Cash register"
+      }
+    },
+    "placeholder": { "content": "This section is under construction and will be available soon." }
   }
 }

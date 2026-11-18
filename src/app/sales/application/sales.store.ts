@@ -21,6 +21,54 @@ const MOCK_CUSTOMERS: Customer[] = [
   { id: 'c3', name: 'Inversiones del Sur E.I.R.L.',  docType: 'RUC', docNumber: '20500112233' },
 ];
 
+const MOCK_SAVED_QUOTES: Quote[] = [
+  {
+    id: 'q1',
+    number: '4829103',
+    date: new Date('2026-08-12T10:30:00'),
+    type: 'cotizacion',
+    customer: MOCK_CUSTOMERS[0],
+    items: [{ product: MOCK_PRODUCTS[0], quantity: 12, unitPrice: 145 }],
+    sellerName: 'Carlos M.',
+    currency: 'Soles (PEN)',
+    paymentMethod: 'Transferencia BCP',
+    partialPayment: 870,
+    subtotal: 1740,
+    taxes: 313.2,
+    total: 2053.2
+  },
+  {
+    id: 'q2',
+    number: '4829104',
+    date: new Date('2026-08-11T15:00:00'),
+    type: 'factura',
+    customer: MOCK_CUSTOMERS[2],
+    items: [{ product: MOCK_PRODUCTS[6], quantity: 40, unitPrice: 68 }],
+    sellerName: 'Carlos M.',
+    currency: 'Soles (PEN)',
+    paymentMethod: 'Depósito Bancario',
+    partialPayment: 4100,
+    subtotal: 2720,
+    taxes: 489.6,
+    total: 3209.6
+  },
+  {
+    id: 'q3',
+    number: '4829105',
+    date: new Date('2026-08-10T09:15:00'),
+    type: 'boleta',
+    customer: MOCK_CUSTOMERS[1],
+    items: [{ product: MOCK_PRODUCTS[4], quantity: 3, unitPrice: 185 }],
+    sellerName: 'Carlos M.',
+    currency: 'Soles (PEN)',
+    paymentMethod: 'Efectivo',
+    partialPayment: 0,
+    subtotal: 555,
+    taxes: 99.9,
+    total: 654.9
+  }
+];
+
 @Injectable({ providedIn: 'root' })
 export class SalesStore {
   // ── catalogue ──────────────────────────────────────────────────────────────
@@ -113,7 +161,19 @@ export class SalesStore {
   clearSale(): void { this.saleItems.set([]); }
 
   // ── saved quotes ───────────────────────────────────────────────────────────
-  readonly savedQuotes = signal<Quote[]>([]);
+  readonly savedQuotes = signal<Quote[]>(MOCK_SAVED_QUOTES);
+
+  readonly quotesWithBalance = computed(() =>
+    this.savedQuotes().filter(q => q.partialPayment > 0 && q.total > q.partialPayment)
+  );
+
+  readonly totalCollectedToday = computed(() =>
+    this.savedQuotes().reduce((acc, q) => acc + q.partialPayment, 0)
+  );
+
+  readonly totalPendingBalance = computed(() =>
+    this.quotesWithBalance().reduce((acc, q) => acc + (q.total - q.partialPayment), 0)
+  );
   readonly pendingContractType = signal<import('../domain/model/quote.entity').QuoteType | null>(null);
 
   setPendingContractType(type: import('../domain/model/quote.entity').QuoteType): void {

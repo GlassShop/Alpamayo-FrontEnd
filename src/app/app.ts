@@ -1,6 +1,6 @@
 import {Component, inject, signal} from '@angular/core';
-import {TranslateService} from "@ngx-translate/core";
-import {Layout} from "./shared/presentation/components/layout/layout";
+import {Layout} from './shared/presentation/components/layout/layout';
+import {ConfigurationStore} from './sellers/application/configuration.store';
 
 @Component({
   selector: 'app-root',
@@ -9,22 +9,9 @@ import {Layout} from "./shared/presentation/components/layout/layout";
   styleUrl: './app.css'
 })
 export class App {
-  /**
-   * Signal for the application title.
-   */
-  protected readonly title = signal('learning-center');
+  protected readonly title = signal('Vidrieria Alpamayo');
 
-  /**
-   * Translation service instance.
-   */
-  private translate: TranslateService;
-
-  /**
-   * Creates an instance of App and sets up translation.
-   */
   constructor() {
-    this.translate = inject(TranslateService);
-    this.translate.addLangs(['en', 'es']);
-    this.translate.use('en');
+    inject(ConfigurationStore);
   }
 }

@@ -74,9 +74,25 @@
     "quotes":   { "title": "Ventas & CRM" },
     "sales":    { "title": "Stock & Retazos" },
     "cash":     { "title": "Caja y Cobranzas" },
-    "orders":   { "title": "Estado de Taller" },
+    "orders":   { "title": "Seguimiento de Pedidos" },
     "agenda":   { "title": "Agenda & Visitas" },
     "profile":  { "title": "Mi Perfil & Metas" },
+    "configuration": {
+      "title": "Configuración",
+      "subtitle": "Preferencias de la aplicación para el vendedor",
+      "back": "Volver al perfil",
+      "language": {
+        "title": "Idioma",
+        "description": "Selecciona el idioma de la interfaz. La preferencia se guarda en este navegador."
+      },
+      "shortcuts": {
+        "title": "Accesos rápidos",
+        "dashboard": "Dashboard de ventas",
+        "sales": "Catálogo de productos",
+        "workshop": "Estado de taller",
+        "cash": "Caja y cobranzas"
+      }
+    },
     "placeholder": { "content": "Esta sección está en construcción y estará disponible pronto." }
   }
 }

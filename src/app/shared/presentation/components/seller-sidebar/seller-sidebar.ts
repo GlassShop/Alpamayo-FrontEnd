@@ -36,6 +36,7 @@ export class SellerSidebar implements OnInit {
         { link: '/sellers/quotes/productos',    label: 'Productos',                        icon: 'inventory_2' },
         { link: '/sellers/quotes/cotizaciones', label: 'Mis Cotizaciones & Proformas PDF', icon: 'receipt_long' },
         { link: '/sellers/quotes/adelantos',    label: 'Registro de Adelantos',            icon: 'payments' },
+        { link: '/sellers/cash',                label: 'Caja y Cobranzas',                 icon: 'point_of_sale' },
       ]
     },
     {
@@ -43,6 +44,7 @@ export class SellerSidebar implements OnInit {
       children: [
         { link: '/sellers/workshop/estado-taller', label: 'Estado de Taller',    icon: 'view_kanban' },
         { link: '/sellers/workshop/sprint',         label: 'Sprint de Proyectos', icon: 'table_chart' },
+        { link: '/sellers/orders',                  label: 'Seguimiento Pedidos', icon: 'local_shipping' },
       ]
     },
     { link: '/sellers/agenda',  label: 'Agenda & Visitas',  icon: 'calendar_month' },

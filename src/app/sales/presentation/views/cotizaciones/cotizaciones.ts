@@ -1,5 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {DecimalPipe, DatePipe} from '@angular/common';
+import {RouterLink} from '@angular/router';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDialogModule, MatDialog} from '@angular/material/dialog';
@@ -9,7 +10,7 @@ import {DigitalContractDialogComponent} from '../direct-sales/digital-contract-d
 
 @Component({
   selector: 'app-cotizaciones',
-  imports: [DecimalPipe, DatePipe, MatIconModule, MatButtonModule, MatDialogModule],
+  imports: [DecimalPipe, DatePipe, RouterLink, MatIconModule, MatButtonModule, MatDialogModule],
   templateUrl: './cotizaciones.html',
   styleUrl: './cotizaciones.css'
 })

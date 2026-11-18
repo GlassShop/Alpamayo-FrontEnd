@@ -72,7 +72,7 @@
     <mat-card class="activity-card">
       <mat-card-header>
         <mat-card-title>Actividad Reciente</mat-card-title>
-        <div class="card-action-link"><a routerLink="/sellers/quotes">Ver todo</a></div>
+        <div class="card-action-link"><a routerLink="/sellers/quotes/cotizaciones">Ver todo</a></div>
       </mat-card-header>
       <mat-card-content>
         <table mat-table [dataSource]="store.summary().recentActivities" class="activity-table">
@@ -105,7 +105,10 @@
     </mat-card>
 
     <mat-card class="stock-card">
-      <mat-card-header><mat-card-title>Consulta Rápida Stock</mat-card-title></mat-card-header>
+      <mat-card-header>
+        <mat-card-title>Consulta Rápida Stock</mat-card-title>
+        <div class="card-action-link"><a routerLink="/sellers/sales">Ver inventario</a></div>
+      </mat-card-header>
       <mat-card-content>
         <mat-form-field appearance="outline" class="stock-search-field">
           <mat-label>Buscar producto...</mat-label>

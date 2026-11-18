@@ -1,0 +1,77 @@
+<div class="cash-page">
+  <div class="cash-header">
+    <div>
+      <h1 class="cash-title">Caja y Cobranzas</h1>
+      <p class="cash-subtitle">Resumen del turno conectado con cotizaciones y adelantos</p>
+    </div>
+    <div class="cash-actions">
+      <a mat-stroked-button routerLink="/sellers/quotes/adelantos">Ver adelantos</a>
+      <a mat-flat-button routerLink="/sellers/quotes/cotizaciones" class="cash-btn-primary">Ver cotizaciones</a>
+    </div>
+  </div>
+
+  <div class="cash-metrics">
+    <mat-card class="cash-metric">
+      <mat-card-content>
+        <mat-icon>today</mat-icon>
+        <span class="cash-metric-label">Ventas del turno</span>
+        <span class="cash-metric-value">{{ dashboardStore.summary().shiftSalesTotal | currency:'PEN':'S/ ':'1.2-2' }}</span>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="cash-metric">
+      <mat-card-content>
+        <mat-icon>payments</mat-icon>
+        <span class="cash-metric-label">Adelantos registrados</span>
+        <span class="cash-metric-value">{{ salesStore.totalCollectedToday() | currency:'PEN':'S/ ':'1.2-2' }}</span>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="cash-metric cash-metric--pending">
+      <mat-card-content>
+        <mat-icon>account_balance_wallet</mat-icon>
+        <span class="cash-metric-label">Saldo pendiente</span>
+        <span class="cash-metric-value">{{ salesStore.totalPendingBalance() | currency:'PEN':'S/ ':'1.2-2' }}</span>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-card class="cash-card">
+    <mat-card-header>
+      <mat-card-title>Movimientos recientes del dashboard</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @for (activity of dashboardStore.summary().recentActivities; track activity.id) {
+        @if (activity.total !== null) {
+          <div class="cash-row">
+            <div>
+              <span class="cash-doc">{{ activity.document }}</span>
+              <span class="cash-client">{{ activity.client }}</span>
+            </div>
+            <span class="cash-amount">{{ activity.total | currency:'PEN':'S/ ':'1.2-2' }}</span>
+          </div>
+        }
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="cash-card">
+    <mat-card-header>
+      <mat-card-title>Documentos con saldo pendiente</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @if (salesStore.quotesWithBalance().length === 0) {
+        <p class="cash-empty">No hay saldos pendientes. Genera cotizaciones desde Productos.</p>
+      }
+      @for (quote of salesStore.quotesWithBalance(); track quote.id) {
+        <div class="cash-row">
+          <div>
+            <span class="cash-doc">Nº {{ quote.number }} · {{ quote.customer.name }}</span>
+            <span class="cash-client">Adelanto: S/ {{ quote.partialPayment | number:'1.2-2' }}</span>
+          </div>
+          <span class="cash-amount cash-amount--pending">
+            S/ {{ (quote.total - quote.partialPayment) | number:'1.2-2' }}
+          </span>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

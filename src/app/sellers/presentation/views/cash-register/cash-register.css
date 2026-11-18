@@ -1,0 +1,20 @@
+.cash-page { display:flex; flex-direction:column; gap:16px; }
+.cash-header { display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:12px; }
+.cash-title { margin:0; font-size:1.5rem; font-weight:700; color:#0f172a; }
+.cash-subtitle { margin:4px 0 0; font-size:0.85rem; color:#64748b; }
+.cash-actions { display:flex; gap:8px; }
+.cash-btn-primary { background:#3b82f6!important; color:#fff!important; }
+.cash-metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.cash-metric { border:1px solid #e2e8f0!important; border-radius:12px!important; box-shadow:none!important; }
+.cash-metric mat-icon { color:#3b82f6; margin-bottom:4px; }
+.cash-metric--pending mat-icon { color:#f59e0b; }
+.cash-metric-label { display:block; font-size:0.72rem; font-weight:700; color:#64748b; text-transform:uppercase; }
+.cash-metric-value { display:block; font-size:1.3rem; font-weight:800; color:#0f172a; }
+.cash-card { border:1px solid #e2e8f0!important; border-radius:12px!important; box-shadow:none!important; }
+.cash-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f1f5f9; }
+.cash-row:last-child { border-bottom:none; }
+.cash-doc { display:block; font-weight:600; color:#1e293b; }
+.cash-client { display:block; font-size:0.75rem; color:#94a3b8; }
+.cash-amount { font-weight:800; color:#22c55e; }
+.cash-amount--pending { color:#f59e0b; }
+.cash-empty { color:#94a3b8; text-align:center; padding:16px; }
