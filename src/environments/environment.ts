@@ -8,5 +8,6 @@ export const environment = {
   signInEndpointPath: '/authentication/sign-in',
   glassTypesEndpointPath: '/glass-types',
   priceListsEndpointPath: '/price-lists',
-  pricesEndpointPath: '/prices'
+  pricesEndpointPath: '/prices',
+  usersEndpointPath: '/users'
 };

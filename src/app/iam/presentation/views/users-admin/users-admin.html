@@ -1,0 +1,163 @@
+<header class="al-page-header">
+  <div>
+    <h1 class="al-page-title">{{ 'users.title' | translate }}</h1>
+    <p class="al-page-subtitle">{{ 'users.subtitle' | translate }}</p>
+  </div>
+</header>
+
+@if (store.error(); as error) {
+  <div class="al-alert al-alert--error" role="alert">
+    <mat-icon>error_outline</mat-icon><span>{{ 'users.error.' + error | translate }}</span>
+    @if (error === 'load') {
+      <button class="al-btn al-btn--secondary" (click)="store.load()">{{ 'common.retry' | translate }}</button>
+    } @else {
+      <button class="al-icon-btn" (click)="store.clearMessages()" [attr.aria-label]="'common.close' | translate"><mat-icon>close</mat-icon></button>
+    }
+  </div>
+}
+@if (store.notice(); as notice) {
+  <div class="al-alert ua-notice" role="status">
+    <mat-icon>check_circle</mat-icon><span>{{ 'users.notice.' + notice | translate }}</span>
+    <button class="al-icon-btn" (click)="store.clearMessages()" [attr.aria-label]="'common.close' | translate"><mat-icon>close</mat-icon></button>
+  </div>
+}
+
+<div class="ua-grid">
+  <!-- Accounts -->
+  <section class="al-card">
+    <div class="al-card-header">
+      <h2 class="al-card-title"><mat-icon>group</mat-icon>{{ 'users.list-title' | translate }}</h2>
+      <span class="al-muted ua-count">{{ store.users().length }}</span>
+    </div>
+    @if (store.loading()) {
+      <div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div>
+    } @else {
+      <div class="al-table-wrapper">
+        <table class="al-table">
+          <thead>
+            <tr>
+              <th>{{ 'users.col-name' | translate }}</th>
+              <th>{{ 'users.col-role' | translate }}</th>
+              <th>{{ 'users.col-status' | translate }}</th>
+              <th class="al-num"><span class="sr-only">{{ 'users.col-actions' | translate }}</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of store.users(); track user.id) {
+              <tr [class.ua-inactive]="!user.active">
+                <td>
+                  <span class="ua-name">{{ user.fullName }}
+                    @if (store.isSelf(user)) { <span class="ua-you">{{ 'users.you' | translate }}</span> }
+                  </span>
+                  <span class="al-muted ua-username">{{ user.username }}</span>
+                </td>
+                <td>
+                  <select class="al-select ua-role" (change)="onRole(user, $event)" [disabled]="store.saving() || store.isSelf(user)"
+                          [attr.aria-label]="('users.col-role' | translate) + ' — ' + user.fullName">
+                    @for (role of roles; track role) {
+                      <option [value]="role" [selected]="role === user.role">{{ roleLabel[role] | translate }}</option>
+                    }
+                  </select>
+                </td>
+                <td>
+                  <span class="al-pill" [class.al-pill--success]="user.active" [class.al-pill--danger]="!user.active">
+                    {{ (user.active ? 'users.active' : 'users.inactive') | translate }}
+                  </span>
+                </td>
+                <td class="al-num ua-actions">
+                  <button class="al-icon-btn" (click)="startReset(user)" [disabled]="store.saving()"
+                          [matTooltip]="'users.reset-password' | translate" [attr.aria-label]="('users.reset-password' | translate) + ' — ' + user.fullName">
+                    <mat-icon>key</mat-icon>
+                  </button>
+                  @if (!store.isSelf(user)) {
+                    <button class="al-icon-btn" [class.al-icon-btn--danger]="user.active" (click)="store.setActive(user, !user.active)" [disabled]="store.saving()"
+                            [matTooltip]="(user.active ? 'users.deactivate' : 'users.reactivate') | translate"
+                            [attr.aria-label]="((user.active ? 'users.deactivate' : 'users.reactivate') | translate) + ' — ' + user.fullName">
+                      <mat-icon>{{ user.active ? 'person_off' : 'person_add' }}</mat-icon>
+                    </button>
+                  }
+                </td>
+              </tr>
+              @if (resetting()?.id === user.id) {
+                <tr class="ua-reset-row">
+                  <td colspan="4">
+                    <form class="ua-reset" [formGroup]="resetForm" (ngSubmit)="confirmReset()">
+                      <strong>{{ 'users.reset-for' | translate: { name: user.fullName } }}</strong>
+                      <div class="al-field">
+                        <label class="al-label" for="ua-reset-password">{{ 'users.new-password' | translate }}</label>
+                        <input class="al-input" id="ua-reset-password" type="password" formControlName="password"
+                               autocomplete="new-password" aria-describedby="ua-reset-password-msg"/>
+                        <span id="ua-reset-password-msg" class="al-error-text">@if (isInvalidControl(resetForm, 'password')) { {{ errorMessagesForControl(resetForm, 'password') }} }</span>
+                      </div>
+                      <div class="al-field">
+                        <label class="al-label" for="ua-reset-confirm">{{ 'users.confirm-password' | translate }}</label>
+                        <input class="al-input" id="ua-reset-confirm" type="password" formControlName="confirm"
+                               autocomplete="new-password" aria-describedby="ua-reset-confirm-msg"/>
+                        <span id="ua-reset-confirm-msg" class="al-error-text">@if (resetForm.hasError('mismatch') && resetForm.controls.confirm.touched) { {{ 'forms.error.mismatch' | translate }} }</span>
+                      </div>
+                      <div class="ua-reset-actions">
+                        <button type="button" class="al-btn al-btn--secondary" (click)="resetting.set(null)">{{ 'common.cancel' | translate }}</button>
+                        <button type="submit" class="al-btn al-btn--primary" [disabled]="store.saving()">{{ 'users.save-password' | translate }}</button>
+                      </div>
+                    </form>
+                  </td>
+                </tr>
+              }
+            } @empty {
+              <tr><td colspan="4" class="al-muted">{{ 'users.empty' | translate }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  <!-- New account -->
+  <form class="al-card" [formGroup]="createForm" (ngSubmit)="createUser()" novalidate>
+    <div class="al-card-header"><h2 class="al-card-title"><mat-icon>person_add</mat-icon>{{ 'users.new-title' | translate }}</h2></div>
+    <div class="al-card-body">
+      <div class="al-field">
+        <label class="al-label" for="ua-fullname">{{ 'users.full-name' | translate }}</label>
+        <input class="al-input" id="ua-fullname" formControlName="fullName" autocomplete="off"
+               [placeholder]="'users.full-name-example' | translate" aria-describedby="ua-fullname-msg"/>
+        <span id="ua-fullname-msg" class="al-error-text">@if (isInvalidControl(createForm, 'fullName')) { {{ errorMessagesForControl(createForm, 'fullName') }} }</span>
+      </div>
+      <div class="al-field">
+        <label class="al-label" for="ua-username">{{ 'users.username' | translate }}</label>
+        <input class="al-input" id="ua-username" formControlName="username" autocomplete="off" autocapitalize="none" spellcheck="false"
+               [placeholder]="'users.username-example' | translate" aria-describedby="ua-username-msg"/>
+        @if (isInvalidControl(createForm, 'username')) {
+          <span id="ua-username-msg" class="al-error-text">{{ errorMessagesForControl(createForm, 'username') }}</span>
+        } @else {
+          <span id="ua-username-msg" class="al-hint">{{ 'users.username-hint' | translate }}</span>
+        }
+      </div>
+      <div class="al-field">
+        <label class="al-label" for="ua-role">{{ 'users.col-role' | translate }}</label>
+        <select class="al-select" id="ua-role" formControlName="role">
+          @for (role of roles; track role) { <option [value]="role">{{ roleLabel[role] | translate }}</option> }
+        </select>
+      </div>
+      <div class="al-field">
+        <label class="al-label" for="ua-password">{{ 'users.initial-password' | translate }}</label>
+        <input class="al-input" id="ua-password" type="password" formControlName="password" autocomplete="new-password"
+               aria-describedby="ua-password-msg"/>
+        @if (isInvalidControl(createForm, 'password')) {
+          <span id="ua-password-msg" class="al-error-text">{{ errorMessagesForControl(createForm, 'password') }}</span>
+        } @else {
+          <span id="ua-password-msg" class="al-hint">{{ 'users.password-hint' | translate: { min: minLength } }}</span>
+        }
+      </div>
+      <div class="al-field">
+        <label class="al-label" for="ua-confirm">{{ 'users.confirm-password' | translate }}</label>
+        <input class="al-input" id="ua-confirm" type="password" formControlName="confirm" autocomplete="new-password"
+               aria-describedby="ua-confirm-msg"/>
+        <span id="ua-confirm-msg" class="al-error-text">@if (createForm.hasError('mismatch') && createForm.controls.confirm.touched) { {{ 'forms.error.mismatch' | translate }} }</span>
+      </div>
+      <button class="al-btn al-btn--primary" type="submit" [disabled]="store.saving()">
+        <mat-icon>person_add</mat-icon>{{ 'users.create' | translate }}
+      </button>
+      <p class="al-muted ua-handover">{{ 'users.handover' | translate }}</p>
+    </div>
+  </form>
+</div>
