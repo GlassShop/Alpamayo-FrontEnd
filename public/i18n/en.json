@@ -195,7 +195,8 @@
     "users": "Users",
     "settings": "Settings",
     "sign-out": "Sign out",
-    "no-session": "Not signed in"
+    "no-session": "Not signed in",
+    "quotes": "My quotes"
   },
   "users": {
     "title": "Users",
@@ -242,6 +243,103 @@
       "deactivated": "Account deactivated: it can no longer sign in.",
       "reactivated": "Account reactivated.",
       "password-reset": "Password reset. Hand it over to the person."
+    }
+  },
+  "quotes": {
+    "number": "No.",
+    "date": "Date",
+    "customer": "Customer",
+    "seller": "Seller",
+    "total": "Total",
+    "advance": "Advance",
+    "balance": "Balance due",
+    "currency": "Currency",
+    "currency-pen": "Soles (PEN)",
+    "unit-price": "Unit price",
+    "print": "Print / PDF",
+    "new-quote": "New quote",
+    "editing": "Editing {{ number }}",
+    "saved-notice": "Quote {{ number }} saved.",
+    "price-changed": "Prices changed since it was saved: before S/ {{ saved }}, now S/ {{ current }}. Saving will use current prices.",
+    "conditions-title": "Sale conditions accepted by the customer",
+    "payment": {
+      "CASH": "Cash",
+      "YAPE": "Yape",
+      "PLIN": "Plin",
+      "CARD": "Card"
+    },
+    "extras": {
+      "title": "Additional concepts",
+      "hint": "Installation, transport, accessories… at the price you set.",
+      "add": "Add row",
+      "description": "Description",
+      "example": "e.g. Installation",
+      "incomplete": "Incomplete"
+    },
+    "save": {
+      "open": "Save quote",
+      "title": "Save quote",
+      "title-edit": "Save changes to {{ number }}",
+      "customer": "Customer",
+      "doc": "DNI or RUC",
+      "doc-example": "8 digits (DNI) or 11 (RUC)",
+      "doc-hint": "Customer data is looked up once complete.",
+      "invalid-doc": "Invalid document. Check the digits.",
+      "searching": "Searching…",
+      "found": "Customer found.",
+      "not-found": "We could not find this document.",
+      "lookup-error": "The lookup is not available right now.",
+      "manual-hint": "Enter the customer data by hand; it will be remembered next time.",
+      "name": "Name or company name",
+      "phone": "Phone",
+      "address": "Address",
+      "invalid-phone": "Invalid phone.",
+      "payment": "Payment",
+      "method": "Payment method",
+      "choose": "Choose…",
+      "advance-too-high": "Cannot exceed the total.",
+      "notes": "Note",
+      "accept": "The customer accepts the sale conditions",
+      "accept-required": "The customer must accept the conditions to save.",
+      "submit": "Save",
+      "submit-edit": "Save changes",
+      "incomplete-hint": "Complete or remove unpriced lines and incomplete concepts."
+    },
+    "list": {
+      "title": "My quotes",
+      "title-all": "Quotes",
+      "subtitle": "Quotes you saved.",
+      "subtitle-all": "Quotes from the whole team.",
+      "search": "Search by customer, DNI/RUC or number",
+      "all-sellers": "All sellers",
+      "paid": "Paid",
+      "edit": "Edit",
+      "empty": "No saved quotes yet.",
+      "no-results": "No quote matches the search.",
+      "confirm-replace": "You have an unsaved quote in the quoter. Replace it with the selected one?"
+    },
+    "print-view": {
+      "back": "Back",
+      "quote": "Quote",
+      "valid-until": "Valid until",
+      "description": "Description",
+      "line-total": "Amount",
+      "accepted": "Conditions accepted by the customer",
+      "yes": "Yes",
+      "no": "No",
+      "customer-signature": "Customer signature",
+      "seller-signature": "Seller"
+    },
+    "error": {
+      "load": "Could not load the quotes.",
+      "not-found": "The quote does not exist or you have no access to it.",
+      "save": "Could not save. Please try again.",
+      "incomplete": "The quote has incomplete or unpriced lines.",
+      "invalid-document": "The DNI or RUC is not valid.",
+      "missing-name": "Customer name is missing.",
+      "invalid-advance": "Advance must be between 0 and the total.",
+      "terms-not-accepted": "The customer must accept the sale conditions.",
+      "totals-mismatch": "Prices changed while quoting. Review the quote and save again."
     }
   }
 }

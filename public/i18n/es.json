@@ -195,7 +195,8 @@
     "users": "Usuarios",
     "settings": "Configuración",
     "sign-out": "Cerrar sesión",
-    "no-session": "Sin sesión"
+    "no-session": "Sin sesión",
+    "quotes": "Mis cotizaciones"
   },
   "users": {
     "title": "Usuarios",
@@ -242,6 +243,103 @@
       "deactivated": "Cuenta desactivada: ya no puede iniciar sesión.",
       "reactivated": "Cuenta reactivada.",
       "password-reset": "Contraseña restablecida. Entrégasela a la persona."
+    }
+  },
+  "quotes": {
+    "number": "N.º",
+    "date": "Fecha",
+    "customer": "Cliente",
+    "seller": "Vendedora",
+    "total": "Total",
+    "advance": "A cuenta",
+    "balance": "Por pagar",
+    "currency": "Moneda",
+    "currency-pen": "Soles (PEN)",
+    "unit-price": "P. unit.",
+    "print": "Imprimir / PDF",
+    "new-quote": "Nueva cotización",
+    "editing": "Editando {{ number }}",
+    "saved-notice": "Cotización {{ number }} guardada.",
+    "price-changed": "Los precios cambiaron desde que se guardó: antes S/ {{ saved }}, ahora S/ {{ current }}. Al guardar se usarán los precios actuales.",
+    "conditions-title": "Condiciones de venta aceptadas por el cliente",
+    "payment": {
+      "CASH": "Efectivo",
+      "YAPE": "Yape",
+      "PLIN": "Plin",
+      "CARD": "Tarjeta"
+    },
+    "extras": {
+      "title": "Conceptos adicionales",
+      "hint": "Instalación, transporte, accesorios… con el precio que indiques.",
+      "add": "Agregar fila",
+      "description": "Descripción",
+      "example": "Ej. Instalación",
+      "incomplete": "Incompleto"
+    },
+    "save": {
+      "open": "Guardar cotización",
+      "title": "Guardar cotización",
+      "title-edit": "Guardar cambios de {{ number }}",
+      "customer": "Cliente",
+      "doc": "DNI o RUC",
+      "doc-example": "8 dígitos (DNI) u 11 (RUC)",
+      "doc-hint": "Al completarlo se buscan los datos del cliente.",
+      "invalid-doc": "Documento no válido. Revisa los dígitos.",
+      "searching": "Buscando…",
+      "found": "Cliente encontrado.",
+      "not-found": "No encontramos este documento.",
+      "lookup-error": "No se pudo consultar ahora.",
+      "manual-hint": "Ingresa los datos del cliente a mano; quedarán guardados para la próxima vez.",
+      "name": "Nombre o razón social",
+      "phone": "Teléfono",
+      "address": "Dirección",
+      "invalid-phone": "Teléfono no válido.",
+      "payment": "Pago",
+      "method": "Forma de pago",
+      "choose": "Elige…",
+      "advance-too-high": "No puede ser mayor que el total.",
+      "notes": "Nota",
+      "accept": "El cliente acepta las condiciones de venta",
+      "accept-required": "El cliente debe aceptar las condiciones para guardar.",
+      "submit": "Guardar",
+      "submit-edit": "Guardar cambios",
+      "incomplete-hint": "Completa o quita las líneas sin precio y los conceptos incompletos."
+    },
+    "list": {
+      "title": "Mis cotizaciones",
+      "title-all": "Cotizaciones",
+      "subtitle": "Las cotizaciones que guardaste.",
+      "subtitle-all": "Cotizaciones de todo el equipo.",
+      "search": "Buscar por cliente, DNI/RUC o número",
+      "all-sellers": "Todas las vendedoras",
+      "paid": "Pagado",
+      "edit": "Editar",
+      "empty": "Aún no hay cotizaciones guardadas.",
+      "no-results": "Ninguna cotización coincide con la búsqueda.",
+      "confirm-replace": "Tienes una cotización sin guardar en el cotizador. ¿Reemplazarla por la seleccionada?"
+    },
+    "print-view": {
+      "back": "Volver",
+      "quote": "Cotización",
+      "valid-until": "Válida hasta",
+      "description": "Descripción",
+      "line-total": "Importe",
+      "accepted": "Condiciones aceptadas por el cliente",
+      "yes": "Sí",
+      "no": "No",
+      "customer-signature": "Firma del cliente",
+      "seller-signature": "Vendedora"
+    },
+    "error": {
+      "load": "No se pudieron cargar las cotizaciones.",
+      "not-found": "La cotización no existe o no tienes acceso a ella.",
+      "save": "No se pudo guardar. Inténtalo de nuevo.",
+      "incomplete": "La cotización tiene líneas incompletas o sin precio.",
+      "invalid-document": "El DNI o RUC no es válido.",
+      "missing-name": "Falta el nombre del cliente.",
+      "invalid-advance": "«A cuenta» debe estar entre 0 y el total.",
+      "terms-not-accepted": "El cliente debe aceptar las condiciones de venta.",
+      "totals-mismatch": "Los precios cambiaron mientras cotizabas. Revisa la cotización y vuelve a guardar."
     }
   }
 }
