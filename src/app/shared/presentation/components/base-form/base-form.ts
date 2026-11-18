@@ -7,7 +7,8 @@ import {TranslateService} from '@ngx-translate/core';
  * Messages come from the translation files (`forms.error.*`).
  */
 export class BaseForm {
-  private readonly translate = inject(TranslateService);
+  /** Named specifically so subclasses can inject their own TranslateService as `translate`. */
+  private readonly formMessages = inject(TranslateService);
 
   /** True when the control is invalid and the user already interacted with it. */
   protected isInvalidControl(form: FormGroup, controlName: string): boolean {
@@ -25,7 +26,7 @@ export class BaseForm {
   private messageFor(errorKey: string, detail: unknown): string {
     const params = detail && typeof detail === 'object' ? detail as Record<string, unknown> : {};
     const key = `forms.error.${errorKey}`;
-    const message = this.translate.instant(key, params);
-    return message === key ? this.translate.instant('forms.error.invalid') : message;
+    const message = this.formMessages.instant(key, params);
+    return message === key ? this.formMessages.instant('forms.error.invalid') : message;
   }
 }
