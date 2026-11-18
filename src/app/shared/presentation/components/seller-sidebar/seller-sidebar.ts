@@ -1,8 +1,9 @@
-import {Component, Input, signal, inject, OnInit} from '@angular/core';
+import {Component, Input, computed, signal, inject, OnInit} from '@angular/core';
 import {Router, RouterLink, RouterLinkActive, NavigationEnd} from '@angular/router';
 import {filter} from 'rxjs/operators';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {IamStore} from '../../../../iam/application/iam.store';
 
 export interface SubNavOption { link: string; label: string; icon: string; }
 export interface NavOption {
@@ -10,6 +11,8 @@ export interface NavOption {
   key?: string;
   label: string;
   icon: string;
+  /** Highlight only on an exact URL match (e.g. /catalogo vs /catalogo/precios). */
+  exact?: boolean;
   children?: SubNavOption[];
 }
 
@@ -27,29 +30,18 @@ export class SellerSidebar implements OnInit {
 
   expandedKeys = signal<Set<string>>(new Set());
 
+  readonly iamStore = inject(IamStore);
+
+  /** Initials of the signed-in user, or a neutral mark when nobody is signed in. */
+  readonly userInitials = computed(() =>
+    (this.iamStore.currentUsername() ?? '').slice(0, 2).toUpperCase() || '—'
+  );
+
   options = signal<NavOption[]>([
-    { link: '/sellers/dashboard',   label: 'Dashboard Ventas',     icon: 'space_dashboard' },
-    { link: '/sellers/quoting/new', label: 'Proyectos & Cotizador', icon: 'calculate' },
-    {
-      key: 'quotes', label: 'Ventas & CRM', icon: 'group',
-      children: [
-        { link: '/sellers/quotes/productos',    label: 'Productos',                        icon: 'inventory_2' },
-        { link: '/sellers/quotes/cotizaciones', label: 'Mis Cotizaciones & Proformas PDF', icon: 'receipt_long' },
-        { link: '/sellers/quotes/adelantos',    label: 'Registro de Adelantos',            icon: 'payments' },
-        { link: '/sellers/cash',                label: 'Caja y Cobranzas',                 icon: 'point_of_sale' },
-      ]
-    },
-    {
-      key: 'workshop', label: 'Taller de Producción', icon: 'precision_manufacturing',
-      children: [
-        { link: '/sellers/workshop/estado-taller', label: 'Estado de Taller',    icon: 'view_kanban' },
-        { link: '/sellers/workshop/sprint',         label: 'Sprint de Proyectos', icon: 'table_chart' },
-        { link: '/sellers/orders',                  label: 'Seguimiento Pedidos', icon: 'local_shipping' },
-      ]
-    },
-    { link: '/sellers/agenda',  label: 'Agenda & Visitas',  icon: 'calendar_month' },
-    { link: '/sellers/sales',   label: 'Stock & Retazos',   icon: 'inventory_2' },
-    { link: '/sellers/profile', label: 'Mi Perfil & Metas', icon: 'manage_accounts' }
+    { link: '/cotizador',        label: 'Cotizador',     icon: 'calculate' },
+    { link: '/catalogo',         label: 'Catálogo',      icon: 'window', exact: true },
+    { link: '/catalogo/precios', label: 'Precios (CEO)', icon: 'price_change' },
+    { link: '/configuracion',    label: 'Configuración', icon: 'settings' }
   ]);
 
   ngOnInit(): void {

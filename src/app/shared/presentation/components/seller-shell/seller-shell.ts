@@ -5,6 +5,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {SellerSidebar} from '../seller-sidebar/seller-sidebar';
 
+/** Application frame: side navigation, top bar and routed content. */
 @Component({
   selector: 'app-seller-shell',
   imports: [RouterOutlet, MatIconModule, MatButtonModule, MatTooltipModule, SellerSidebar],
@@ -14,7 +15,7 @@ import {SellerSidebar} from '../seller-sidebar/seller-sidebar';
 export class SellerShell {
   private readonly router = inject(Router);
   readonly collapsed = signal(false);
-  toggleSidebar(): void { this.collapsed.update(v => !v); }
-  openConfiguration(): void { this.router.navigate(['/sellers/configuration']); }
-}
 
+  toggleSidebar(): void { this.collapsed.update(v => !v); }
+  openConfiguration(): void { this.router.navigate(['/configuracion']); }
+}
