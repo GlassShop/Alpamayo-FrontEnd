@@ -77,7 +77,7 @@ La API se configura en `src/environments/environment*.ts` (`apiBaseUrl`). En des
 | `/cotizaciones` | Mis cotizaciones (el CEO ve todas y filtra por vendedora) | Todos los roles |
 | `/cotizaciones/:id` | Cotización lista para imprimir o guardar como PDF | Quien la creó y el CEO |
 | `/catalogo` | Catálogo de vidrios y precios; agregar tipos de vidrio | Todos los roles |
-| `/catalogo/precios` | Precios por pie² y nuevas listas de precio | CEO |
+| `/catalogo/precios` | Precios por pie², nuevas listas de precio e historial de cambios (quién, cuándo, anterior → nuevo y motivo opcional) | CEO |
 | `/usuarios` | Cuentas del personal: crear, rol, desactivar, restablecer contraseña | CEO |
 | `/configuracion` | Idioma de la interfaz | Todos los roles |
 
