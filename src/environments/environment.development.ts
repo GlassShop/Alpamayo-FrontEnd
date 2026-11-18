@@ -1,10 +1,13 @@
+/**
+ * Every server address lives here, never in the code.
+ * Development points to the local json-server (`npm run api`).
+ * TODO: replace apiBaseUrl with the real backend URL once it is deployed (sprint 2).
+ */
 export const environment = {
   production: false,
-  platformProviderApiBaseUrl: 'https://fake-api-prueba.onrender.com/api/v1',
-  platformProviderCategoriesEndpointPath: '/categories',
-  platformProviderCoursesEndpointPath: '/courses',
-  platformProviderSignInEndpointPath: '/authentication/sign-in',
-  platformProviderSignUpEndpointPath: '/authentication/sign-up',
-  platformProviderSellersDashboardEndpointPath: '/sellers-dashboard-summaries',
-  logoProviderApiBaseUrl: 'https://img.logo.dev'
+  apiBaseUrl: 'http://localhost:3000/api/v1',
+  signInEndpointPath: '/authentication/sign-in',
+  glassTypesEndpointPath: '/glass-types',
+  priceListsEndpointPath: '/price-lists',
+  pricesEndpointPath: '/prices'
 };
