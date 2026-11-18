@@ -70,10 +70,18 @@ La API se configura en `src/environments/environment*.ts` (`apiBaseUrl`). En des
 
 ## Rutas
 
-| Ruta | Pantalla |
-| --- | --- |
-| `/iniciar-sesion` | Inicio de sesión |
-| `/cotizador` | Cotizador por pie² con la lista de precio elegida |
-| `/catalogo` | Catálogo de vidrios y precios (solo lectura) |
-| `/catalogo/precios` | Precios por pie², nuevos vidrios y nuevas listas (CEO) |
-| `/configuracion` | Idioma de la interfaz |
+| Ruta | Pantalla | Quién |
+| --- | --- | --- |
+| `/iniciar-sesion` | Inicio de sesión | Público |
+| `/cotizador` | Cotizador por pie² con la lista de precio elegida | Todos los roles |
+| `/catalogo` | Catálogo de vidrios y precios; agregar tipos de vidrio | Todos los roles |
+| `/catalogo/precios` | Precios por pie² y nuevas listas de precio | CEO |
+| `/usuarios` | Cuentas del personal: crear, rol, desactivar, restablecer contraseña | CEO |
+| `/configuracion` | Idioma de la interfaz | Todos los roles |
+
+## Inicio de sesión y roles
+
+- Solo el CEO crea cuentas y entrega usuario y contraseña; no hay registro público.
+- Roles: **CEO** (todo, incluidos precios y usuarios), **Vendedora** y **Almacén** (cotizar, ver el catálogo y agregar tipos de vidrio). Los permisos están en `src/app/iam/domain/model/permission.ts`.
+- La sesión se mantiene al recargar y se cierra al pulsar «Cerrar sesión» o a las 8 horas.
+- En desarrollo, `npm run api` simula el login con contraseñas guardadas con hash; las cuentas de prueba están en `mock-api/README.md`.
