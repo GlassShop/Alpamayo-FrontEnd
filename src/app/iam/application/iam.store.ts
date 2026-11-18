@@ -3,7 +3,6 @@ import {User} from '../domain/model/user.entity';
 import {SignInCommand} from '../domain/model/sign-in.command';
 import {Router} from '@angular/router';
 import {IamApi} from '../infrastructure/iam-api';
-import {SignUpCommand} from '../domain/model/sign-up.command';
 
 /**
  * Application service managing IAM domain state and authentication orchestration.
@@ -11,7 +10,7 @@ import {SignUpCommand} from '../domain/model/sign-up.command';
  * @remarks
  * In Domain-Driven Design, this is an application service that:
  * - Manages the state of the authenticated user session
- * - Coordinates authentication flows (sign-in, sign-up, sign-out)
+ * - Coordinates authentication flows (sign-in, sign-out)
  * - Integrates with the infrastructure layer (IamApi)
  * - Handles navigation after authentication state changes
  *
@@ -137,7 +136,7 @@ export class IamStore {
    * 2. On success:
    *    - Stores the authentication token in localStorage
    *    - Updates state signals (isSignedIn, username, userID)
-   *    - Navigates to the home page
+   *    - Navigates to the quoter
    * 3. On failure:
    *    - Clears authentication state
    *    - Logs the error
@@ -153,65 +152,20 @@ export class IamStore {
    * ```
    */
   signIn(signInCommand: SignInCommand, router: Router) {
-    console.log(signInCommand);
     this.iamApi.signIn(signInCommand).subscribe({
       next: (signInResource) => {
         localStorage.setItem('token', signInResource.token);
         this.isSignedInSignal.set(true);
         this.currentUsernameSignal.set(signInResource.username);
         this.currentUserIdSignal.set(signInResource.id);
-        router.navigate(['/home']).then();
+        router.navigate(['/cotizador']).then();
       },
       error: (err) => {
         console.error('Sign-in failed:', err);
         this.isSignedInSignal.set(false);
         this.currentUsernameSignal.set(null);
         this.currentUserIdSignal.set(null);
-        router.navigate(['/iam/sign-in']).then();
-      }
-    });
-  }
-
-  /**
-   * Executes the sign-up flow (user registration).
-   *
-   * @param signUpCommand - Domain command containing new user credentials
-   * @param router - Angular Router for post-registration navigation
-   *
-   * @remarks
-   * Coordinates the sign-up process:
-   * 1. Sends the sign-up command to the API
-   * 2. On success:
-   *    - Redirects to the sign-in page for the user to log in
-   * 3. On failure:
-   *    - Clears any potential authentication state
-   *    - Logs the error
-   *    - Redirects back to the sign-up page
-   *
-   * Note: Sign-up does not automatically sign in the user. They must
-   * complete the sign-in flow with their new credentials.
-   *
-   * @example
-   * ```typescript
-   * const command = new SignUpCommand({
-   *   username: 'john.doe',
-   *   password: 'newpass123'
-   * });
-   * this.iamStore.signUp(command, this.router);
-   * ```
-   */
-  signUp(signUpCommand: SignUpCommand, router: Router) {
-    this.iamApi.signUp(signUpCommand).subscribe({
-      next: (signUpResource) => {
-        console.log('Sign-up successful:', signUpResource);
-        router.navigate(['/iam/sign-in']).then();
-      },
-      error: (err) => {
-        console.error('Sign-up failed:', err);
-        this.isSignedInSignal.set(false);
-        this.currentUsernameSignal.set(null);
-        this.currentUserIdSignal.set(null);
-        router.navigate(['/iam/sign-up']).then();
+        router.navigate(['/iniciar-sesion']).then();
       }
     });
   }
@@ -238,7 +192,7 @@ export class IamStore {
     this.isSignedInSignal.set(false);
     this.currentUsernameSignal.set(null);
     this.currentUserIdSignal.set(null);
-    router.navigate(['/iam/sign-in']).then();
+    router.navigate(['/iniciar-sesion']).then();
   }
 
   /**

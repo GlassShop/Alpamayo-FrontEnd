@@ -7,6 +7,7 @@ import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {Router} from '@angular/router';
 import {IamStore} from '../../../application/iam.store';
 import {SignInCommand} from '../../../domain/model/sign-in.command';
+import {TranslatePipe} from '@ngx-translate/core';
 import {BaseForm} from '../../../../shared/presentation/components/base-form/base-form';
 
 /**
@@ -23,7 +24,8 @@ import {BaseForm} from '../../../../shared/presentation/components/base-form/bas
     MatError,
     MatButton,
     MatInput,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    TranslatePipe
   ],
   templateUrl: './sign-in-form.html',
   styleUrl: './sign-in-form.css'

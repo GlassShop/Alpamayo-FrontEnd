@@ -59,8 +59,6 @@ export const iamInterceptor: HttpInterceptorFn = (request, next) => {
     ? request.clone({headers: request.headers.set('Authorization', `Bearer ${token}`)})
     : request;
 
-  console.log(token);
-
   /**
    * Pass the (potentially modified) request to the next handler in the chain.
    * This continues the HTTP request/response processing pipeline.

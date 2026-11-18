@@ -37,23 +37,21 @@ import {inject} from '@angular/core';
  *   {
  *     path: 'iam',
  *     children: [
- *       { path: 'sign-in', component: SignInComponent },
- *       { path: 'sign-up', component: SignUpComponent }
+ *       { path: 'iniciar-sesion', component: SignInComponent }
  *     ]
  *   }
  * ];
  * ```
  */
-export const iamGuard: CanActivateFn = (route, state) => {
+export const iamGuard: CanActivateFn = () => {
   const store = inject(IamStore);
   const router = inject(Router);
-  console.log(`trying to navigate to ${route.url} with state ${state.url}`);
   if (store.isSignedIn()) {
     // User is authenticated, allow navigation
     return true;
   } else {
     // User is not authenticated, redirect to sign-in page
-    router.navigate(['/iam/sign-in']).then();
+    router.navigate(['/iniciar-sesion']).then();
     return false;
   }
 }
