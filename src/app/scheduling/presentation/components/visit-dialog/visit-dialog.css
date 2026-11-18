@@ -1,0 +1,26 @@
+:host { display: block; }
+.vd { display: flex; flex-direction: column; max-height: 90dvh; font-family: var(--al-font); color: var(--al-text); }
+.vd-header {
+  display: flex; align-items: center; justify-content: space-between; padding: 16px 20px;
+  background: var(--al-surface-muted); border-bottom: 1px solid var(--al-border);
+}
+.vd-header h2 { margin: 0; font-size: 1.1rem; font-weight: 800; }
+.vd-body { padding: 16px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+.vd-section { margin: 0; padding: 12px 16px 16px; border: 1px solid var(--al-divider); border-radius: var(--al-radius); display: flex; flex-direction: column; gap: 12px; }
+.vd-section legend { padding: 0 6px; font-size: .75rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--al-text-muted); }
+.vd-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
+.vd-row .al-field { min-width: 150px; }
+.vd-time { flex: 0 0 120px !important; min-width: 0 !important; }
+.vd-type { flex: 0 0 170px !important; min-width: 0 !important; }
+.vd-textarea { height: auto; padding: 8px 12px; resize: vertical; }
+
+.vd-day { padding: 10px 12px; border-radius: var(--al-radius); background: var(--al-field); border: 1px dashed var(--al-border); font-size: .82rem; }
+.vd-day p { margin: 0; }
+.vd-day-title { font-weight: 700; margin-bottom: 4px !important; text-transform: none; }
+.vd-day-item { padding: 2px 0; }
+.vd-day--conflict { background: var(--al-warning-soft); border-color: #fcd34d; }
+.vd-warning { display: flex; align-items: center; gap: 6px; color: var(--al-warning); font-weight: 700; margin-bottom: 6px !important; }
+.vd-warning mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+.vd-footer { display: flex; justify-content: flex-end; gap: 12px; padding: 14px 20px; background: var(--al-field); border-top: 1px solid var(--al-border); }
+@media (max-width: 560px) { .vd-row { flex-direction: column; } .vd-row .al-field, .vd-time, .vd-type { width: 100%; flex: 1 1 auto !important; } }

@@ -21,6 +21,7 @@ interface NavOption {
 const NAV_OPTIONS: readonly NavOption[] = [
   {link: '/cotizador',        labelKey: 'nav.quote',    icon: 'calculate',    permission: 'quote'},
   {link: '/cotizaciones',     labelKey: 'nav.quotes',   icon: 'description',  permission: 'quote'},
+  {link: '/agenda',           labelKey: 'nav.agenda',   icon: 'calendar_month', permission: 'agenda'},
   {link: '/catalogo',         labelKey: 'nav.catalog',  icon: 'window',       permission: 'catalog.view', exact: true},
   {link: '/catalogo/precios', labelKey: 'nav.prices',   icon: 'price_change', permission: 'prices.manage'},
   {link: '/usuarios',         labelKey: 'nav.users',    icon: 'group',        permission: 'users.manage'},

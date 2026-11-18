@@ -1,0 +1,68 @@
+<header class="al-page-header">
+  <div>
+    <h1 class="al-page-title">{{ 'agenda.title' | translate }}</h1>
+    <p class="al-page-subtitle">{{ 'agenda.subtitle' | translate }}</p>
+  </div>
+  <div class="ag-header-actions">
+    @if (iam.can('technicians.manage')) {
+      <button type="button" class="al-btn al-btn--secondary" (click)="openTechnicians()"><mat-icon>engineering</mat-icon>{{ 'agenda.technicians' | translate }}</button>
+    }
+    <button type="button" class="al-btn al-btn--primary" (click)="newVisit()" [disabled]="technicians.active().length === 0">
+      <mat-icon>add</mat-icon>{{ 'agenda.new-visit' | translate }}
+    </button>
+  </div>
+</header>
+
+@if (!technicians.loading() && technicians.active().length === 0) {
+  <div class="al-alert al-alert--info" role="status">
+    <mat-icon>info</mat-icon>
+    <span>{{ (iam.can('technicians.manage') ? 'agenda.no-technicians-ceo' : 'agenda.no-technicians-seller') | translate }}</span>
+  </div>
+}
+@if (agenda.error() === 'load') {
+  <div class="al-alert al-alert--error" role="alert">
+    <mat-icon>error_outline</mat-icon><span>{{ 'agenda.error.load' | translate }}</span>
+    <button class="al-btn al-btn--secondary" (click)="agenda.load()">{{ 'common.retry' | translate }}</button>
+  </div>
+}
+
+<section class="al-card">
+  <div class="ag-toolbar">
+    <div class="ag-nav">
+      <button type="button" class="al-btn al-btn--secondary ag-today" (click)="agenda.goToday()" [disabled]="isCurrentPeriod()">{{ 'agenda.today' | translate }}</button>
+      <button type="button" class="al-icon-btn" (click)="agenda.move(-1)" [attr.aria-label]="'agenda.previous' | translate"><mat-icon>chevron_left</mat-icon></button>
+      <button type="button" class="al-icon-btn" (click)="agenda.move(1)" [attr.aria-label]="'agenda.next' | translate"><mat-icon>chevron_right</mat-icon></button>
+      <h2 class="ag-title" aria-live="polite">{{ title() }}</h2>
+      @if (agenda.loading()) { <mat-icon class="ag-loading" aria-hidden="true">sync</mat-icon> }
+    </div>
+    <div class="ag-controls">
+      <select class="al-select ag-filter" (change)="onTechnician($event)" [attr.aria-label]="'agenda.technician' | translate">
+        <option value="">{{ 'agenda.all-technicians' | translate }}</option>
+        @for (t of technicians.all(); track t.id) {
+          <option [value]="t.id" [selected]="agenda.technicianFilter() === t.id">{{ t.name }}</option>
+        }
+      </select>
+      <div class="ag-switch" role="group" [attr.aria-label]="'agenda.view' | translate">
+        <button type="button" [class.ag-switch--on]="agenda.view() === 'month'" [attr.aria-pressed]="agenda.view() === 'month'" (click)="setView('month')">{{ 'agenda.month' | translate }}</button>
+        <button type="button" [class.ag-switch--on]="agenda.view() === 'week'" [attr.aria-pressed]="agenda.view() === 'week'" (click)="setView('week')">{{ 'agenda.week' | translate }}</button>
+      </div>
+    </div>
+  </div>
+
+  @if (agenda.view() === 'month') {
+    <app-month-view [weeks]="agenda.weeks()" [anchor]="agenda.anchor()" [byDay]="agenda.byDay()" [technicians]="techById()"
+                    [weekdayNames]="weekdayNames()" (openVisit)="openVisit($event)" (openDay)="agenda.openWeek($event)"/>
+  } @else {
+    <app-week-view [days]="agenda.days()" [byDay]="agenda.byDay()" [technicians]="techById()" [dayLabels]="dayLabels()"
+                   (openVisit)="openVisit($event)" (createAt)="createAt($event)"/>
+  }
+
+  @if (technicians.active().length > 0) {
+    <footer class="ag-legend">
+      @for (t of technicians.active(); track t.id) {
+        <span class="ag-legend-item"><span class="ag-dot" [style.background]="t.color" aria-hidden="true"></span>{{ t.name }}</span>
+      }
+      <span class="al-muted ag-hint">{{ (agenda.view() === 'week' ? 'agenda.hint-week' : 'agenda.hint-month') | translate }}</span>
+    </footer>
+  }
+</section>

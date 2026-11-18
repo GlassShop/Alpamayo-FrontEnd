@@ -1,0 +1,75 @@
+<article class="vt" aria-labelledby="vt-title">
+  <header class="vt-header" [style.--tech]="technician()?.color ?? '#4b5a70'">
+    <div class="vt-heading">
+      <span class="vt-type"><mat-icon aria-hidden="true">{{ icon[visit().type] }}</mat-icon>{{ 'agenda.types.' + visit().type | translate }}</span>
+      <h2 id="vt-title" [class.vt-cancelled]="visit().status === 'CANCELLED'">{{ visit().title }}</h2>
+      <p class="vt-when"><mat-icon aria-hidden="true">event</mat-icon><span>{{ dayTitle() }}</span> · <strong>{{ visit().time }}</strong></p>
+    </div>
+    <div class="vt-header-side">
+      <span class="al-pill" [class.al-pill--success]="visit().status === 'DONE'" [class.al-pill--danger]="visit().status === 'CANCELLED'"
+            [class.al-pill--warning]="visit().status === 'SCHEDULED'">{{ 'agenda.status.' + visit().status | translate }}</span>
+      <button type="button" class="al-icon-btn" (click)="close()" [attr.aria-label]="'common.close' | translate"><mat-icon>close</mat-icon></button>
+    </div>
+  </header>
+
+  <div class="vt-body">
+    <dl class="vt-data">
+      <dt>{{ 'agenda.technician' | translate }}</dt>
+      <dd><span class="vt-swatch" [style.background]="technician()?.color" aria-hidden="true"></span>{{ technician()?.name ?? '—' }}
+        @if (technician()?.phone) { <span class="al-muted">· {{ technician()?.phone }}</span> }</dd>
+      <dt>{{ 'quotes.customer' | translate }}</dt><dd>{{ visit().customer.name }} <span class="al-muted">· {{ visit().customer.phone }}</span></dd>
+      <dt>{{ 'agenda.address' | translate }}</dt><dd>{{ visit().address }}</dd>
+      @if (visit().reference) { <dt>{{ 'agenda.reference' | translate }}</dt><dd>{{ visit().reference }}</dd> }
+      @if (visit().specs) { <dt>{{ 'agenda.specs' | translate }}</dt><dd class="vt-specs">{{ visit().specs }}</dd> }
+      @if (visit().quoteId) {
+        <dt>{{ 'agenda.quote' | translate }}</dt>
+        <dd><a [routerLink]="['/cotizaciones', visit().quoteId]" (click)="close()">{{ 'agenda.see-quote' | translate }}</a></dd>
+      }
+      <dt>{{ 'agenda.scheduled-by' | translate }}</dt><dd>{{ visit().createdBy.fullName }}</dd>
+    </dl>
+
+    <div class="vt-links">
+      @if (whatsappTechnician(); as link) {
+        <a class="al-btn al-btn--secondary" [href]="link" target="_blank" rel="noopener"><mat-icon>engineering</mat-icon>{{ 'agenda.send-technician' | translate }}</a>
+      }
+      @if (whatsappCustomer(); as link) {
+        <a class="al-btn al-btn--secondary" [href]="link" target="_blank" rel="noopener"><mat-icon>chat</mat-icon>{{ 'agenda.confirm-customer' | translate }}</a>
+      }
+      <a class="al-btn al-btn--secondary" [href]="maps()" target="_blank" rel="noopener"><mat-icon>map</mat-icon>{{ 'agenda.open-maps' | translate }}</a>
+    </div>
+
+    <section class="vt-history" aria-labelledby="vt-history-title">
+      <h3 id="vt-history-title">{{ 'agenda.history' | translate }}</h3>
+      <ol>
+        @for (change of visit().changes.slice().reverse(); track $index) {
+          <li>
+            <span class="vt-history-date">{{ change.at | date:'dd/MM/yyyy HH:mm' }}</span>
+            <strong>{{ change.by.fullName }}</strong>
+            {{ change.fields[0] === 'created' ? ('agenda.created' | translate) : ('agenda.changed' | translate: { fields: fieldsLabel(change.fields) }) }}
+          </li>
+        }
+      </ol>
+    </section>
+
+    @if (agenda.error(); as error) {
+      <div class="al-alert al-alert--error" role="alert"><mat-icon>error_outline</mat-icon><span>{{ 'agenda.error.' + error | translate }}</span></div>
+    }
+  </div>
+
+  <footer class="vt-footer">
+    @if (canEdit()) {
+      @if (visit().status === 'SCHEDULED') {
+        <button type="button" class="al-btn al-btn--secondary vt-cancel" (click)="setStatus('CANCELLED')" [disabled]="agenda.saving()">
+          <mat-icon>event_busy</mat-icon>{{ 'agenda.cancel-visit' | translate }}</button>
+        <button type="button" class="al-btn al-btn--secondary" (click)="setStatus('DONE')" [disabled]="agenda.saving()">
+          <mat-icon>task_alt</mat-icon>{{ 'agenda.mark-done' | translate }}</button>
+        <button type="button" class="al-btn al-btn--primary" (click)="edit()"><mat-icon>edit</mat-icon>{{ 'agenda.edit' | translate }}</button>
+      } @else {
+        <button type="button" class="al-btn al-btn--secondary" (click)="setStatus('SCHEDULED')" [disabled]="agenda.saving()">
+          <mat-icon>undo</mat-icon>{{ 'agenda.reopen' | translate }}</button>
+      }
+    } @else {
+      <span class="al-muted vt-readonly"><mat-icon>lock</mat-icon>{{ 'agenda.read-only' | translate: { name: visit().createdBy.fullName } }}</span>
+    }
+  </footer>
+</article>

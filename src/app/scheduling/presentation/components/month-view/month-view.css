@@ -1,0 +1,38 @@
+:host { display: block; }
+.mv { display: flex; flex-direction: column; min-width: 0; }
+.mv-head, .mv-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.mv-head span {
+  padding: 8px; font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--al-text-muted); background: var(--al-surface-muted); border-bottom: 1px solid var(--al-border);
+}
+.mv-day {
+  min-height: 108px; padding: 4px; display: flex; flex-direction: column; gap: 3px; min-width: 0;
+  border-right: 1px solid var(--al-divider); border-bottom: 1px solid var(--al-divider); background: var(--al-surface);
+}
+.mv-day--out { background: var(--al-field); }
+.mv-day--out .mv-num { color: #b8bec6; }
+.mv-num {
+  align-self: flex-start; min-width: 26px; height: 26px; border: none; background: transparent; border-radius: var(--al-radius);
+  font: inherit; font-size: .8rem; font-weight: 700; color: var(--al-text); cursor: pointer;
+}
+.mv-num:hover { background: var(--al-surface-muted); }
+.mv-day--today .mv-num { background: var(--al-primary); color: #fff; }
+
+.mv-visit {
+  display: flex; align-items: center; gap: 4px; width: 100%; min-width: 0; padding: 2px 6px; cursor: pointer;
+  border: none; border-left: 3px solid var(--tech); border-radius: var(--al-radius);
+  background: color-mix(in srgb, var(--tech) 12%, white); color: var(--al-text); font: inherit; font-size: .72rem; text-align: left;
+}
+.mv-visit:hover { background: color-mix(in srgb, var(--tech) 22%, white); }
+.mv-visit mat-icon { font-size: 14px; width: 14px; height: 14px; color: var(--tech); flex-shrink: 0; }
+.mv-time { font-weight: 700; font-variant-numeric: tabular-nums; }
+.mv-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mv-visit--cancelled { opacity: .55; text-decoration: line-through; }
+.mv-visit--done { opacity: .75; }
+.mv-more { border: none; background: transparent; font: inherit; font-size: .72rem; font-weight: 700; color: var(--al-primary-strong); cursor: pointer; text-align: left; padding: 0 6px; }
+
+@media (max-width: 640px) {
+  .mv-day { min-height: 64px; }
+  .mv-time, .mv-title { display: none; }
+  .mv-visit { width: auto; padding: 2px 4px; }
+}

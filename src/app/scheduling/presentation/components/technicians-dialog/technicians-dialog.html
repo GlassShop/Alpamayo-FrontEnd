@@ -1,0 +1,66 @@
+<section class="td" aria-labelledby="td-title">
+  <header class="td-header">
+    <h2 id="td-title">{{ 'agenda.technicians' | translate }}</h2>
+    <button type="button" class="al-icon-btn" (click)="close()" [attr.aria-label]="'common.close' | translate"><mat-icon>close</mat-icon></button>
+  </header>
+
+  <div class="td-body">
+    <p class="al-muted td-intro">{{ 'agenda.technicians-intro' | translate }}</p>
+
+    <ul class="td-list">
+      @for (t of store.all(); track t.id) {
+        <li class="td-item" [class.td-item--inactive]="!t.active">
+          <span class="td-swatch" [style.background]="t.color" aria-hidden="true"></span>
+          <div class="td-info">
+            <strong>{{ t.name }}</strong>
+            @if (editingPhone() === t.id) {
+              <input class="al-input td-phone" [value]="t.phone" (blur)="savePhone(t, $event)" (keydown.enter)="$any($event.target).blur()"
+                     [attr.aria-label]="('quotes.save.phone' | translate) + ' — ' + t.name"/>
+            } @else {
+              <button type="button" class="td-link" (click)="editingPhone.set(t.id)">{{ t.phone }} <mat-icon>edit</mat-icon></button>
+            }
+          </div>
+          <div class="td-colors" role="radiogroup" [attr.aria-label]="('agenda.color' | translate) + ' — ' + t.name">
+            @for (c of colors; track c) {
+              <button type="button" class="td-color" role="radio" [attr.aria-checked]="c === t.color" [class.td-color--on]="c === t.color"
+                      [style.background]="c" (click)="setColor(t, c)" [attr.aria-label]="c"></button>
+            }
+          </div>
+          <button type="button" class="al-btn al-btn--secondary td-toggle" (click)="store.update(t, {active: !t.active})" [disabled]="store.saving()">
+            {{ (t.active ? 'agenda.deactivate' : 'agenda.activate') | translate }}
+          </button>
+        </li>
+      } @empty {
+        <li class="al-muted">{{ 'agenda.no-technicians' | translate }}</li>
+      }
+    </ul>
+
+    <form class="td-new" [formGroup]="form" (ngSubmit)="add()" novalidate>
+      <h3>{{ 'agenda.new-technician' | translate }}</h3>
+      <div class="td-row">
+        <div class="al-field">
+          <label class="al-label" for="td-name">{{ 'users.full-name' | translate }}</label>
+          <input class="al-input" id="td-name" formControlName="name" aria-describedby="td-name-msg"/>
+          <span id="td-name-msg" class="al-error-text">@if (isInvalidControl(form, 'name')) { {{ errorMessagesForControl(form, 'name') }} }</span>
+        </div>
+        <div class="al-field">
+          <label class="al-label" for="td-phone">{{ 'quotes.save.phone' | translate }}</label>
+          <input class="al-input" id="td-phone" formControlName="phone" inputmode="tel" aria-describedby="td-phone-msg"/>
+          <span id="td-phone-msg" class="al-error-text">@if (isInvalidControl(form, 'phone')) { {{ 'quotes.save.invalid-phone' | translate }} }</span>
+        </div>
+      </div>
+      <div class="td-colors" role="radiogroup" [attr.aria-label]="'agenda.color' | translate">
+        @for (c of colors; track c) {
+          <button type="button" class="td-color" role="radio" [attr.aria-checked]="c === form.controls.color.value"
+                  [class.td-color--on]="c === form.controls.color.value" [style.background]="c"
+                  (click)="form.controls.color.setValue(c)" [attr.aria-label]="c"></button>
+        }
+      </div>
+      <button type="submit" class="al-btn al-btn--primary" [disabled]="store.saving()"><mat-icon>person_add</mat-icon>{{ 'agenda.add-technician' | translate }}</button>
+    </form>
+
+    @if (store.error(); as error) {
+      <div class="al-alert al-alert--error" role="alert"><mat-icon>error_outline</mat-icon><span>{{ 'agenda.error.technicians-' + error | translate }}</span></div>
+    }
+  </div>
+</section>

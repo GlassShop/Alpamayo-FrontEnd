@@ -1,0 +1,41 @@
+:host { display: block; }
+.wv-scroll { overflow-x: auto; }
+.wv { min-width: 760px; }
+.wv-row { display: grid; grid-template-columns: 56px repeat(7, minmax(0, 1fr)); }
+.wv-row--head { position: sticky; top: 0; z-index: 1; }
+.wv-corner, .wv-dayhead { background: var(--al-surface-muted); border-bottom: 1px solid var(--al-border); }
+.wv-dayhead {
+  padding: 8px; font-size: .75rem; font-weight: 700; text-transform: capitalize; color: var(--al-text-muted);
+  border-left: 1px solid var(--al-divider);
+}
+.wv-dayhead--today { color: var(--al-primary-strong); box-shadow: inset 0 -3px 0 var(--al-primary); }
+.wv-hour { padding: 4px 6px; font-size: .7rem; color: var(--al-text-muted); text-align: right; font-variant-numeric: tabular-nums; border-bottom: 1px solid var(--al-divider); }
+
+.wv-cell {
+  position: relative; min-height: 52px; padding: 3px; display: flex; flex-direction: column; gap: 3px;
+  border-left: 1px solid var(--al-divider); border-bottom: 1px solid var(--al-divider); background: var(--al-surface);
+}
+.wv-cell--today { background: #fffafa; }
+
+.wv-visit {
+  position: relative; z-index: 1; display: flex; flex-direction: column; gap: 1px; padding: 4px 6px; cursor: pointer; text-align: left;
+  border: none; border-left: 3px solid var(--tech); border-radius: var(--al-radius); font: inherit; font-size: .72rem; color: var(--al-text);
+  background: color-mix(in srgb, var(--tech) 14%, white);
+}
+.wv-visit:hover { background: color-mix(in srgb, var(--tech) 24%, white); }
+.wv-visit-top { display: flex; align-items: center; gap: 4px; }
+.wv-visit-top mat-icon { font-size: 14px; width: 14px; height: 14px; color: var(--tech); }
+.wv-done { color: var(--al-success) !important; margin-left: auto; }
+.wv-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wv-tech { color: var(--al-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wv-visit--cancelled { opacity: .55; }
+.wv-visit--cancelled .wv-title { text-decoration: line-through; }
+
+/* "+" to create in an empty slot: visible on hover/focus, always on touch screens */
+.wv-add {
+  position: absolute; inset: 0; border: none; background: transparent; cursor: pointer; opacity: 0;
+  display: flex; align-items: flex-end; justify-content: flex-end; padding: 2px; color: var(--al-primary);
+}
+.wv-add:hover, .wv-add:focus-visible { opacity: 1; background: var(--al-primary-soft); }
+.wv-add mat-icon { font-size: 18px; width: 18px; height: 18px; }
+@media (hover: none) { .wv-add { opacity: .35; } }

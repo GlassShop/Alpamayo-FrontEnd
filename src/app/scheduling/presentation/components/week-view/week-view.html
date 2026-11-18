@@ -1,0 +1,36 @@
+<div class="wv-scroll">
+  <div class="wv" role="grid" [attr.aria-label]="'agenda.week' | translate">
+    <div class="wv-row wv-row--head" role="row">
+      <span class="wv-corner" aria-hidden="true"></span>
+      @for (day of days(); track day; let i = $index) {
+        <span class="wv-dayhead" role="columnheader" [class.wv-dayhead--today]="day === today">{{ dayLabels()[i] }}</span>
+      }
+    </div>
+    @for (hour of hours; track hour) {
+      <div class="wv-row" role="row">
+        <span class="wv-hour" role="rowheader">{{ label(hour) }}</span>
+        @for (day of days(); track day) {
+          <div class="wv-cell" role="gridcell" [class.wv-cell--today]="day === today">
+            @for (visit of visitsAt(day, hour); track visit.id) {
+              <button type="button" class="wv-visit" [style.--tech]="color(visit)"
+                      [class.wv-visit--cancelled]="visit.status === 'CANCELLED'" [class.wv-visit--done]="visit.status === 'DONE'"
+                      (click)="openVisit.emit(visit)">
+                <span class="wv-visit-top">
+                  <mat-icon aria-hidden="true">{{ icon[visit.type] }}</mat-icon>
+                  <strong>{{ visit.time }}</strong>
+                  @if (visit.status === 'DONE') { <mat-icon class="wv-done" aria-hidden="true">check_circle</mat-icon> }
+                </span>
+                <span class="wv-title">{{ visit.title }}</span>
+                <span class="wv-tech">{{ techName(visit) }}</span>
+              </button>
+            }
+            <button type="button" class="wv-add" (click)="create(day, hour)"
+                    [attr.aria-label]="('agenda.new-at' | translate) + ' ' + day + ' ' + label(hour)">
+              <mat-icon aria-hidden="true">add</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

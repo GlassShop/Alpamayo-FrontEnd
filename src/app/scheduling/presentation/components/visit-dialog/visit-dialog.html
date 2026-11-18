@@ -1,0 +1,105 @@
+<form class="vd" [formGroup]="form" (ngSubmit)="save()" novalidate aria-labelledby="vd-title">
+  <header class="vd-header">
+    <h2 id="vd-title">{{ (editing ? 'agenda.edit-visit' : 'agenda.new-visit') | translate }}</h2>
+    <button type="button" class="al-icon-btn" (click)="cancel()" [attr.aria-label]="'common.close' | translate"><mat-icon>close</mat-icon></button>
+  </header>
+
+  <div class="vd-body">
+    <fieldset class="vd-section">
+      <legend>{{ 'agenda.when-who' | translate }}</legend>
+      <div class="vd-row">
+        <div class="al-field">
+          <label class="al-label" for="vd-date">{{ 'agenda.date' | translate }}</label>
+          <input class="al-input" id="vd-date" type="date" formControlName="date"/>
+        </div>
+        <div class="al-field vd-time">
+          <label class="al-label" for="vd-time">{{ 'agenda.time' | translate }}</label>
+          <input class="al-input" id="vd-time" type="time" step="900" formControlName="time"/>
+        </div>
+        <div class="al-field">
+          <label class="al-label" for="vd-tech">{{ 'agenda.technician' | translate }}</label>
+          <select class="al-select" id="vd-tech" formControlName="technicianId" aria-describedby="vd-tech-msg">
+            <option [ngValue]="null" disabled>{{ 'quotes.save.choose' | translate }}</option>
+            @for (t of technicianOptions(); track t.id) {
+              <option [ngValue]="t.id">{{ t.name }}{{ t.active ? '' : ' (' + ('agenda.inactive' | translate) + ')' }}</option>
+            }
+          </select>
+          <span id="vd-tech-msg" class="al-error-text">@if (isInvalidControl(form, 'technicianId')) { {{ errorMessagesForControl(form, 'technicianId') }} }</span>
+        </div>
+      </div>
+
+      @if (selectedTechnician(); as tech) {
+        <div class="vd-day" [class.vd-day--conflict]="conflicts().length > 0" aria-live="polite">
+          @if (conflicts().length > 0) {
+            <p class="vd-warning"><mat-icon>warning_amber</mat-icon>
+              {{ 'agenda.conflict' | translate: { name: tech.name, times: conflictTimes() } }}</p>
+          }
+          <p class="vd-day-title">{{ 'agenda.tech-day' | translate: { name: tech.name, day: dayLabel() } }}</p>
+          @for (other of technicianDay(); track other.id) {
+            <p class="vd-day-item"><strong>{{ other.time }}</strong> {{ other.title }} · {{ other.customer.name }}</p>
+          } @empty {
+            <p class="vd-day-item al-muted">{{ 'agenda.tech-free' | translate }}</p>
+          }
+        </div>
+      }
+    </fieldset>
+
+    <fieldset class="vd-section">
+      <legend>{{ 'agenda.job' | translate }}</legend>
+      <div class="vd-row">
+        <div class="al-field vd-type">
+          <label class="al-label" for="vd-type">{{ 'agenda.type' | translate }}</label>
+          <select class="al-select" id="vd-type" formControlName="type">
+            @for (t of types; track t) { <option [value]="t">{{ 'agenda.types.' + t | translate }}</option> }
+          </select>
+        </div>
+        <div class="al-field">
+          <label class="al-label" for="vd-title-input">{{ 'agenda.project' | translate }}</label>
+          <input class="al-input" id="vd-title-input" formControlName="title" [placeholder]="'agenda.project-example' | translate" aria-describedby="vd-title-msg"/>
+          <span id="vd-title-msg" class="al-error-text">@if (isInvalidControl(form, 'title')) { {{ errorMessagesForControl(form, 'title') }} }</span>
+        </div>
+      </div>
+      <div class="al-field">
+        <label class="al-label" for="vd-specs">{{ 'agenda.specs' | translate }} <span class="al-muted">({{ 'agenda.optional' | translate }})</span></label>
+        <textarea class="al-input vd-textarea" id="vd-specs" rows="3" formControlName="specs" [placeholder]="'agenda.specs-example' | translate"></textarea>
+      </div>
+    </fieldset>
+
+    <fieldset class="vd-section">
+      <legend>{{ 'agenda.customer-place' | translate }}</legend>
+      <div class="vd-row">
+        <div class="al-field">
+          <label class="al-label" for="vd-cname">{{ 'quotes.customer' | translate }}</label>
+          <input class="al-input" id="vd-cname" formControlName="customerName" aria-describedby="vd-cname-msg"/>
+          <span id="vd-cname-msg" class="al-error-text">@if (isInvalidControl(form, 'customerName')) { {{ errorMessagesForControl(form, 'customerName') }} }</span>
+        </div>
+        <div class="al-field">
+          <label class="al-label" for="vd-cphone">{{ 'quotes.save.phone' | translate }}</label>
+          <input class="al-input" id="vd-cphone" formControlName="customerPhone" inputmode="tel" aria-describedby="vd-cphone-msg"/>
+          <span id="vd-cphone-msg" class="al-error-text">@if (isInvalidControl(form, 'customerPhone')) { {{ 'quotes.save.invalid-phone' | translate }} }</span>
+        </div>
+      </div>
+      <div class="al-field">
+        <label class="al-label" for="vd-address">{{ 'agenda.address' | translate }}</label>
+        <input class="al-input" id="vd-address" formControlName="address" [placeholder]="'agenda.address-example' | translate" aria-describedby="vd-address-msg"/>
+        <span id="vd-address-msg" class="al-error-text">@if (isInvalidControl(form, 'address')) { {{ errorMessagesForControl(form, 'address') }} }</span>
+      </div>
+      <div class="al-field">
+        <label class="al-label" for="vd-reference">{{ 'agenda.reference' | translate }} <span class="al-muted">({{ 'agenda.optional' | translate }})</span></label>
+        <input class="al-input" id="vd-reference" formControlName="reference" [placeholder]="'agenda.reference-example' | translate"/>
+      </div>
+    </fieldset>
+
+    @if (agenda.error(); as error) {
+      <div class="al-alert al-alert--error" role="alert"><mat-icon>error_outline</mat-icon><span>{{ 'agenda.error.' + error | translate }}</span></div>
+    }
+  </div>
+
+  <footer class="vd-footer">
+    <button type="button" class="al-btn al-btn--secondary" (click)="cancel()">{{ 'common.cancel' | translate }}</button>
+    <button type="submit" class="al-btn al-btn--primary" [disabled]="agenda.saving()">
+      <mat-icon>{{ agenda.saving() ? 'hourglass_empty' : 'event_available' }}</mat-icon>
+      {{ (editing ? 'agenda.save-changes' : 'agenda.schedule') | translate }}
+    </button>
+  </footer>
+</form>

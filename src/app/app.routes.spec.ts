@@ -47,8 +47,8 @@ describe('app routes', () => {
       await router.navigateByUrl('/'); // settle the post-sign-in navigation
     });
 
-    it('opens the quoter, saved quotes, the catalog and the settings', async () => {
-      for (const url of ['/cotizador', '/cotizaciones', '/catalogo', '/configuracion']) {
+    it('opens the quoter, saved quotes, the agenda, the catalog and the settings', async () => {
+      for (const url of ['/cotizador', '/cotizaciones', '/agenda', '/catalogo', '/configuracion']) {
         await router.navigateByUrl(url);
         expect(router.url).toBe(url);
       }
@@ -72,14 +72,18 @@ describe('app routes', () => {
       signInAs('WAREHOUSE');
       await router.navigateByUrl('/catalogo');
       expect(router.url).toBe('/catalogo');
+      await router.navigateByUrl('/agenda');
+      expect(router.url).toBe('/agenda');
       await router.navigateByUrl('/usuarios');
       expect(router.url).toBe('/cotizador');
     });
   });
 
   describe('as the CEO', () => {
-    it('opens prices and users', async () => {
+    it('opens prices, users and the agenda', async () => {
       signInAs('CEO');
+      await router.navigateByUrl('/agenda');
+      expect(router.url).toBe('/agenda');
       await router.navigateByUrl('/catalogo/precios');
       expect(router.url).toBe('/catalogo/precios');
       await router.navigateByUrl('/usuarios');

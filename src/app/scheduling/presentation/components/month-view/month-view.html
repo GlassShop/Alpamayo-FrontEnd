@@ -1,0 +1,30 @@
+<div class="mv" role="grid" [attr.aria-label]="'agenda.month' | translate">
+  <div class="mv-head" role="row">
+    @for (name of weekdayNames(); track $index) { <span role="columnheader">{{ name }}</span> }
+  </div>
+  @for (week of rows(); track week[0]) {
+    <div class="mv-week" role="row">
+      @for (day of week; track day) {
+        <div class="mv-day" role="gridcell" [class.mv-day--out]="!inMonth(day)" [class.mv-day--today]="day === today">
+          <button type="button" class="mv-num" (click)="openDay.emit(day)"
+                  [attr.aria-label]="('agenda.open-week-of' | translate) + ' ' + day">{{ dayNumber(day) }}</button>
+          @for (visit of visitsOf(day).slice(0, max); track visit.id) {
+            <button type="button" class="mv-visit" [class.mv-visit--cancelled]="visit.status === 'CANCELLED'"
+                    [class.mv-visit--done]="visit.status === 'DONE'"
+                    [style.--tech]="color(visit)" (click)="pick(visit, $event)"
+                    [attr.aria-label]="visit.time + ' ' + visit.title + ' — ' + techName(visit)">
+              <mat-icon aria-hidden="true">{{ icon[visit.type] }}</mat-icon>
+              <span class="mv-time">{{ visit.time }}</span>
+              <span class="mv-title">{{ visit.title }}</span>
+            </button>
+          }
+          @if (visitsOf(day).length > max) {
+            <button type="button" class="mv-more" (click)="openDay.emit(day)">
+              {{ 'agenda.more' | translate: { count: visitsOf(day).length - max } }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
