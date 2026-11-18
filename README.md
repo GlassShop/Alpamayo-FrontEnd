@@ -8,6 +8,7 @@ Cliente web Angular 21 del sistema de gestión de Vidriería Alpamayo, vidrierí
 - Catálogo de vidrios: lo ven todos; solo el CEO cambia precios.
 - Cotizador de vidrios por pie cuadrado, con total al instante.
 - Administración de usuarios, solo para el CEO.
+- Agenda de visitas técnicas (mes y semana).
 
 Fuera de esta iteración: móvil, aluminios, ventanas por serie, clientes, inventario, facturación y panel de indicadores.
 
@@ -52,6 +53,7 @@ Cada dominio en `src/app` tiene cuatro capas: `domain`, `application`, `infrastr
 | `iam` | Inicio de sesión, guardia de rutas e interceptor del token |
 | `catalog` | Tipos de vidrio (nombre, espesor, color), listas de precio y precio por pie² que fija el CEO |
 | `quoting` | Regla de cálculo (`domain/services/square-foot-calculator.ts`) y cotizador |
+| `scheduling` | Agenda: técnicos, visitas, calendario (`domain/services/calendar.ts`) y aviso de cruces |
 
 ## Desarrollo
 
@@ -76,6 +78,7 @@ La API se configura en `src/environments/environment*.ts` (`apiBaseUrl`). En des
 | `/cotizador` | Cotizador por pie² con la lista de precio elegida, conceptos adicionales y «Guardar cotización» | Todos los roles |
 | `/cotizaciones` | Mis cotizaciones (el CEO ve todas y filtra por vendedora) | Todos los roles |
 | `/cotizaciones/:id` | Cotización lista para imprimir o guardar como PDF | Quien la creó y el CEO |
+| `/agenda` | Agenda de visitas técnicas en vista mes o semana; el CEO registra a los técnicos | Todos ven todo; cada una edita sus visitas, el CEO todas |
 | `/catalogo` | Catálogo de vidrios y precios; agregar tipos de vidrio | Todos los roles |
 | `/catalogo/precios` | Precios por pie², nuevas listas de precio e historial de cambios (quién, cuándo, anterior → nuevo y motivo opcional) | CEO |
 | `/usuarios` | Cuentas del personal: crear, rol, desactivar, restablecer contraseña | CEO |
@@ -95,3 +98,12 @@ La API se configura en `src/environments/environment*.ts` (`apiBaseUrl`). En des
 - Moneda: solo soles por ahora.
 - Los datos de la empresa del encabezado (RUC, dirección, teléfono), la validez y las condiciones de venta están en `src/app/shared/domain/model/company-profile.ts`. **Completa el RUC, la dirección y el teléfono reales.**
 - En desarrollo, la búsqueda por DNI/RUC usa un directorio ficticio (`mock-api/db.json`) y los clientes de cotizaciones anteriores; el servidor real consultará RENIEC/SUNAT.
+
+## Agenda de visitas
+
+- Una visita tiene fecha, hora de inicio, técnico, tipo (medición, instalación, reparación u otro), trabajo, cliente con teléfono, dirección y, opcionalmente, referencia y especificaciones técnicas.
+- En la vista semana, pulsar un espacio libre agenda a ese día y hora; en la vista mes, pulsar un día abre su semana. Cada técnico tiene su color.
+- Si el técnico ya tiene otra visita a menos de una hora, se avisa pero se permite guardar: la vendedora decide si cambia de técnico o de día.
+- Todos ven todas las visitas. Solo quien la agendó o el CEO pueden editarla, marcarla realizada o cancelarla. No se borran: las canceladas quedan tachadas. Cada cambio queda en el historial (quién, cuándo, qué).
+- Los técnicos no usan la app: el CEO los registra en «Técnicos» (nombre, teléfono, color) y los desactiva cuando dejan de trabajar. Desde la visita se envía todo al técnico por WhatsApp, se confirma al cliente y se abre la dirección en Google Maps.
+- «Agendar visita» en «Mis cotizaciones» o en la cotización impresa rellena los datos del cliente.
