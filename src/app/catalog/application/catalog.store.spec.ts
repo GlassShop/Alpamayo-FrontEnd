@@ -67,6 +67,20 @@ describe('CatalogStore', () => {
     expect(store.priceFor(1, 2)).toBe(7);
   });
 
+  it('sends the reason for the price history only when there is one', () => {
+    loadCatalog();
+    store.setPrice(1, 1, 9.5, '  Subió el proveedor  ');
+    const withReason = http.expectOne(`${PRICES}/10`);
+    expect(withReason.request.body.changeReason).toBe('Subió el proveedor');
+    withReason.flush({...prices[0], pricePerSqFt: 9.5});
+    expect(store.priceSaves()).toBe(1);
+
+    store.setPrice(1, 1, 9.8);
+    const withoutReason = http.expectOne(`${PRICES}/10`);
+    expect('changeReason' in withoutReason.request.body).toBe(false);
+    withoutReason.flush({...prices[0], pricePerSqFt: 9.8});
+  });
+
   it('rejects zero or negative prices without calling the API', () => {
     loadCatalog();
     store.setPrice(1, 1, 0);

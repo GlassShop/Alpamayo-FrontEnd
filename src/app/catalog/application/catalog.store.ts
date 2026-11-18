@@ -24,6 +24,7 @@ export class CatalogStore {
   private readonly savingSignal     = signal(false);
   private readonly errorSignal      = signal<string | null>(null);
   private readonly loadedSignal     = signal(false);
+  private readonly priceSavesSignal = signal(0);
 
   readonly glassTypes = this.glassTypesSignal.asReadonly();
   readonly priceLists = this.priceListsSignal.asReadonly();
@@ -32,6 +33,8 @@ export class CatalogStore {
   readonly saving     = this.savingSignal.asReadonly();
   readonly error      = this.errorSignal.asReadonly();
   readonly loaded     = this.loadedSignal.asReadonly();
+  /** Increases every time a price is saved, so the price history can refresh. */
+  readonly priceSaves = this.priceSavesSignal.asReadonly();
 
   /** Price lookup indexed by "glassTypeId:priceListId". */
   private readonly priceIndex = computed(() =>
@@ -71,19 +74,23 @@ export class CatalogStore {
     return this.priceIndex().get(this.key(glassTypeId, priceListId))?.pricePerSqFt ?? null;
   }
 
-  /** Creates or updates the price of a glass type in a list (CEO only). */
-  setPrice(glassTypeId: number, priceListId: number, pricePerSqFt: number): void {
+  /**
+   * Creates or updates the price of a glass type in a list (CEO only).
+   * The optional reason is stored by the server in the price history.
+   */
+  setPrice(glassTypeId: number, priceListId: number, pricePerSqFt: number, reason?: string): void {
     if (!Number.isFinite(pricePerSqFt) || pricePerSqFt <= 0) {
       this.errorSignal.set('catalog.error.invalid-price');
       return;
     }
     const existing = this.priceIndex().get(this.key(glassTypeId, priceListId));
     const request$ = existing
-      ? this.api.updatePrice({...existing, pricePerSqFt})
-      : this.api.createPrice({id: 0, glassTypeId, priceListId, pricePerSqFt});
-    this.save(request$, saved => this.pricesSignal.update(list =>
-      existing ? list.map(p => p.id === saved.id ? saved : p) : [...list, saved]
-    ));
+      ? this.api.updatePrice({...existing, pricePerSqFt}, reason)
+      : this.api.createPrice({id: 0, glassTypeId, priceListId, pricePerSqFt}, reason);
+    this.save(request$, saved => {
+      this.pricesSignal.update(list => existing ? list.map(p => p.id === saved.id ? saved : p) : [...list, saved]);
+      this.priceSavesSignal.update(n => n + 1);
+    });
   }
 
   /** Adds a new glass type (CEO only). */
