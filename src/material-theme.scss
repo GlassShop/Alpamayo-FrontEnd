@@ -7,7 +7,7 @@
 @include mat.core();
 
 :root {
-  @include mat.toolbar-overrides((container-background-color: slategray, container-text-color: white));
+  @include mat.toolbar-overrides((container-background-color: #191c1e, container-text-color: white));
 }
 
 html {
@@ -15,10 +15,10 @@ html {
   @include mat.theme(
     (
       color: (
-        primary: mat.$azure-palette,
-        tertiary: mat.$blue-palette,
+        primary: mat.$red-palette,
+        tertiary: mat.$orange-palette,
       ),
-      typography: Roboto,
+      typography: Inter,
       density: 0,
     )
   );

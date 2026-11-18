@@ -1,14 +1,172 @@
-@import './material-theme.scss'; /* You can add global styles to this file, and also import other style files */
+/*
+ * Global design tokens and building blocks for Vidriería Alpamayo.
+ * Visual reference: the team's Figma ("Portal del Vendedor"), adapted.
+ * Components use these classes and variables instead of hard-coded colours.
+ */
+:root {
+  --al-primary: #dc2626;
+  --al-primary-strong: #b91c1c;
+  --al-primary-soft: #fef2f2;
 
-html, body {
-    height: 100%;
+  --al-text: #191c1e;
+  --al-text-muted: #545f73;
+  --al-label: #5c403c;
+  --al-placeholder: #6b7280;
+
+  --al-border: #e6bdb8;
+  --al-divider: #e0e3e5;
+  --al-surface: #ffffff;
+  --al-surface-muted: #f2f4f6;
+  --al-field: #f7f9fb;
+  --al-page: #f7f9fb;
+
+  --al-slate: #4b5a70;
+  --al-warm: #916f6b;
+  --al-success: #15803d;
+  --al-success-soft: #f0fdf4;
+  --al-warning: #b45309;
+  --al-warning-soft: #fffbeb;
+
+  --al-radius: 2px;
+  --al-shadow: 0 2px 2px rgba(0, 0, 0, .02);
+  --al-font: Inter, "Helvetica Neue", Arial, sans-serif;
 }
+
+html, body { height: 100%; }
 
 body {
-    margin: 0;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
+  margin: 0;
+  font-family: var(--al-font);
+  color: var(--al-text);
+  background: var(--al-page);
+  -webkit-font-smoothing: antialiased;
 }
 
-.container-with-spacing {
-    margin: 10px; /* Applies margin to all sides */
+/* ── page header ─────────────────────────────────────────────────────── */
+.al-page-header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 24px;
+}
+.al-page-title { margin: 0; font-size: 2rem; line-height: 1.15; font-weight: 800; letter-spacing: -.02em; color: var(--al-text); }
+.al-page-subtitle { margin: 6px 0 0; font-size: .95rem; color: var(--al-text-muted); }
+
+/* ── cards ───────────────────────────────────────────────────────────── */
+.al-card {
+  background: var(--al-surface); border: 1px solid var(--al-border);
+  border-radius: var(--al-radius); box-shadow: var(--al-shadow);
+  display: flex; flex-direction: column; min-width: 0;
+}
+.al-card-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 16px 20px; background: var(--al-surface-muted);
+  border-bottom: 1px solid var(--al-border);
+}
+.al-card-title { margin: 0; font-size: 1rem; font-weight: 700; color: var(--al-text); display: flex; align-items: center; gap: 8px; }
+.al-card-title mat-icon { color: var(--al-primary); font-size: 20px; width: 20px; height: 20px; }
+.al-card-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.al-card-footer {
+  display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+  padding: 16px; background: var(--al-field); border-top: 1px solid var(--al-border);
+}
+
+/* ── form fields ─────────────────────────────────────────────────────── */
+.al-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1; }
+.al-label { font-size: .75rem; letter-spacing: .04em; color: var(--al-label); }
+.al-input, .al-select {
+  height: 40px; box-sizing: border-box; width: 100%; padding: 0 12px;
+  background: var(--al-field); border: 1px solid var(--al-border); border-radius: var(--al-radius);
+  font: inherit; font-size: .9rem; color: var(--al-text); outline: none;
+  transition: border-color .12s, box-shadow .12s;
+}
+.al-input::placeholder { color: var(--al-placeholder); }
+.al-input:focus, .al-select:focus { border-color: var(--al-primary); box-shadow: 0 0 0 3px rgba(220, 38, 38, .12); }
+.al-input.ng-invalid.ng-touched { border-color: var(--al-primary); }
+.al-input[type=number] { -moz-appearance: textfield; font-variant-numeric: tabular-nums; }
+.al-select { appearance: none; cursor: pointer; padding-right: 36px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--al-text-muted) 50%), linear-gradient(135deg, var(--al-text-muted) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%; background-size: 5px 5px; background-repeat: no-repeat; }
+.al-hint { font-size: .75rem; color: var(--al-text-muted); }
+.al-error-text { font-size: .75rem; color: var(--al-primary-strong); }
+
+/* number input with − / + buttons */
+.al-stepper { display: flex; }
+.al-stepper .al-input { border-radius: 0; text-align: center; min-width: 0; }
+.al-step {
+  flex: 0 0 40px; height: 40px; border: 1px solid var(--al-border); background: #e6e8ea;
+  font-size: 1.1rem; font-weight: 700; color: var(--al-text); cursor: pointer;
+}
+.al-step:first-child { border-right: none; border-radius: var(--al-radius) 0 0 var(--al-radius); }
+.al-step:last-child { border-left: none; border-radius: 0 var(--al-radius) var(--al-radius) 0; }
+.al-step:hover { background: var(--al-divider); }
+
+/* ── buttons ─────────────────────────────────────────────────────────── */
+.al-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 40px; padding: 0 20px; border-radius: var(--al-radius); cursor: pointer;
+  font: inherit; font-size: .875rem; font-weight: 700; letter-spacing: .01em; white-space: nowrap;
+  border: 1px solid transparent; transition: background-color .12s, border-color .12s, opacity .12s;
+}
+.al-btn mat-icon { font-size: 18px; width: 18px; height: 18px; }
+.al-btn:disabled { opacity: .45; cursor: not-allowed; }
+.al-btn--primary { background: var(--al-primary); color: #fff; }
+.al-btn--primary:not(:disabled):hover { background: var(--al-primary-strong); }
+.al-btn--secondary { background: var(--al-surface); color: var(--al-text); border-color: var(--al-border); }
+.al-btn--secondary:not(:disabled):hover { background: var(--al-surface-muted); }
+.al-btn--block { width: 100%; }
+.al-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
+  border: none; background: transparent; border-radius: var(--al-radius); cursor: pointer; color: var(--al-text-muted);
+}
+.al-icon-btn:hover { background: var(--al-surface-muted); color: var(--al-text); }
+.al-icon-btn--danger:hover { color: var(--al-primary); background: var(--al-primary-soft); }
+.al-icon-btn mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+/* ── tables ──────────────────────────────────────────────────────────── */
+.al-table-wrapper { overflow-x: auto; position: relative; }
+.al-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.al-table th {
+  text-align: left; padding: 12px 20px; font-size: .72rem; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--al-text-muted); background: var(--al-surface-muted);
+  border-bottom: 1px solid var(--al-border); white-space: nowrap;
+}
+.al-table td { padding: 14px 20px; border-bottom: 1px solid var(--al-divider); color: var(--al-text); vertical-align: middle; }
+.al-table tbody tr:last-child td { border-bottom: none; }
+.al-table tbody tr:hover td { background: #fcfcfd; }
+.al-num { text-align: right !important; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ── status & messages ───────────────────────────────────────────────── */
+.al-pill {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: var(--al-radius);
+  font-size: .7rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+}
+.al-pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.al-pill--success { color: var(--al-success); background: var(--al-success-soft); }
+.al-pill--warning { color: var(--al-warning); background: var(--al-warning-soft); }
+.al-pill--danger  { color: var(--al-primary-strong); background: var(--al-primary-soft); }
+
+.al-alert {
+  display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--al-radius);
+  font-size: .875rem; border: 1px solid; margin-bottom: 16px;
+}
+.al-alert > span { flex: 1; }
+.al-alert--error { color: var(--al-primary-strong); background: var(--al-primary-soft); border-color: #fecaca; }
+
+.al-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  padding: 48px 16px; text-align: center; color: var(--al-text-muted); font-size: .9rem;
+}
+.al-empty mat-icon { font-size: 40px; width: 40px; height: 40px; color: #c4c8cc; }
+.al-empty--error mat-icon { color: var(--al-primary); }
+
+.al-muted { color: var(--al-text-muted); }
+
+@media (max-width: 640px) {
+  .al-page-title { font-size: 1.5rem; }
+  .al-card-body { padding: 16px; }
+  .al-table th, .al-table td { padding: 10px 12px; }
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }
