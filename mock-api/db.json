@@ -63,7 +63,82 @@
       "passwordHash": "scrypt$5babe06beb303df63aaef9b8e76a14ce$7d0193e6e1bdddecefd09e5c4ee4423d2b3d3a00ca1e956dc21c0e015e27f5ed1459d117040a29a1906cc4d07a0e4b2893e54c224ec74247d9e903a2468b665d"
     }
   ],
-  "quotes": [],
+  "quotes": [
+    {
+      "id": 1,
+      "number": "COT-000001",
+      "createdAt": "2026-11-18T20:03:41.712Z",
+      "updatedAt": "2026-11-18T20:04:34.313Z",
+      "seller": {
+        "id": 2,
+        "fullName": "Vendedora Demo"
+      },
+      "customer": {
+        "docType": "DNI",
+        "docNumber": "45678912",
+        "name": "Cliente Demo Uno",
+        "phone": "123456789",
+        "address": "Jr. Ficticio 100, Huaraz"
+      },
+      "paymentMethod": "YAPE",
+      "priceList": {
+        "id": 1,
+        "name": "Pública"
+      },
+      "currency": "PEN",
+      "lines": [
+        {
+          "glassTypeId": 1,
+          "description": "Laminado 6 mm cielo",
+          "width": 123,
+          "height": 123,
+          "unit": "cm",
+          "billedWidthCm": 125,
+          "billedHeightCm": 125,
+          "quantity": 4,
+          "squareFeet": 69.44,
+          "pricePerSqFt": 8,
+          "unitPrice": 138.89,
+          "total": 555.56
+        },
+        {
+          "glassTypeId": 1,
+          "description": "Laminado 6 mm cielo",
+          "width": 3450,
+          "height": 230,
+          "unit": "mm",
+          "billedWidthCm": 345,
+          "billedHeightCm": 25,
+          "quantity": 1,
+          "squareFeet": 9.58,
+          "pricePerSqFt": 8,
+          "unitPrice": 76.67,
+          "total": 76.67
+        },
+        {
+          "glassTypeId": 2,
+          "description": "Espejo doble 4 mm plateado",
+          "width": 500,
+          "height": 127,
+          "unit": "cm",
+          "billedWidthCm": 500,
+          "billedHeightCm": 130,
+          "quantity": 8,
+          "squareFeet": 577.78,
+          "pricePerSqFt": 6.5,
+          "unitPrice": 469.44,
+          "total": 3755.56
+        }
+      ],
+      "extras": [],
+      "total": 4387.79,
+      "subtotal": 3718.47,
+      "igv": 669.32,
+      "advance": 3000,
+      "balance": 1387.79,
+      "termsAccepted": true
+    }
+  ],
   "document-directory": [
     {
       "docType": "DNI",
