@@ -12,5 +12,7 @@ export const environment = {
   priceHistoryEndpointPath: '/price-history',
   usersEndpointPath: '/users',
   quotesEndpointPath: '/quotes',
-  documentLookupEndpointPath: '/document-lookup'
+  documentLookupEndpointPath: '/document-lookup',
+  techniciansEndpointPath: '/technicians',
+  visitsEndpointPath: '/visits'
 };
