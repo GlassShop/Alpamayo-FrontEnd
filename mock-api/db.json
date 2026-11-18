@@ -1,24 +1,156 @@
 {
   "glass-types": [
-    { "id": 1, "name": "Laminado", "thicknessMm": 6, "color": "cielo" },
-    { "id": 2, "name": "Espejo doble", "thicknessMm": 4, "color": "plateado" }
+    {
+      "id": 1,
+      "name": "Laminado",
+      "thicknessMm": 6,
+      "color": "cielo"
+    },
+    {
+      "id": 2,
+      "name": "Espejo doble",
+      "thicknessMm": 4,
+      "color": "plateado"
+    }
   ],
   "price-lists": [
-    { "id": 1, "name": "Pública" },
-    { "id": 2, "name": "Vidriero" }
+    {
+      "id": 1,
+      "name": "Pública"
+    },
+    {
+      "id": 2,
+      "name": "Vidriero"
+    }
   ],
   "prices": [
-    { "id": 1, "glassTypeId": 1, "priceListId": 1, "pricePerSqFt": 8 },
-    { "id": 2, "glassTypeId": 2, "priceListId": 1, "pricePerSqFt": 6.5 }
+    {
+      "id": 1,
+      "glassTypeId": 1,
+      "priceListId": 1,
+      "pricePerSqFt": 8
+    },
+    {
+      "id": 2,
+      "glassTypeId": 2,
+      "priceListId": 1,
+      "pricePerSqFt": 6.5
+    }
   ],
   "users": [
-    {"id": 1, "username": "ceo", "fullName": "Gerencia Alpamayo", "role": "CEO", "active": true, "passwordHash": "scrypt$4d21974091bc8f5f820b0cdada97c0c7$ad2194abef7906db3c9ccfc2cfa2fc61a5779d22d2327472f3018cebf5414b69b25891155a7b9ddbf57c7037272d2c8615521cead93aaa94eb2d66a83e3f17b9"},
-    {"id": 2, "username": "vendedora", "fullName": "Vendedora Demo", "role": "SELLER", "active": true, "passwordHash": "scrypt$2c1489216e8225e78c2d99878e9015ac$880e918e533472768f30313e7561d8d450013c4235da6183568bc0d0880d4f4797e4b28401747d02a118c0e6051c526b596f9c1d0de465c30c09bf09375964c7"},
-    {"id": 3, "username": "almacen", "fullName": "Almacén Demo", "role": "WAREHOUSE", "active": true, "passwordHash": "scrypt$5babe06beb303df63aaef9b8e76a14ce$7d0193e6e1bdddecefd09e5c4ee4423d2b3d3a00ca1e956dc21c0e015e27f5ed1459d117040a29a1906cc4d07a0e4b2893e54c224ec74247d9e903a2468b665d"}
+    {
+      "id": 1,
+      "username": "ceo",
+      "fullName": "Gerencia Alpamayo",
+      "role": "CEO",
+      "active": true,
+      "passwordHash": "scrypt$4d21974091bc8f5f820b0cdada97c0c7$ad2194abef7906db3c9ccfc2cfa2fc61a5779d22d2327472f3018cebf5414b69b25891155a7b9ddbf57c7037272d2c8615521cead93aaa94eb2d66a83e3f17b9"
+    },
+    {
+      "id": 2,
+      "username": "vendedora",
+      "fullName": "Vendedora Demo",
+      "role": "SELLER",
+      "active": true,
+      "passwordHash": "scrypt$2c1489216e8225e78c2d99878e9015ac$880e918e533472768f30313e7561d8d450013c4235da6183568bc0d0880d4f4797e4b28401747d02a118c0e6051c526b596f9c1d0de465c30c09bf09375964c7"
+    },
+    {
+      "id": 3,
+      "username": "almacen",
+      "fullName": "Almacén Demo",
+      "role": "WAREHOUSE",
+      "active": true,
+      "passwordHash": "scrypt$5babe06beb303df63aaef9b8e76a14ce$7d0193e6e1bdddecefd09e5c4ee4423d2b3d3a00ca1e956dc21c0e015e27f5ed1459d117040a29a1906cc4d07a0e4b2893e54c224ec74247d9e903a2468b665d"
+    }
   ],
-  "quotes": [],
+  "quotes": [
+    {
+      "id": 1,
+      "number": "COT-000001",
+      "createdAt": "2026-11-18T20:03:41.712Z",
+      "updatedAt": "2026-11-18T20:04:34.313Z",
+      "seller": {
+        "id": 2,
+        "fullName": "Vendedora Demo"
+      },
+      "customer": {
+        "docType": "DNI",
+        "docNumber": "45678912",
+        "name": "Cliente Demo Uno",
+        "phone": "123456789",
+        "address": "Jr. Ficticio 100, Huaraz"
+      },
+      "paymentMethod": "YAPE",
+      "priceList": {
+        "id": 1,
+        "name": "Pública"
+      },
+      "currency": "PEN",
+      "lines": [
+        {
+          "glassTypeId": 1,
+          "description": "Laminado 6 mm cielo",
+          "width": 123,
+          "height": 123,
+          "unit": "cm",
+          "billedWidthCm": 125,
+          "billedHeightCm": 125,
+          "quantity": 4,
+          "squareFeet": 69.44,
+          "pricePerSqFt": 8,
+          "unitPrice": 138.89,
+          "total": 555.56
+        },
+        {
+          "glassTypeId": 1,
+          "description": "Laminado 6 mm cielo",
+          "width": 3450,
+          "height": 230,
+          "unit": "mm",
+          "billedWidthCm": 345,
+          "billedHeightCm": 25,
+          "quantity": 1,
+          "squareFeet": 9.58,
+          "pricePerSqFt": 8,
+          "unitPrice": 76.67,
+          "total": 76.67
+        },
+        {
+          "glassTypeId": 2,
+          "description": "Espejo doble 4 mm plateado",
+          "width": 500,
+          "height": 127,
+          "unit": "cm",
+          "billedWidthCm": 500,
+          "billedHeightCm": 130,
+          "quantity": 8,
+          "squareFeet": 577.78,
+          "pricePerSqFt": 6.5,
+          "unitPrice": 469.44,
+          "total": 3755.56
+        }
+      ],
+      "extras": [],
+      "total": 4387.79,
+      "subtotal": 3718.47,
+      "igv": 669.32,
+      "advance": 3000,
+      "balance": 1387.79,
+      "termsAccepted": true
+    }
+  ],
   "document-directory": [
-    { "docType": "DNI", "docNumber": "45678912", "name": "Cliente Demo Uno", "address": "Jr. Ficticio 100, Huaraz" },
-    { "docType": "RUC", "docNumber": "20123456786", "name": "Constructora Demo S.A.C.", "address": "Av. Ficticia 123, Huaraz" }
+    {
+      "docType": "DNI",
+      "docNumber": "45678912",
+      "name": "Cliente Demo Uno",
+      "address": "Jr. Ficticio 100, Huaraz"
+    },
+    {
+      "docType": "RUC",
+      "docNumber": "20123456786",
+      "name": "Constructora Demo S.A.C.",
+      "address": "Av. Ficticia 123, Huaraz"
+    }
   ]
 }
