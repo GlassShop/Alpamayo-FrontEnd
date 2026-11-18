@@ -11,6 +11,11 @@ import {parseQuoteRows, ParsedLine, RejectedRow} from '../../../domain/services/
 import {buildQuoteTemplate, TEMPLATE_FILE_NAME} from '../../../infrastructure/excel/quote-template.writer';
 import {QuoteSheetReadError, readQuoteSheet} from '../../../infrastructure/excel/quote-sheet.reader';
 import {ImportRowView, QuoteImportPreview} from '../../components/quote-import-preview/quote-import-preview';
+import {RouterLink} from '@angular/router';
+import {MatDialog} from '@angular/material/dialog';
+import {SaveQuoteDialog, SaveQuoteDialogData} from '../../components/save-quote-dialog/save-quote-dialog';
+import {SavedQuote} from '../../../domain/model/saved-quote.entity';
+import {QuoteExtras} from '../../components/quote-extras/quote-extras';
 
 const UNIT_KEY = 'alpamayo.quote-unit';
 
@@ -29,15 +34,19 @@ interface ImportPreview {
  */
 @Component({
   selector: 'app-quote-builder',
-  imports: [DecimalPipe, TranslatePipe, MatIconModule, MatTooltipModule, QuoteImportPreview],
+  imports: [DecimalPipe, RouterLink, TranslatePipe, MatIconModule, MatTooltipModule, QuoteImportPreview, QuoteExtras],
   templateUrl: './quote-builder.html',
   styleUrl: './quote-builder.css'
 })
 export class QuoteBuilder implements OnInit {
   readonly catalog = inject(CatalogStore);
   readonly quoting = inject(QuotingStore);
+  private readonly dialog = inject(MatDialog);
   readonly label = glassTypeLabel;
   readonly units = MEASURE_UNITS;
+
+  /** Quote just saved, to offer printing it. */
+  readonly justSaved = signal<SavedQuote | null>(null);
 
   // ── draft line in the form ──
   readonly glassTypeId = signal<number | null>(null);
@@ -155,9 +164,20 @@ export class QuoteBuilder implements OnInit {
     this.quoting.removeLine(id);
   }
 
+  /** Starts a new quote (also leaves edit mode of a saved one). */
   clearQuote(): void {
     this.quoting.clear();
+    this.justSaved.set(null);
     this.resetForm();
+  }
+
+  // ── saving ──
+
+  openSaveDialog(): void {
+    const data: SaveQuoteDialogData = {initial: this.quoting.editing()?.details};
+    this.dialog.open<SaveQuoteDialog, SaveQuoteDialogData, SavedQuote>(SaveQuoteDialog, {
+      data, width: '640px', maxWidth: 'calc(100vw - 32px)', autoFocus: '#sq-doc', panelClass: 'al-dialog'
+    }).afterClosed().subscribe(saved => { if (saved) this.justSaved.set(saved); });
   }
 
   /** Keeps glass type and unit so the next line is faster to enter. */

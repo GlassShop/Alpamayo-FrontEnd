@@ -59,6 +59,7 @@ label.qb-excel-btn:focus-within { outline: 2px solid var(--al-primary); outline-
   padding: 16px; background: var(--al-surface-muted); border: 1px solid var(--al-border); border-radius: var(--al-radius);
 }
 .qb-total-value { font-size: 2rem; font-weight: 800; letter-spacing: -.01em; color: var(--al-primary); font-variant-numeric: tabular-nums; }
+.qb-price-changed { margin: 0 24px 16px; }
 
 @media (max-width: 1100px) {
   .qb-grid { grid-template-columns: 1fr; }

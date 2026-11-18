@@ -3,7 +3,19 @@
     <h1 class="al-page-title">{{ 'quoting.title' | translate }}</h1>
     <p class="al-page-subtitle">{{ 'quoting.subtitle' | translate }}</p>
   </div>
+  @if (quoting.editing(); as editing) {
+    <span class="al-chip"><mat-icon>edit_document</mat-icon>{{ 'quotes.editing' | translate: { number: editing.number } }}</span>
+  }
 </header>
+
+@if (justSaved(); as saved) {
+  <div class="al-alert al-alert--success" role="status">
+    <mat-icon>check_circle</mat-icon>
+    <span>{{ 'quotes.saved-notice' | translate: { number: saved.number } }}</span>
+    <a class="al-btn al-btn--primary" [routerLink]="['/cotizaciones', saved.id]"><mat-icon>print</mat-icon>{{ 'quotes.print' | translate }}</a>
+    <button class="al-icon-btn" (click)="justSaved.set(null)" [attr.aria-label]="'common.close' | translate"><mat-icon>close</mat-icon></button>
+  </div>
+}
 
 @if (catalog.error() === 'catalog.error.load') {
   <section class="al-card">
@@ -195,9 +207,22 @@
         </div>
       </div>
 
+      @if (quoting.priceChanged()) {
+        <div class="al-alert al-alert--info qb-price-changed" role="status">
+          <mat-icon>info</mat-icon>
+          <span>{{ 'quotes.price-changed' | translate: { saved: (quoting.editing()!.savedTotal | number:'1.2-2'), current: (quoting.total() | number:'1.2-2') } }}</span>
+        </div>
+      }
+
       <div class="al-card-footer">
-        <button class="al-btn al-btn--secondary" (click)="clearQuote()" [disabled]="quoting.lines().length === 0">
-          <mat-icon>delete_sweep</mat-icon>{{ 'quoting.clear' | translate }}
+        <button class="al-btn al-btn--secondary" (click)="clearQuote()"
+                [disabled]="quoting.lines().length + quoting.extras().length === 0 && !quoting.editing()">
+          <mat-icon>{{ quoting.editing() ? 'note_add' : 'delete_sweep' }}</mat-icon>
+          {{ (quoting.editing() ? 'quotes.new-quote' : 'quoting.clear') | translate }}
+        </button>
+        <button class="al-btn al-btn--primary" (click)="openSaveDialog()" [disabled]="!quoting.canSave()"
+                [matTooltip]="quoting.canSave() ? '' : ('quotes.save.incomplete-hint' | translate)">
+          <mat-icon>save</mat-icon>{{ (quoting.editing() ? 'quotes.save.submit-edit' : 'quotes.save.open') | translate }}
         </button>
       </div>
     </section>
@@ -251,6 +276,9 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Additional concepts: price typed by the seller -->
+      <app-quote-extras/>
     </section>
   </div>
 }

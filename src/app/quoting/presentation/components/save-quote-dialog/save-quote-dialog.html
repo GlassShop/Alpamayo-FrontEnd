@@ -1,0 +1,122 @@
+<form class="sq" [formGroup]="form" (ngSubmit)="save()" novalidate aria-labelledby="sq-title">
+  <header class="sq-header">
+    <h2 class="sq-title" id="sq-title">
+      {{ (quoting.editing() ? 'quotes.save.title-edit' : 'quotes.save.title') | translate: { number: quoting.editing()?.number } }}
+    </h2>
+    <button type="button" class="al-icon-btn" (click)="cancel()" [attr.aria-label]="'common.close' | translate"><mat-icon>close</mat-icon></button>
+  </header>
+
+  <div class="sq-body">
+    <p class="sq-meta al-muted">
+      {{ 'quotes.seller' | translate }}: <strong>{{ iam.currentUsername() }}</strong> ·
+      {{ 'quotes.currency' | translate }}: <strong>{{ 'quotes.currency-pen' | translate }}</strong> ·
+      {{ 'quotes.total' | translate }}: <strong>S/ {{ quoting.total() | number:'1.2-2' }}</strong>
+    </p>
+
+    <!-- Customer -->
+    <fieldset class="sq-section">
+      <legend>{{ 'quotes.save.customer' | translate }}</legend>
+      <div class="al-field">
+        <label class="al-label" for="sq-doc">{{ 'quotes.save.doc' | translate }}</label>
+        <span class="sq-doc">
+          <input class="al-input" id="sq-doc" formControlName="docNumber" inputmode="numeric" maxlength="13"
+                 autocomplete="off" [placeholder]="'quotes.save.doc-example' | translate" aria-describedby="sq-doc-msg"/>
+          @if (docType(); as type) { <span class="sq-doc-type">{{ type }}</span> }
+        </span>
+        <span id="sq-doc-msg" class="sq-doc-msg" aria-live="polite">
+          @switch (lookup.status()) {
+            @case ('searching') { <span class="al-hint"><mat-icon>hourglass_empty</mat-icon>{{ 'quotes.save.searching' | translate }}</span> }
+            @case ('found') { <span class="sq-found"><mat-icon>check_circle</mat-icon>{{ 'quotes.save.found' | translate }}</span> }
+            @case ('not-found') { <span class="sq-warn"><mat-icon>person_search</mat-icon>{{ 'quotes.save.not-found' | translate }}</span> }
+            @case ('error') { <span class="sq-warn"><mat-icon>cloud_off</mat-icon>{{ 'quotes.save.lookup-error' | translate }}</span> }
+            @default {
+              @if (docNumber() && !docValid() && (form.controls.docNumber.touched || docNumber().length >= 8)) {
+                <span class="al-error-text">{{ 'quotes.save.invalid-doc' | translate }}</span>
+              } @else { <span class="al-hint">{{ 'quotes.save.doc-hint' | translate }}</span> }
+            }
+          }
+        </span>
+      </div>
+
+      @if (manual()) {
+        <div class="sq-manual" role="status">
+          <mat-icon>edit_note</mat-icon><span>{{ 'quotes.save.manual-hint' | translate }}</span>
+        </div>
+      }
+
+      <div class="al-field">
+        <label class="al-label" for="sq-name">{{ 'quotes.save.name' | translate }}</label>
+        <input class="al-input" id="sq-name" formControlName="name" autocomplete="off" aria-describedby="sq-name-msg"
+               [readonly]="lookup.status() === 'searching'"/>
+        <span id="sq-name-msg" class="al-error-text">@if (isInvalidControl(form, 'name')) { {{ errorMessagesForControl(form, 'name') }} }</span>
+      </div>
+      <div class="sq-row">
+        <div class="al-field">
+          <label class="al-label" for="sq-phone">{{ 'quotes.save.phone' | translate }}</label>
+          <input class="al-input" id="sq-phone" formControlName="phone" inputmode="tel" autocomplete="off" aria-describedby="sq-phone-msg"/>
+          <span id="sq-phone-msg" class="al-error-text">@if (isInvalidControl(form, 'phone')) { {{ 'quotes.save.invalid-phone' | translate }} }</span>
+        </div>
+        <div class="al-field">
+          <label class="al-label" for="sq-address">{{ 'quotes.save.address' | translate }}</label>
+          <input class="al-input" id="sq-address" formControlName="address" autocomplete="off"/>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Payment -->
+    <fieldset class="sq-section">
+      <legend>{{ 'quotes.save.payment' | translate }}</legend>
+      <div class="sq-row">
+        <div class="al-field">
+          <label class="al-label" for="sq-method">{{ 'quotes.save.method' | translate }}</label>
+          <select class="al-select" id="sq-method" formControlName="paymentMethod" aria-describedby="sq-method-msg">
+            <option value="" disabled>{{ 'quotes.save.choose' | translate }}</option>
+            @for (m of paymentMethods; track m) { <option [value]="m">{{ 'quotes.payment.' + m | translate }}</option> }
+          </select>
+          <span id="sq-method-msg" class="al-error-text">@if (isInvalidControl(form, 'paymentMethod')) { {{ errorMessagesForControl(form, 'paymentMethod') }} }</span>
+        </div>
+        <div class="al-field">
+          <label class="al-label" for="sq-advance">{{ 'quotes.advance' | translate }} (S/)</label>
+          <input class="al-input" id="sq-advance" type="number" min="0" step="0.01" inputmode="decimal" formControlName="advance"
+                 aria-describedby="sq-advance-msg"/>
+          <span id="sq-advance-msg" class="al-error-text">@if (advanceTooHigh()) { {{ 'quotes.save.advance-too-high' | translate }} }</span>
+        </div>
+        <div class="sq-balance">
+          <span class="al-label">{{ 'quotes.balance' | translate }}</span>
+          <strong>S/ {{ balance() | number:'1.2-2' }}</strong>
+        </div>
+      </div>
+      <div class="al-field">
+        <label class="al-label" for="sq-notes">{{ 'quotes.save.notes' | translate }}</label>
+        <textarea class="al-input sq-notes" id="sq-notes" formControlName="notes" rows="2"></textarea>
+      </div>
+    </fieldset>
+
+    <!-- Sale conditions -->
+    <fieldset class="sq-section sq-terms">
+      <legend>{{ 'quotes.conditions-title' | translate }}</legend>
+      <ol>
+        @for (condition of conditions; track $index) { <li>{{ condition }}</li> }
+      </ol>
+      <label class="sq-check">
+        <input type="checkbox" id="sq-terms" formControlName="termsAccepted"/>
+        <span>{{ 'quotes.save.accept' | translate }}</span>
+      </label>
+      @if (submitted() && !form.controls.termsAccepted.value) {
+        <span class="al-error-text">{{ 'quotes.save.accept-required' | translate }}</span>
+      }
+    </fieldset>
+
+    @if (savedQuotes.error(); as error) {
+      <div class="al-alert al-alert--error" role="alert"><mat-icon>error_outline</mat-icon><span>{{ 'quotes.error.' + error | translate }}</span></div>
+    }
+  </div>
+
+  <footer class="sq-footer">
+    <button type="button" class="al-btn al-btn--secondary" (click)="cancel()">{{ 'common.cancel' | translate }}</button>
+    <button type="submit" class="al-btn al-btn--primary" [disabled]="savedQuotes.saving()">
+      <mat-icon>{{ savedQuotes.saving() ? 'hourglass_empty' : 'save' }}</mat-icon>
+      {{ (quoting.editing() ? 'quotes.save.submit-edit' : 'quotes.save.submit') | translate }}
+    </button>
+  </footer>
+</form>
