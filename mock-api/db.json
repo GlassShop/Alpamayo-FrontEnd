@@ -1,0 +1,14 @@
+{
+  "glass-types": [
+    { "id": 1, "name": "Laminado", "thicknessMm": 6, "color": "cielo" },
+    { "id": 2, "name": "Espejo doble", "thicknessMm": 4, "color": "plateado" }
+  ],
+  "price-lists": [
+    { "id": 1, "name": "Pública" },
+    { "id": 2, "name": "Vidriero" }
+  ],
+  "prices": [
+    { "id": 1, "glassTypeId": 1, "priceListId": 1, "pricePerSqFt": 8 },
+    { "id": 2, "glassTypeId": 2, "priceListId": 1, "pricePerSqFt": 6.5 }
+  ]
+}
