@@ -1,6 +1,7 @@
-import {Component, inject, signal} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {Layout} from './shared/presentation/components/layout/layout';
 import {ConfigurationStore} from './shared/application/configuration.store';
+import {AppErrorStore} from './shared/application/app-error.store';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +10,7 @@ import {ConfigurationStore} from './shared/application/configuration.store';
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('Vidriería Alpamayo');
+  readonly appError = inject(AppErrorStore);
 
   constructor() {
     inject(ConfigurationStore);

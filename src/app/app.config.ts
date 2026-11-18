@@ -1,5 +1,6 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { ApplicationConfig, inject, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideRouter, withNavigationErrorHandler } from '@angular/router';
+import { AppErrorStore } from './shared/application/app-error.store';
 
 import { routes } from './app.routes';
 import {provideHttpClient, withInterceptors} from '@angular/common/http';
@@ -15,6 +16,7 @@ export const appConfig: ApplicationConfig = {
       loader: provideTranslateHttpLoader({ prefix: './i18n/', suffix: '.json'}),
       fallbackLang: 'es',
     }),
-    provideRouter(routes)
+    // A page that fails to open must never leave a blank screen.
+    provideRouter(routes, withNavigationErrorHandler(event => inject(AppErrorStore).handleNavigationError(event.error)))
   ]
 };

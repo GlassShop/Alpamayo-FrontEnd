@@ -1,1 +1,16 @@
+<!--
+  Shown when a page cannot be opened, so the app never ends on a blank screen.
+  Texts are inline on purpose: the translations may be what failed to load.
+-->
+@if (appError.error(); as error) {
+  <div class="app-error" role="alert">
+    <strong>No se pudo abrir esta página.</strong>
+    <span>Recarga la página. Si sigue igual, detén la app y vuelve a ejecutar <code>npm run dev</code>.</span>
+    <details><summary>Detalle técnico</summary><code>{{ error }}</code></details>
+    <div class="app-error-actions">
+      <button class="al-btn al-btn--primary" (click)="appError.reload()">Recargar</button>
+      <button class="al-btn al-btn--secondary" (click)="appError.dismiss()">Cerrar</button>
+    </div>
+  </div>
+}
 <app-layout/>
