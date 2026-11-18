@@ -182,5 +182,88 @@
         "fullName": "Gerencia Alpamayo"
       }
     }
+  ],
+  "technicians": [
+    {
+      "id": 1,
+      "name": "Técnico Demo Juan",
+      "phone": "943000111",
+      "color": "#2563eb",
+      "active": true
+    },
+    {
+      "id": 2,
+      "name": "Técnico Demo Pedro",
+      "phone": "943000222",
+      "color": "#16a34a",
+      "active": true
+    }
+  ],
+  "visits": [
+    {
+      "id": 1,
+      "date": "2026-11-19",
+      "time": "10:00",
+      "technicianId": 1,
+      "type": "MEASUREMENT",
+      "title": "Medición de puerta de ducha",
+      "customer": {
+        "name": "Cliente Demo Uno",
+        "phone": "943111222"
+      },
+      "address": "Jr. Ficticio 100, Huaraz",
+      "status": "SCHEDULED",
+      "createdBy": {
+        "id": 2,
+        "fullName": "Vendedora Demo"
+      },
+      "createdAt": "2026-11-18T14:00:00.000Z",
+      "changes": [
+        {
+          "at": "2026-11-18T14:00:00.000Z",
+          "by": {
+            "id": 2,
+            "fullName": "Vendedora Demo"
+          },
+          "fields": [
+            "created"
+          ]
+        }
+      ],
+      "reference": "Frente al parque, portón verde",
+      "specs": "Medir vano del baño principal; vidrio templado 8 mm"
+    },
+    {
+      "id": 2,
+      "date": "2026-11-20",
+      "time": "15:00",
+      "technicianId": 2,
+      "type": "INSTALLATION",
+      "title": "Proyecto ventanas colegio",
+      "customer": {
+        "name": "Colegio Demo",
+        "phone": "943222333"
+      },
+      "address": "Av. Ficticia 123, Huaraz",
+      "status": "SCHEDULED",
+      "createdBy": {
+        "id": 1,
+        "fullName": "Gerencia Alpamayo"
+      },
+      "createdAt": "2026-11-18T14:00:00.000Z",
+      "changes": [
+        {
+          "at": "2026-11-18T14:00:00.000Z",
+          "by": {
+            "id": 1,
+            "fullName": "Gerencia Alpamayo"
+          },
+          "fields": [
+            "created"
+          ]
+        }
+      ],
+      "specs": "Instalar 12 ventanas del pabellón B"
+    }
   ]
 }

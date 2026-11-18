@@ -95,6 +95,7 @@ server.use((req, res, next) => {
   const ceoOnly =
     req.path.startsWith('/users') ||
     req.path.startsWith('/price-history') ||
+    (writes && req.path.startsWith('/technicians')) ||
     (writes && (req.path.startsWith('/prices') || req.path.startsWith('/price-lists'))) ||
     (writes && req.path.startsWith('/glass-types') && req.method !== 'POST');
   if (ceoOnly && !isCeo) return res.status(403).json({code: 'forbidden'});
@@ -274,6 +275,81 @@ server.put('/quotes/:id', (req, res) => {
 });
 
 server.all(['/quotes', '/quotes/:id'], (req, res) => res.status(405).json({code: 'not-allowed'}));
+
+// ── agenda: technicians and visits ───────────────────────────────────────
+// Technicians do not sign in; the CEO keeps the list. Everyone sees every
+// visit, only its author or the CEO may change it, every change is recorded
+// and visits are cancelled, never deleted.
+const VISIT_TYPES = ['MEASUREMENT', 'INSTALLATION', 'REPAIR', 'OTHER'];
+const VISIT_STATUSES = ['SCHEDULED', 'DONE', 'CANCELLED'];
+const visits = () => db.get('visits');
+const actor = (user) => ({id: user.id, fullName: user.fullName});
+
+server.all('/technicians/:id', (req, res, next) =>
+  req.method === 'DELETE' ? res.status(405).json({code: 'deactivate-instead'}) : next());
+
+function visitProblem(v) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(v.date ?? '') || !/^\d{2}:\d{2}$/.test(v.time ?? '')) return 'invalid-date';
+  if (!VISIT_TYPES.includes(v.type)) return 'invalid-type';
+  if (!String(v.title ?? '').trim() || !String(v.address ?? '').trim()) return 'missing-fields';
+  if (!String(v.customer?.name ?? '').trim() || !String(v.customer?.phone ?? '').trim()) return 'missing-customer';
+  if (v.status !== undefined && !VISIT_STATUSES.includes(v.status)) return 'invalid-status';
+  return null;
+}
+
+function visitFields(body) {
+  const out = {};
+  for (const key of ['date', 'time', 'technicianId', 'type', 'title', 'address', 'reference', 'specs', 'quoteId', 'status']) {
+    if (key in (body ?? {})) out[key] = typeof body[key] === 'string' ? body[key].trim() : body[key];
+  }
+  if (body?.customer) out.customer = {name: String(body.customer.name ?? '').trim(), phone: String(body.customer.phone ?? '').trim()};
+  return out;
+}
+
+server.get('/visits', (req, res) => {
+  const {from, to} = req.query;
+  res.json(visits().filter(v => (!from || v.date >= from) && (!to || v.date <= to)).sortBy(['date', 'time']).value());
+});
+
+server.post('/visits', (req, res) => {
+  const fields = visitFields(req.body);
+  const technician = db.get('technicians').find({id: fields.technicianId}).value();
+  if (!technician?.active) return res.status(400).json({code: 'invalid-technician'});
+  const problem = visitProblem(fields);
+  if (problem) return res.status(400).json({code: problem});
+  for (const key of ['reference', 'specs']) if (!fields[key]) delete fields[key];
+  const id = visits().value().reduce((max, v) => Math.max(max, v.id), 0) + 1;
+  const now = new Date().toISOString();
+  const visit = {id, ...fields, status: 'SCHEDULED', createdBy: actor(req.currentUser), createdAt: now,
+    changes: [{at: now, by: actor(req.currentUser), fields: ['created']}]};
+  visits().push(visit).write();
+  res.status(201).json(visit);
+});
+
+server.all('/visits/:id', (req, res, next) => {
+  if (req.method === 'DELETE') return res.status(405).json({code: 'cancel-instead'});
+  if (!['PUT', 'PATCH'].includes(req.method)) return next();
+  const existing = visits().find({id: Number(req.params.id)}).value();
+  if (!existing) return res.status(404).json({code: 'not-found'});
+  if (existing.createdBy.id !== req.currentUser.id && req.currentUser.role !== 'CEO') {
+    return res.status(403).json({code: 'not-your-visit'});
+  }
+  const changes = visitFields(req.body);
+  if ('technicianId' in changes && changes.technicianId !== existing.technicianId) {
+    const technician = db.get('technicians').find({id: changes.technicianId}).value();
+    if (!technician?.active) return res.status(400).json({code: 'invalid-technician'});
+  }
+  const updated = {...existing, ...changes};
+  for (const key of ['reference', 'specs']) if (!updated[key]) delete updated[key];
+  const problem = visitProblem(updated);
+  if (problem) return res.status(400).json({code: problem});
+  const changedFields = Object.keys(changes).filter(k => JSON.stringify(existing[k] ?? '') !== JSON.stringify(updated[k] ?? ''));
+  if (changedFields.length === 0) return res.json(existing);
+  updated.changes = [...existing.changes, {at: new Date().toISOString(), by: actor(req.currentUser), fields: changedFields}];
+  // Replace the whole object so cleared optional fields really disappear.
+  db.set('visits', visits().map(v => v.id === existing.id ? updated : v).value()).write();
+  res.json(updated);
+});
 
 // ── DNI / RUC lookup ─────────────────────────────────────────────────────
 // The real backend will query RENIEC/SUNAT. Here: a fictional directory plus
