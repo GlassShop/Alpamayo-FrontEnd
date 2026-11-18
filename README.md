@@ -1,142 +1,79 @@
-# ACME Learning Center Application (`learning-center`)
+# Vidriería Alpamayo — Frontend
 
-## Overview
-`learning-center` is an Angular 21 client application for managing learning information in the ACME Learning Center domain. The current implementation focuses on maintaining categories and courses, with the codebase organized around bounded contexts and layered responsibilities.
+Cliente web Angular 21 del sistema de gestión de Vidriería Alpamayo, vidriería mayorista en Huaraz, Perú.
 
-In development mode, the application consumes a local fake API exposed through `json-server`. The frontend is configured to call `http://localhost:3000/api/v1` for learning resources.
+## Alcance de la iteración 1
 
-## Features
-- Category maintenance with create, read, update, and delete behavior
-- Course maintenance with create, read, update, and delete behavior
-- Course-to-category association through category selection
-- Internationalization with English and Spanish resources using `ngx-translate`
-- Client-side navigation with Angular Router
-- HTTP communication through Angular `HttpClient`
-- Angular Material-based presentation components
-- Layered organization by bounded context:
-  - `learning`
-  - `iam`
-  - `shared`
+- Inicio de sesión con usuario y contraseña y tres roles: CEO, vendedora y almacén.
+- Catálogo de vidrios: lo ven todos; solo el CEO cambia precios.
+- Cotizador de vidrios por pie cuadrado, con total al instante.
+- Administración de usuarios, solo para el CEO.
 
-## Current Scope
-The currently enabled application routes expose:
-- `home`
-- `about`
-- `learning/categories`
-- `learning/courses`
+Fuera de esta iteración: móvil, aluminios, ventanas por serie, clientes, inventario, facturación y panel de indicadores.
 
-The codebase also contains an `iam` bounded context, including routes, store, interceptor, and endpoint classes. However, IAM routes are currently not enabled in `src/app/app.routes.ts`, so authentication is present in the codebase but not active in the running application.
+## Reglas del proyecto
 
-## Architecture Overview
-The application structure follows bounded contexts and layers under `src/app`:
+1. Los precios nunca se escriben en el código: vienen de la API.
+2. Ninguna clave ni dirección de servidor en el código: todo va en `src/environments/`.
+3. Cada ruta protegida usa la guardia de IAM y valida el rol.
+4. Código en inglés técnico; textos visibles en español mediante `public/i18n/`.
+5. Cada tienda y cada regla de cálculo lleva pruebas automáticas.
 
-- `learning`
-  - `domain`
-  - `application`
-  - `infrastructure`
-  - `presentation`
-- `iam`
-  - `domain`
-  - `application`
-  - `infrastructure`
-  - `presentation`
-- `shared`
-  - `domain`
-  - `infrastructure`
-  - `presentation`
+## Regla de cálculo del cotizador
 
-This structure helps keep domain concepts, API integration, application state, and UI concerns clearly separated.
+- Cada medida se redondea hacia arriba al múltiplo de 5 cm.
+- Pie cuadrado de una pieza = ancho × alto ÷ 900.
+- Total de la línea = pie cuadrado × cantidad × precio por pie cuadrado de la lista elegida (pública o vidriero).
+- El IGV está incluido en el total: subtotal sin IGV = total ÷ 1.18.
+- Las medidas pueden ingresarse en cm, mm o pulgadas: se convierten a cm antes de redondear (2130 mm → 215 cm; 84" → 215 cm).
 
-## Technologies
-- Angular 21
-- TypeScript
-- RxJS
-- Angular Router
-- Angular `HttpClient`
-- Angular Material
-- `ngx-translate`
-- `json-server`
-- PlantUML
+## Importar medidas desde Excel
 
-## Documentation
-### User Stories
-Functional requirements are documented in [`docs/user-stories.md`](docs/user-stories.md).
+1. En el cotizador, «Descargar plantilla» genera `plantilla-cotizacion-alpamayo.xlsx` con listas desplegables de vidrio (del catálogo actual) y de unidad. No incluye precios.
+2. El cliente llena una fila por pieza (Tipo de vidrio, Ancho, Alto, Unidad, Cantidad, Referencia) y la devuelve.
+3. «Importar Excel» muestra una vista previa: filas listas con su total y filas con errores (n.° de fila y motivo). Al confirmar, reemplaza las líneas de la cotización.
 
-### Class Diagram
-The class diagram is available in [`docs/class-diagram.puml`](docs/class-diagram.puml).
+El lector también acepta Excel propios del cliente si tienen columnas reconocibles («Vidrio», «Ancho», «Alto», «Cant.»…), aunque estén en otro orden o tengan filas de título arriba.
 
-## Prerequisites
-Before running the project, make sure the environment includes:
-- Node.js
-- npm
+Casos de prueba de referencia:
 
-## Installation
-Install project dependencies from the project root:
+| Caso | Medidas | Cantidad | Precio | Resultado |
+| --- | --- | --- | --- | --- |
+| Laminado cielo 6 mm, lista pública | 213 × 123 cm → 215 × 125 | 2 | S/ 8.00 | 59.72 pie² · S/ 477.78 |
+| Espejo doble 4 mm | 120 × 60 cm | 1 | S/ 6.50 | 8 pie² · S/ 52.00 |
+
+## Estructura
+
+Cada dominio en `src/app` tiene cuatro capas: `domain`, `application`, `infrastructure` y `presentation`.
+
+| Carpeta | Contenido |
+| --- | --- |
+| `shared` | Base de API, ensamblador, entidad base, layout, configuración de idioma, componentes comunes |
+| `iam` | Inicio de sesión, guardia de rutas e interceptor del token |
+| `catalog` | Tipos de vidrio (nombre, espesor, color), listas de precio y precio por pie² que fija el CEO |
+| `quoting` | Regla de cálculo (`domain/services/square-foot-calculator.ts`) y cotizador |
+
+## Desarrollo
 
 ```bash
-npm install
+npm ci          # instala dependencias exactas del lockfile
+npm run dev     # enciende la API de prueba y la app juntas → abre http://localhost:4200
+npm run api     # solo la API local de prueba (http://localhost:3000/api/v1, ver mock-api/README.md)
+npm start       # solo la app (http://localhost:4200)
+npm test        # pruebas unitarias (Vitest)
+npm run build   # build de producción en dist/alpamayo
 ```
 
-## Running the Application
-Start the Angular development server from the project root:
+Con `npm run dev`, al cerrar la terminal (Ctrl+C) se apagan las dos partes. Si aparece "port already in use", ya hay otra copia encendida: abre http://localhost:4200 o ciérrala antes.
 
-```bash
-npm start
-```
+La API se configura en `src/environments/environment*.ts` (`apiBaseUrl`). En desarrollo apunta a json-server (`npm run api`); si está apagado, las pantallas muestran un error controlado, nunca datos inventados.
 
-This starts the application at:
+## Rutas
 
-- `http://localhost:4200/`
-
-## Starting the Fake API
-The development environment is configured to consume the fake API at:
-
-- `http://localhost:3000/api/v1`
-
-The fake API configuration files are located in the `server` folder:
-- `server/db.json`
-- `server/routes.json`
-- `server/start.sh`
-
-### Option 1: Start from the project root
-
-```bash
-npx json-server --watch server/db.json --routes server/routes.json --port 3000
-```
-
-### Option 2: Use the provided script
-The provided script uses relative paths, so it should be executed from inside the `server` directory:
-
-```bash
-cd server
-sh start.sh
-```
-
-## Development Workflow
-For local development, start the fake API first and then start the Angular application:
-
-```bash
-npx json-server --watch server/db.json --routes server/routes.json --port 3000
-npm start
-```
-
-## Available Scripts
-From the project root, the following scripts are available:
-
-```bash
-npm start
-npm run build
-npm run watch
-npm test
-```
-
-## Fake API Notes
-- The fake API currently provides learning resources for `categories` and `courses`.
-- The development environment maps `/api/v1/*` requests through `server/routes.json`.
-- IAM endpoint paths exist in the environment configuration, but they are not currently backed by the fake API data in `server/db.json`.
-
-## Project Notes
-- Translation files are located in `public/i18n/`.
-- The development API base URL is defined in `src/environments/environment.development.ts`.
-- The production environment file points to `http://localhost:8080/api/v1`, which may require adjustment for a real deployment target.
-
+| Ruta | Pantalla |
+| --- | --- |
+| `/iniciar-sesion` | Inicio de sesión |
+| `/cotizador` | Cotizador por pie² con la lista de precio elegida |
+| `/catalogo` | Catálogo de vidrios y precios (solo lectura) |
+| `/catalogo/precios` | Precios por pie², nuevos vidrios y nuevas listas (CEO) |
+| `/configuracion` | Idioma de la interfaz |
