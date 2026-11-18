@@ -1,0 +1,12 @@
+:host { display: block; max-width: 1280px; }
+.pe-saving { display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; font-weight: 700; color: var(--al-primary); }
+.pe-saving mat-icon { font-size: 18px; width: 18px; height: 18px; }
+.pe-unit { font-size: .78rem; }
+.pe-name { display: block; font-weight: 600; }
+.pe-meta { display: block; font-size: .75rem; }
+.pe-color { text-transform: capitalize; }
+.pe-price { width: 110px; text-align: right; background: var(--al-surface); }
+.pe-forms { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 24px; align-items: start; }
+.pe-row { display: flex; gap: 16px; }
+.pe-forms .al-btn { align-self: flex-start; }
+@media (max-width: 560px) { .pe-row { flex-direction: column; } }

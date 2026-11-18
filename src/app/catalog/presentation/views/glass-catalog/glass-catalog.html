@@ -1,0 +1,61 @@
+<header class="al-page-header">
+  <div>
+    <h1 class="al-page-title">{{ 'catalog.title' | translate }}</h1>
+    <p class="al-page-subtitle">{{ 'catalog.subtitle' | translate }}</p>
+  </div>
+  <a class="al-btn al-btn--secondary" routerLink="/catalogo/precios"><mat-icon>price_change</mat-icon>{{ 'catalog.go-prices' | translate }}</a>
+</header>
+
+<section class="al-card">
+  @if (catalog.error() === 'catalog.error.load') {
+    <div class="al-empty al-empty--error">
+      <mat-icon>cloud_off</mat-icon>
+      <span>{{ 'catalog.error.load' | translate }}</span>
+      <button class="al-btn al-btn--secondary" (click)="catalog.load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (!catalog.loaded()) {
+    <div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div>
+  } @else if (catalog.glassTypes().length === 0) {
+    <div class="al-empty"><mat-icon>window</mat-icon>{{ 'catalog.empty' | translate }}</div>
+  } @else {
+    <div class="al-table-wrapper">
+      <table class="al-table">
+        <thead>
+          <tr>
+            <th>{{ 'catalog.glass' | translate }}</th>
+            <th>{{ 'catalog.thickness' | translate }}</th>
+            @for (list of catalog.priceLists(); track list.id) { <th class="al-num">{{ list.name }}</th> }
+            <th>{{ 'catalog.status' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (glass of catalog.glassTypes(); track glass.id) {
+            <tr>
+              <td>
+                <div class="gc-glass">
+                  <span class="gc-icon" aria-hidden="true"><mat-icon>layers</mat-icon></span>
+                  <span class="gc-name">{{ glass.name }}<small>{{ glass.color }}</small></span>
+                </div>
+              </td>
+              <td>{{ glass.thicknessMm }} mm</td>
+              @for (list of catalog.priceLists(); track list.id) {
+                <td class="al-num">
+                  @if (catalog.priceFor(glass.id, list.id); as price) { S/ {{ price | number:'1.2-2' }} }
+                  @else { <span class="al-muted">—</span> }
+                </td>
+              }
+              <td>
+                @if (missingPrices(glass.id) === 0) {
+                  <span class="al-pill al-pill--success">{{ 'catalog.complete' | translate }}</span>
+                } @else {
+                  <span class="al-pill al-pill--warning">{{ 'catalog.missing' | translate: { count: missingPrices(glass.id) } }}</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <footer class="gc-footer al-muted">{{ 'catalog.note' | translate }}</footer>
+  }
+</section>

@@ -1,0 +1,85 @@
+<header class="al-page-header">
+  <div>
+    <h1 class="al-page-title">{{ 'catalog.prices.title' | translate }}</h1>
+    <p class="al-page-subtitle">{{ 'catalog.prices.subtitle' | translate }}</p>
+  </div>
+  @if (catalog.saving()) { <span class="pe-saving"><mat-icon>sync</mat-icon>{{ 'common.saving' | translate }}</span> }
+</header>
+
+@if (catalog.error(); as error) {
+  <div class="al-alert al-alert--error" role="alert">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ error | translate }}</span>
+    @if (error === 'catalog.error.load') {
+      <button class="al-btn al-btn--secondary" (click)="catalog.load()">{{ 'common.retry' | translate }}</button>
+    } @else {
+      <button class="al-icon-btn" (click)="catalog.clearError()" [attr.aria-label]="'common.close' | translate"><mat-icon>close</mat-icon></button>
+    }
+  </div>
+}
+
+@if (catalog.loaded()) {
+  <section class="al-card">
+    <div class="al-card-header">
+      <h2 class="al-card-title"><mat-icon>payments</mat-icon>{{ 'catalog.prices.matrix' | translate }}</h2>
+      <span class="al-muted pe-unit">S/ / pie² · IGV incl.</span>
+    </div>
+    <div class="al-table-wrapper">
+      <table class="al-table">
+        <thead>
+          <tr>
+            <th>{{ 'catalog.glass' | translate }}</th>
+            @for (list of catalog.priceLists(); track list.id) { <th class="al-num">{{ list.name }}</th> }
+          </tr>
+        </thead>
+        <tbody>
+          @for (glass of catalog.glassTypes(); track glass.id) {
+            <tr>
+              <td><span class="pe-name">{{ glass.name }}</span><span class="al-muted pe-meta">{{ glass.thicknessMm }} mm · <span class="pe-color">{{ glass.color }}</span></span></td>
+              @for (list of catalog.priceLists(); track list.id) {
+                <td class="al-num">
+                  <input class="al-input pe-price" type="number" min="0.01" step="0.01" inputmode="decimal"
+                         [value]="catalog.priceFor(glass.id, list.id)?.toFixed(2) ?? ''"
+                         [placeholder]="'catalog.prices.unset' | translate"
+                         [attr.aria-label]="glass.name + ' ' + glass.thicknessMm + ' mm — ' + list.name"
+                         (change)="onPriceCommit(glass.id, list.id, $event)"
+                         (keydown.enter)="$any($event.target).blur()"/>
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr><td [attr.colspan]="catalog.priceLists().length + 1" class="al-muted">{{ 'catalog.empty' | translate }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="pe-forms">
+    <form class="al-card" [formGroup]="glassForm" (ngSubmit)="addGlassType()">
+      <div class="al-card-header"><h2 class="al-card-title"><mat-icon>layers</mat-icon>{{ 'catalog.prices.new-glass' | translate }}</h2></div>
+      <div class="al-card-body">
+        <label class="al-field"><span class="al-label">{{ 'catalog.glass' | translate }}</span>
+          <input class="al-input" formControlName="name" [placeholder]="'catalog.prices.glass-example' | translate"/></label>
+        <div class="pe-row">
+          <label class="al-field"><span class="al-label">{{ 'catalog.thickness' | translate }} (mm)</span>
+            <input class="al-input" type="number" min="0.1" step="0.1" formControlName="thicknessMm"/></label>
+          <label class="al-field"><span class="al-label">{{ 'catalog.color' | translate }}</span>
+            <input class="al-input" formControlName="color" [placeholder]="'catalog.prices.color-example' | translate"/></label>
+        </div>
+        <button class="al-btn al-btn--primary" type="submit" [disabled]="catalog.saving()"><mat-icon>add</mat-icon>{{ 'catalog.prices.add-glass' | translate }}</button>
+      </div>
+    </form>
+
+    <form class="al-card" [formGroup]="listForm" (ngSubmit)="addPriceList()">
+      <div class="al-card-header"><h2 class="al-card-title"><mat-icon>list_alt</mat-icon>{{ 'catalog.prices.new-list' | translate }}</h2></div>
+      <div class="al-card-body">
+        <label class="al-field"><span class="al-label">{{ 'catalog.prices.list-name' | translate }}</span>
+          <input class="al-input" formControlName="name" [placeholder]="'catalog.prices.list-example' | translate"/></label>
+        <button class="al-btn al-btn--primary" type="submit" [disabled]="catalog.saving()"><mat-icon>add</mat-icon>{{ 'catalog.prices.add-list' | translate }}</button>
+      </div>
+    </form>
+  </div>
+} @else if (catalog.loading()) {
+  <section class="al-card"><div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div></section>
+}
