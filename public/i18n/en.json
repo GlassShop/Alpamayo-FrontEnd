@@ -1,98 +1,163 @@
 {
-  "option": {
-    "home": "Home",
-    "about": "About Us",
-    "categories": "Categories",
-    "courses": "Courses"
-  },
-  "about": {
-    "title": "About us",
-    "content": "ACME Learning Center is an Education Platform, part of ACME Corporation."
-  },
-  "home": {
-    "title": "Welcome",
-    "content": "Welcome to ACME Learning Center."
-  },
   "page-not-found": {
     "title": "Page not found",
-    "content": "The path <strong>{{ invalid_path }}</strong> is not valid.",
-    "go-home": "Go Home"
+    "content": "The path <strong>{{ invalid_path }}</strong> does not exist.",
+    "go-home": "Go home"
   },
-  "footer": {
-    "rights": "All rights reserved.",
-    "powered-by": "Powered by",
-    "and": "and"
-  },
-  "categories": {
-    "list-title": "Categories",
-    "id": "ID",
-    "name": "Name",
-    "actions": "Actions",
-    "new": "New Category",
-    "edit": "Edit",
-    "delete": "Delete"
-  },
-  "category": {
-    "new-title": "Create New Category",
-    "edit-title": "Edit Category",
-    "name": "Name",
-    "create": "Create Category",
-    "update": "Update Category",
-    "cancel": "Cancel",
-    "error": {
-      "name-required": "Name is required"
+  "iam": {
+    "sign-in": {
+      "title": "Sign in",
+      "username": "Username",
+      "password": "Password",
+      "submit": "Sign in"
     }
   },
-  "courses": {
-    "list-title": "Courses",
-    "id": "ID",
-    "title": "Title",
-    "description": "Description",
-    "category": "Category",
-    "actions": "Actions",
-    "new": "New Course",
-    "edit": "Edit",
-    "delete": "Delete"
-  },
-  "course": {
-    "new-title": "Create New Course",
-    "edit-title": "Edit Course",
-    "title": "Title",
-    "description": "Description",
-    "category": "Category",
-    "create": "Create Course",
-    "update": "Update Course",
-    "cancel": "Cancel",
-    "error": {
-      "title-required": "Title is required",
-      "description-required": "Description is required",
-      "category-required": "Category is required"
+  "configuration": {
+    "title": "Settings",
+    "subtitle": "Application preferences",
+    "back": "Back to quoter",
+    "language": {
+      "title": "Language",
+      "description": "Choose the interface language. The preference is saved in this browser."
     }
   },
-  "sellers": {
-    "quoting":  { "title": "Projects & Quoting Tool" },
-    "quotes":   { "title": "Sales & CRM" },
-    "sales":    { "title": "Stock & Remnants" },
-    "cash":     { "title": "Cash Register & Collections" },
-    "orders":   { "title": "Order Tracking" },
-    "agenda":   { "title": "Agenda & Visits" },
-    "profile":  { "title": "My Profile & Goals" },
-    "configuration": {
-      "title": "Settings",
-      "subtitle": "Application preferences for the seller",
-      "back": "Back to profile",
-      "language": {
-        "title": "Language",
-        "description": "Select the interface language. Your preference is saved in this browser."
+  "common": {
+    "loading": "Loading…",
+    "saving": "Saving…",
+    "retry": "Retry",
+    "close": "Close",
+    "cancel": "Cancel"
+  },
+  "catalog": {
+    "title": "Glass catalog",
+    "subtitle": "Glass types and price per square foot in each list. Prices include IGV.",
+    "glass": "Glass",
+    "thickness": "Thickness",
+    "color": "Color",
+    "empty": "There is no glass in the catalog yet.",
+    "note": "Only the CEO can change prices, from Prices.",
+    "prices": {
+      "title": "Prices per square foot",
+      "subtitle": "Set the price per square foot (IGV included) of each glass in each list. Saved when you leave the cell.",
+      "unset": "No price",
+      "new-glass": "New glass type",
+      "glass-example": "e.g. Laminated",
+      "color-example": "e.g. sky",
+      "add-glass": "Add glass",
+      "new-list": "New price list",
+      "list-name": "List name",
+      "list-example": "e.g. Builders",
+      "add-list": "Add list",
+      "matrix": "Price matrix"
+    },
+    "error": {
+      "load": "Could not load the catalog. Check that the API is available.",
+      "save": "Could not save. Please try again.",
+      "invalid-price": "Price must be greater than zero.",
+      "invalid-glass": "Enter a name and a thickness greater than zero.",
+      "invalid-list": "Enter the list name.",
+      "duplicate-list": "A list with that name already exists."
+    },
+    "complete": "All prices set",
+    "go-prices": "Edit prices",
+    "missing": "No price: {{ count }}",
+    "status": "Status"
+  },
+  "quoting": {
+    "search-placeholder": "Search glass by name, thickness or color...",
+    "price-list": "Price list",
+    "no-price": "No price in this list",
+    "add": "Add to quote",
+    "empty-catalog": "No glass to show.",
+    "current-quote": "Current quote",
+    "clear": "Clear quote",
+    "remove": "Remove",
+    "unknown-glass": "Glass not found",
+    "width": "Width",
+    "height": "Height",
+    "quantity": "Qty",
+    "billed-as": "Billed as",
+    "issue": {
+      "missing-measures": "Enter width and height",
+      "invalid-quantity": "Quantity must be a whole number above zero",
+      "no-price": "The CEO has not set a price in this list"
+    },
+    "total-square-feet": "Total ft²",
+    "subtotal": "Subtotal before IGV",
+    "igv": "IGV (18%) included",
+    "total": "Total due",
+    "title": "Quoter",
+    "subtitle": "Quote glass by the square foot with the prices set by the CEO. Measures are rounded up to multiples of 5 cm.",
+    "spec-title": "Cut specification",
+    "edit-title": "Edit line",
+    "glass-type": "Glass type",
+    "list-label": "list",
+    "less": "Minus one",
+    "more": "Plus one",
+    "rounding-hint": "Enter width and height to see the billed area.",
+    "update": "Update line",
+    "col-glass": "Glass",
+    "col-size": "Size",
+    "col-qty": "Qty",
+    "col-total": "Total",
+    "col-actions": "Actions",
+    "edit": "Edit",
+    "no-lines": "No lines yet. Fill in the form and press “Add to quote”.",
+    "no-price-short": "No price",
+    "summary-title": "Quote summary",
+    "pieces": "Pieces",
+    "units": "pcs",
+    "igv-included": "IGV included in the total",
+    "lines-title": "Quote lines",
+    "unit-label": "Unit",
+    "reference": "Reference (optional)",
+    "reference-example": "e.g. Living room window",
+    "unit": {
+      "cm": "cm",
+      "mm": "mm",
+      "in": "in"
+    },
+    "example": {
+      "cm": {
+        "width": "e.g. 213",
+        "height": "e.g. 123"
       },
-      "shortcuts": {
-        "title": "Quick links",
-        "dashboard": "Sales dashboard",
-        "sales": "Product catalogue",
-        "workshop": "Workshop status",
-        "cash": "Cash register"
+      "mm": {
+        "width": "e.g. 2130",
+        "height": "e.g. 1230"
+      },
+      "in": {
+        "width": "e.g. 84",
+        "height": "e.g. 48.5"
       }
     },
-    "placeholder": { "content": "This section is under construction and will be available soon." }
+    "import": {
+      "template": "Download template",
+      "template-hint": "Excel for the customer to fill in their measures and send back",
+      "import": "Import Excel",
+      "import-hint": "Load the Excel filled in by the customer",
+      "title": "Review import",
+      "row": "Row",
+      "valid": "Ready: {{ count }}",
+      "invalid": "With errors: {{ count }}",
+      "replace-warning": "The current quote lines will be replaced ({{ count }})",
+      "unit-assumed": "cm assumed",
+      "unit-assumed-hint": "The row had no unit; it was read in centimetres. Check it.",
+      "rejected-title": "Rows that will not be imported",
+      "confirm": "Import ({{ count }})",
+      "issue": {
+        "missing-glass": "glass type missing",
+        "unknown-glass": "glass not in the catalog",
+        "invalid-width": "missing or invalid width",
+        "invalid-height": "missing or invalid height",
+        "unknown-unit": "unknown unit (use cm, mm or in)",
+        "invalid-quantity": "invalid quantity (whole number above zero)"
+      },
+      "error": {
+        "not-excel": "The file is not a valid Excel workbook (.xlsx).",
+        "no-header": "No measures table found. The Excel needs \"Tipo de vidrio\", \"Ancho\" and \"Alto\" columns; use the template.",
+        "empty": "The Excel has no rows with measures."
+      }
+    }
   }
 }

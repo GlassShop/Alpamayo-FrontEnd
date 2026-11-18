@@ -1,98 +1,163 @@
 {
-  "option" : {
-    "home": "Inicio",
-    "about": "Acerca de",
-    "categories": "Categorías",
-    "courses": "Cursos"
-  },
-  "about": {
-    "title": "Acerca de nosotros",
-    "content": "ACME Learning Center es una plataforma educativa, parte de ACME Corporation."
-  },
-  "home": {
-    "title": "Bienvenido",
-    "content": "Bienvenido a ACME Learning Center."
-  },
   "page-not-found": {
     "title": "Página no encontrada",
-    "content": "La ruta <strong>{{ invalidPath }}</strong> es inválida.",
-    "go-home": "Ir a Inicio"
+    "content": "La ruta <strong>{{ invalid_path }}</strong> no existe.",
+    "go-home": "Ir al inicio"
   },
-  "footer": {
-    "rights": "Todos los derechos reservados.",
-    "powered-by": "Desarrollado con",
-    "and": "y"
-  },
-  "categories": {
-    "list-title": "Categorías",
-    "id": "ID",
-    "name": "Nombre",
-    "actions": "Acciones",
-    "new": "Nueva Categoría",
-    "edit": "Editar",
-    "delete": "Eliminar"
-  },
-  "category": {
-    "new-title": "Crear Nueva Categoría",
-    "edit-title": "Editar Categoría",
-    "name": "Nombre",
-    "create": "Crear Categoría",
-    "update": "Actualizar Categoría",
-    "cancel": "Cancelar",
-    "error": {
-      "name-required": "El nombre es obligatorio"
+  "iam": {
+    "sign-in": {
+      "title": "Iniciar sesión",
+      "username": "Usuario",
+      "password": "Contraseña",
+      "submit": "Ingresar"
     }
   },
-  "courses": {
-    "list-title": "Cursos",
-    "id": "ID",
-    "title": "Título",
-    "description": "Descripción",
-    "category": "Categoría",
-    "actions": "Acciones",
-    "new": "Nuevo Curso",
-    "edit": "Editar",
-    "delete": "Eliminar"
-  },
-  "course": {
-    "new-title": "Crear Nuevo Curso",
-    "edit-title": "Editar Curso",
-    "title": "Título",
-    "description": "Descripción",
-    "category": "Categoría",
-    "create": "Crear Curso",
-    "update": "Actualizar Curso",
-    "cancel": "Cancelar",
-    "error": {
-      "title-required": "El título es obligatorio",
-      "description-required": "La descripción es obligatoria",
-      "category-required": "La categoría es obligatoria"
+  "configuration": {
+    "title": "Configuración",
+    "subtitle": "Preferencias de la aplicación",
+    "back": "Volver al cotizador",
+    "language": {
+      "title": "Idioma",
+      "description": "Selecciona el idioma de la interfaz. La preferencia se guarda en este navegador."
     }
   },
-  "sellers": {
-    "quoting":  { "title": "Proyectos & Cotizador" },
-    "quotes":   { "title": "Ventas & CRM" },
-    "sales":    { "title": "Stock & Retazos" },
-    "cash":     { "title": "Caja y Cobranzas" },
-    "orders":   { "title": "Seguimiento de Pedidos" },
-    "agenda":   { "title": "Agenda & Visitas" },
-    "profile":  { "title": "Mi Perfil & Metas" },
-    "configuration": {
-      "title": "Configuración",
-      "subtitle": "Preferencias de la aplicación para el vendedor",
-      "back": "Volver al perfil",
-      "language": {
-        "title": "Idioma",
-        "description": "Selecciona el idioma de la interfaz. La preferencia se guarda en este navegador."
+  "common": {
+    "loading": "Cargando…",
+    "saving": "Guardando…",
+    "retry": "Reintentar",
+    "close": "Cerrar",
+    "cancel": "Cancelar"
+  },
+  "catalog": {
+    "title": "Catálogo de vidrios",
+    "subtitle": "Tipos de vidrio y precio por pie² en cada lista. Los precios incluyen IGV.",
+    "glass": "Vidrio",
+    "thickness": "Espesor",
+    "color": "Color",
+    "empty": "Todavía no hay vidrios en el catálogo.",
+    "note": "Solo el CEO puede cambiar precios, desde Precios.",
+    "prices": {
+      "title": "Precios por pie²",
+      "subtitle": "Fija el precio por pie² (IGV incluido) de cada vidrio en cada lista. Se guarda al salir de la celda.",
+      "unset": "Sin precio",
+      "new-glass": "Nuevo tipo de vidrio",
+      "glass-example": "Ej. Laminado",
+      "color-example": "Ej. cielo",
+      "add-glass": "Agregar vidrio",
+      "new-list": "Nueva lista de precio",
+      "list-name": "Nombre de la lista",
+      "list-example": "Ej. Constructora",
+      "add-list": "Agregar lista",
+      "matrix": "Matriz de precios"
+    },
+    "error": {
+      "load": "No se pudo cargar el catálogo. Revisa que la API esté disponible.",
+      "save": "No se pudo guardar. Inténtalo de nuevo.",
+      "invalid-price": "El precio debe ser mayor que cero.",
+      "invalid-glass": "Indica el nombre y un espesor mayor que cero.",
+      "invalid-list": "Escribe el nombre de la lista.",
+      "duplicate-list": "Ya existe una lista con ese nombre."
+    },
+    "complete": "Precios completos",
+    "go-prices": "Editar precios",
+    "missing": "Sin precio: {{ count }}",
+    "status": "Estado"
+  },
+  "quoting": {
+    "search-placeholder": "Buscar vidrio por nombre, espesor o color...",
+    "price-list": "Lista de precio",
+    "no-price": "Sin precio en esta lista",
+    "add": "Añadir a la cotización",
+    "empty-catalog": "No hay vidrios para mostrar.",
+    "current-quote": "Cotización actual",
+    "clear": "Limpiar cotización",
+    "remove": "Quitar",
+    "unknown-glass": "Vidrio no encontrado",
+    "width": "Ancho",
+    "height": "Alto",
+    "quantity": "Cant.",
+    "billed-as": "Se cobra",
+    "issue": {
+      "missing-measures": "Ingresa ancho y alto",
+      "invalid-quantity": "La cantidad debe ser un entero mayor que cero",
+      "no-price": "El CEO no fijó precio en esta lista"
+    },
+    "total-square-feet": "Total pie²",
+    "subtotal": "Subtotal sin IGV",
+    "igv": "IGV (18%) incluido",
+    "total": "Total a pagar",
+    "title": "Cotizador",
+    "subtitle": "Cotiza vidrios por pie² con los precios que fijó el CEO. Las medidas se redondean hacia arriba a múltiplos de 5 cm.",
+    "spec-title": "Especificaciones de corte",
+    "edit-title": "Editar línea",
+    "glass-type": "Tipo de vidrio",
+    "list-label": "lista",
+    "less": "Restar uno",
+    "more": "Sumar uno",
+    "rounding-hint": "Ingresa ancho y alto para ver el área cobrada.",
+    "update": "Actualizar línea",
+    "col-glass": "Vidrio",
+    "col-size": "Medidas",
+    "col-qty": "Cant.",
+    "col-total": "Total",
+    "col-actions": "Acciones",
+    "edit": "Editar",
+    "no-lines": "Aún no hay líneas. Completa el formulario y pulsa «Añadir a la cotización».",
+    "no-price-short": "Sin precio",
+    "summary-title": "Resumen de la cotización",
+    "pieces": "Piezas",
+    "units": "und.",
+    "igv-included": "IGV incluido en el total",
+    "lines-title": "Líneas de la cotización",
+    "unit-label": "Unidad",
+    "reference": "Referencia (opcional)",
+    "reference-example": "Ej. Ventana sala",
+    "unit": {
+      "cm": "cm",
+      "mm": "mm",
+      "in": "pulg"
+    },
+    "example": {
+      "cm": {
+        "width": "Ej. 213",
+        "height": "Ej. 123"
       },
-      "shortcuts": {
-        "title": "Accesos rápidos",
-        "dashboard": "Dashboard de ventas",
-        "sales": "Catálogo de productos",
-        "workshop": "Estado de taller",
-        "cash": "Caja y cobranzas"
+      "mm": {
+        "width": "Ej. 2130",
+        "height": "Ej. 1230"
+      },
+      "in": {
+        "width": "Ej. 84",
+        "height": "Ej. 48.5"
       }
     },
-    "placeholder": { "content": "Esta sección está en construcción y estará disponible pronto." }
+    "import": {
+      "template": "Descargar plantilla",
+      "template-hint": "Excel para que el cliente escriba sus medidas y te lo envíe",
+      "import": "Importar Excel",
+      "import-hint": "Carga el Excel que llenó el cliente",
+      "title": "Revisar importación",
+      "row": "Fila",
+      "valid": "Listas: {{ count }}",
+      "invalid": "Con errores: {{ count }}",
+      "replace-warning": "Se reemplazarán las líneas actuales de la cotización ({{ count }})",
+      "unit-assumed": "cm supuesto",
+      "unit-assumed-hint": "La fila no traía unidad; se leyó en centímetros. Revísala.",
+      "rejected-title": "Filas que no se importarán",
+      "confirm": "Importar ({{ count }})",
+      "issue": {
+        "missing-glass": "falta el tipo de vidrio",
+        "unknown-glass": "vidrio que no está en el catálogo",
+        "invalid-width": "ancho vacío o no válido",
+        "invalid-height": "alto vacío o no válido",
+        "unknown-unit": "unidad desconocida (usa cm, mm o pulg)",
+        "invalid-quantity": "cantidad no válida (entero mayor que cero)"
+      },
+      "error": {
+        "not-excel": "El archivo no es un Excel válido (.xlsx).",
+        "no-header": "No se encontró la tabla de medidas. El Excel debe tener columnas «Tipo de vidrio», «Ancho» y «Alto»; usa la plantilla.",
+        "empty": "El Excel no tiene filas con medidas."
+      }
+    }
   }
 }
