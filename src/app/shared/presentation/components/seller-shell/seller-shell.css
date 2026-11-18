@@ -24,3 +24,10 @@
   .shell-sidebar { width: 68px; }
   .shell-content { padding: 16px; }
 }
+
+/* Printing a quote: only the page content, on white, without scroll clipping. */
+@media print {
+  :host, .shell, .shell-main, .shell-content { display: block; height: auto; overflow: visible; }
+  .shell-sidebar, .top-bar { display: none; }
+  .shell-content { padding: 0; background: #fff; }
+}
