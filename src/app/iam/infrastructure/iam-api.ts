@@ -2,16 +2,16 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {BaseApi} from '../../shared/infrastructure/base-api';
+import {SignInCommand} from '../domain/model/sign-in.command';
+import {Session} from '../domain/model/session';
 import {SignInApiEndpoint} from './sign-in-api-endpoint';
 import {SignInAssembler} from './sign-in-assembler';
-import {SignInCommand} from '../domain/model/sign-in.command';
-import {SignInResource} from './sign-in-response';
 
 /**
- * Infrastructure facade for IAM HTTP operations.
+ * Infrastructure facade for authentication.
  *
  * @remarks
- * Public sign-up was removed on purpose: only the CEO creates user accounts.
+ * There is no public sign-up: only the CEO creates accounts (see UsersApi).
  */
 @Injectable({providedIn: 'root'})
 export class IamApi extends BaseApi {
@@ -22,7 +22,7 @@ export class IamApi extends BaseApi {
     this.signInEndpoint = new SignInApiEndpoint(http, new SignInAssembler());
   }
 
-  signIn(signInCommand: SignInCommand): Observable<SignInResource> {
-    return this.signInEndpoint.signIn(signInCommand);
+  signIn(command: SignInCommand): Observable<Session> {
+    return this.signInEndpoint.signIn(command);
   }
 }
