@@ -10,5 +10,7 @@ export const environment = {
   glassTypesEndpointPath: '/glass-types',
   priceListsEndpointPath: '/price-lists',
   pricesEndpointPath: '/prices',
-  usersEndpointPath: '/users'
+  usersEndpointPath: '/users',
+  quotesEndpointPath: '/quotes',
+  documentLookupEndpointPath: '/document-lookup'
 };
