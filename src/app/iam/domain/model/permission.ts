@@ -12,16 +12,19 @@ export type Permission =
   | 'prices.manage'       // set prices and create price lists
   | 'users.manage'        // create accounts, change roles, reset passwords
   | 'quotes.view-all'     // see and edit every seller's saved quotes
+  | 'agenda'              // see the agenda and schedule technical visits
+  | 'visits.edit-all'     // change visits scheduled by other users
+  | 'technicians.manage'  // register and edit technicians
   | 'settings';           // interface preferences
 
-const EVERYONE: readonly Permission[] = ['quote', 'catalog.view', 'catalog.add-product', 'settings'];
+const EVERYONE: readonly Permission[] = ['quote', 'catalog.view', 'catalog.add-product', 'agenda', 'settings'];
 
 /**
  * Sellers and warehouse staff share the same permissions for now; only their
  * role tells them apart. The CEO holds every permission.
  */
 export const ROLE_PERMISSIONS: Readonly<Record<Role, readonly Permission[]>> = {
-  CEO: [...EVERYONE, 'prices.manage', 'users.manage', 'quotes.view-all'],
+  CEO: [...EVERYONE, 'prices.manage', 'users.manage', 'quotes.view-all', 'visits.edit-all', 'technicians.manage'],
   SELLER: EVERYONE,
   WAREHOUSE: EVERYONE,
 };
