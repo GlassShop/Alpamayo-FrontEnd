@@ -129,4 +129,69 @@ describe('QuotingStore', () => {
     expect(store.lines()).toEqual([]);
     expect(store.total()).toBe(0);
   });
+
+  describe('additional concepts', () => {
+    it('add the seller-typed price to the IGV-included total', () => {
+      addLaminadoCase1();
+      store.addExtra({description: 'Instalación', quantity: 1, unitPrice: 50});
+      expect(store.total()).toBe(527.78);
+      expect(store.subtotal()).toBe(447.27);
+      expect(store.igv()).toBe(80.51);
+    });
+
+    it('are left out of the total and block saving while incomplete', () => {
+      addLaminadoCase1();
+      const id = store.addExtra({description: '', quantity: 1, unitPrice: 50});
+      expect(store.extraViews()[0].total).toBeNull();
+      expect(store.total()).toBe(477.78);
+      expect(store.canSave()).toBe(false);
+      store.updateExtra(id, {description: 'Transporte'});
+      expect(store.canSave()).toBe(true);
+      store.removeExtra(id);
+      expect(store.extras()).toEqual([]);
+    });
+  });
+
+  describe('saving', () => {
+    const details = {
+      customer: {docType: 'DNI' as const, docNumber: '45678912', name: 'Cliente Demo'},
+      paymentMethod: 'YAPE' as const, advance: 200, termsAccepted: true,
+    };
+
+    it('freezes prices, square feet and totals in a snapshot', () => {
+      addLaminadoCase1();
+      store.addExtra({description: 'Instalación', quantity: 1, unitPrice: 50});
+      const snapshot = store.toSnapshot(details)!;
+      expect(snapshot.priceList).toEqual({id: 1, name: 'Pública'});
+      expect(snapshot.lines[0]).toMatchObject({
+        description: 'Laminado 6 mm cielo', billedWidthCm: 215, billedHeightCm: 125,
+        quantity: 2, squareFeet: 59.72, pricePerSqFt: 8, unitPrice: 238.89, total: 477.78,
+      });
+      expect(snapshot.extras).toEqual([{description: 'Instalación', quantity: 1, unitPrice: 50, total: 50}]);
+      expect(snapshot).toMatchObject({total: 527.78, advance: 200, balance: 327.78, currency: 'PEN'});
+    });
+
+    it('returns no snapshot while a line has no price', () => {
+      store.addLine(2, {width: 100, height: 100});
+      store.selectPriceList(2);
+      expect(store.toSnapshot(details)).toBeNull();
+    });
+
+    it('reloads a saved quote for editing and warns when current prices changed', () => {
+      addLaminadoCase1();
+      const snapshot = store.toSnapshot(details)!;
+      const saved = {...snapshot, id: 7, number: 'COT-000007', createdAt: '', updatedAt: '', seller: {id: 2, fullName: 'Ana'}};
+      store.clear();
+      store.loadForEditing(saved);
+      expect(store.editing()).toMatchObject({id: 7, number: 'COT-000007', savedTotal: 477.78});
+      expect(store.editing()?.details.customer.name).toBe('Cliente Demo');
+      expect(store.total()).toBe(477.78);
+      expect(store.priceChanged()).toBe(false);
+
+      catalog.prices.update(list => list.map(p => p.id === 1 ? {...p, pricePerSqFt: 9} : p));
+      expect(store.priceChanged()).toBe(true);
+      store.clear();
+      expect(store.editing()).toBeNull();
+    });
+  });
 });
