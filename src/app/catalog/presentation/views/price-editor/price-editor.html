@@ -24,6 +24,17 @@
       <h2 class="al-card-title"><mat-icon>payments</mat-icon>{{ 'catalog.prices.matrix' | translate }}</h2>
       <span class="al-muted pe-unit">S/ / pie² · IGV incl.</span>
     </div>
+    <div class="pe-reason">
+      <div class="al-field">
+        <label class="al-label" for="pe-reason">{{ 'catalog.history.reason-label' | translate }}</label>
+        <input class="al-input" id="pe-reason" maxlength="140" [value]="reason()" (input)="onReason($event)"
+               [placeholder]="'catalog.history.reason-example' | translate" aria-describedby="pe-reason-hint"/>
+        <span class="al-hint" id="pe-reason-hint">{{ 'catalog.history.reason-hint' | translate }}</span>
+      </div>
+      @if (reason()) {
+        <button type="button" class="al-btn al-btn--secondary pe-reason-clear" (click)="reason.set('')">{{ 'catalog.history.clear-reason' | translate }}</button>
+      }
+    </div>
     <div class="al-table-wrapper">
       <table class="al-table">
         <thead>
@@ -37,13 +48,20 @@
             <tr>
               <td><span class="pe-name">{{ glass.name }}</span><span class="al-muted pe-meta">{{ glass.thicknessMm }} mm · <span class="pe-color">{{ glass.color }}</span></span></td>
               @for (list of catalog.priceLists(); track list.id) {
-                <td class="al-num">
+                <td class="al-num pe-cell">
                   <input class="al-input pe-price" type="number" min="0.01" step="0.01" inputmode="decimal"
                          [value]="catalog.priceFor(glass.id, list.id)?.toFixed(2) ?? ''"
                          [placeholder]="'catalog.prices.unset' | translate"
                          [attr.aria-label]="glass.name + ' ' + glass.thicknessMm + ' mm — ' + list.name"
                          (change)="onPriceCommit(glass.id, list.id, $event)"
                          (keydown.enter)="$any($event.target).blur()"/>
+                  @if (history.hasHistory(glass.id, list.id)) {
+                    <button type="button" class="al-icon-btn pe-history" (click)="showHistory(glass.id, list.id)"
+                            [matTooltip]="'catalog.history.see' | translate"
+                            [attr.aria-label]="('catalog.history.see' | translate) + ': ' + glass.name + ' ' + glass.thicknessMm + ' mm — ' + list.name">
+                      <mat-icon>history</mat-icon>
+                    </button>
+                  } @else { <span class="pe-history-gap" aria-hidden="true"></span> }
                 </td>
               }
             </tr>
@@ -66,6 +84,8 @@
     </form>
     <p class="al-muted pe-note">{{ 'catalog.prices.new-glass-note' | translate }}</p>
   </div>
+
+  <app-price-history-panel/>
 } @else if (catalog.loading()) {
   <section class="al-card"><div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div></section>
 }

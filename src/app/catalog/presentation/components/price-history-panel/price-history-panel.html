@@ -1,0 +1,77 @@
+<section class="al-card" id="price-history" aria-labelledby="ph-title">
+  <div class="al-card-header ph-header">
+    <h2 class="al-card-title" id="ph-title"><mat-icon>history</mat-icon>{{ 'catalog.history.title' | translate }}</h2>
+    <div class="ph-filters">
+      <label class="ph-filter">
+        <span class="sr-only">{{ 'catalog.glass' | translate }}</span>
+        <select class="al-select" (change)="onGlass($event)" [attr.aria-label]="'catalog.glass' | translate">
+          <option value="">{{ 'catalog.history.all-glass' | translate }}</option>
+          @for (glass of catalog.glassTypes(); track glass.id) {
+            <option [value]="glass.id" [selected]="history.glassTypeId() === glass.id">{{ glassName(glass.id) }}</option>
+          }
+        </select>
+      </label>
+      <label class="ph-filter">
+        <span class="sr-only">{{ 'quoting.price-list' | translate }}</span>
+        <select class="al-select" (change)="onList($event)" [attr.aria-label]="'quoting.price-list' | translate">
+          <option value="">{{ 'catalog.history.all-lists' | translate }}</option>
+          @for (list of catalog.priceLists(); track list.id) {
+            <option [value]="list.id" [selected]="history.priceListId() === list.id">{{ list.name }}</option>
+          }
+        </select>
+      </label>
+      @if (history.isFiltered()) {
+        <button type="button" class="al-btn al-btn--secondary ph-all" (click)="history.showAll()">{{ 'catalog.history.show-all' | translate }}</button>
+      }
+    </div>
+  </div>
+
+  @if (history.error()) {
+    <div class="al-empty al-empty--error">
+      <mat-icon>cloud_off</mat-icon>{{ 'catalog.history.error' | translate }}
+      <button class="al-btn al-btn--secondary" (click)="history.load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (history.loading() && history.changes().length === 0) {
+    <div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div>
+  } @else {
+    <div class="al-table-wrapper ph-scroll">
+      <table class="al-table">
+        <thead>
+          <tr>
+            <th>{{ 'quotes.date' | translate }}</th>
+            <th>{{ 'catalog.glass' | translate }}</th>
+            <th>{{ 'quoting.price-list' | translate }}</th>
+            <th class="al-num">{{ 'catalog.history.change' | translate }}</th>
+            <th class="al-num">%</th>
+            <th>{{ 'catalog.history.by' | translate }}</th>
+            <th>{{ 'catalog.history.reason' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (change of history.changes(); track change.id) {
+            <tr>
+              <td class="ph-date">{{ change.changedAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ glassName(change.glassTypeId) }}</td>
+              <td>{{ listName(change.priceListId) }}</td>
+              <td class="al-num ph-values">
+                @if (change.previousPrice !== null) { <span class="al-muted">S/ {{ change.previousPrice | number:'1.2-2' }}</span> → }
+                <strong>S/ {{ change.newPrice | number:'1.2-2' }}</strong>
+              </td>
+              <td class="al-num">
+                @if (percent(change); as p) {
+                  <span [class.ph-up]="p > 0" [class.ph-down]="p < 0">{{ p > 0 ? '+' : '' }}{{ p | number:'1.1-1' }}%</span>
+                } @else if (change.previousPrice === null) {
+                  <span class="al-pill al-pill--success">{{ 'catalog.history.first' | translate }}</span>
+                } @else { <span class="al-muted">0.0%</span> }
+              </td>
+              <td>{{ change.changedBy.fullName }}</td>
+              <td class="ph-reason">{{ change.reason ?? '—' }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="7" class="ph-empty">{{ 'catalog.history.empty' | translate }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

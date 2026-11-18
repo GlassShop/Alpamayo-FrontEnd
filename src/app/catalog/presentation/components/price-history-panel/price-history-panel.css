@@ -1,0 +1,13 @@
+:host { display: block; margin-top: 24px; scroll-margin-top: 24px; }
+.ph-header { flex-wrap: wrap; }
+.ph-filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.ph-filter .al-select { height: 34px; min-width: 170px; background-color: var(--al-surface); }
+.ph-all { height: 34px; padding: 0 12px; font-size: .78rem; }
+.ph-scroll { max-height: 420px; overflow-y: auto; }
+.ph-date { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ph-values { white-space: nowrap; }
+/* Seen from the business: a price rise is green, a drop is red. */
+.ph-up { color: var(--al-success); font-weight: 700; }
+.ph-down { color: var(--al-primary-strong); font-weight: 700; }
+.ph-reason { max-width: 260px; }
+.ph-empty { text-align: center; color: var(--al-text-muted); padding: 24px !important; }

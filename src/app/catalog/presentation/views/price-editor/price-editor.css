@@ -6,6 +6,13 @@
 .pe-meta { display: block; font-size: .75rem; }
 .pe-color { text-transform: capitalize; }
 .pe-price { width: 110px; text-align: right; background: var(--al-surface); }
+.pe-cell { white-space: nowrap; }
+.pe-cell .pe-price { vertical-align: middle; }
+.pe-history { vertical-align: middle; margin-left: 2px; }
+.pe-history-gap { display: inline-block; width: 34px; }
+.pe-reason { display: flex; align-items: flex-end; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--al-divider); }
+.pe-reason .al-field { max-width: 520px; }
+.pe-reason-clear { height: 40px; flex-shrink: 0; }
 .pe-forms { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 24px; align-items: start; }
 .pe-forms .al-btn { align-self: flex-start; }
 .pe-note { margin: 0; align-self: center; font-size: .85rem; }
