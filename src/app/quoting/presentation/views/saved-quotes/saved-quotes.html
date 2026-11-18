@@ -76,6 +76,12 @@
                         [matTooltip]="'quotes.list.edit' | translate" [attr.aria-label]="('quotes.list.edit' | translate) + ' ' + quote.number">
                   <mat-icon>edit</mat-icon>
                 </button>
+                @if (iam.can('agenda')) {
+                  <a class="al-icon-btn" routerLink="/agenda" [queryParams]="{cotizacion: quote.id}"
+                     [matTooltip]="'agenda.schedule-visit' | translate" [attr.aria-label]="('agenda.schedule-visit' | translate) + ' ' + quote.number">
+                    <mat-icon>event</mat-icon>
+                  </a>
+                }
               </td>
             </tr>
           } @empty {

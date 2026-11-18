@@ -2,6 +2,7 @@
   <a class="al-btn al-btn--secondary" routerLink="/cotizaciones"><mat-icon>arrow_back</mat-icon>{{ 'quotes.print-view.back' | translate }}</a>
   @if (store.current()) {
     <button class="al-btn al-btn--secondary" (click)="edit()"><mat-icon>edit</mat-icon>{{ 'quotes.list.edit' | translate }}</button>
+    <a class="al-btn al-btn--secondary" routerLink="/agenda" [queryParams]="{cotizacion: store.current()!.id}"><mat-icon>event</mat-icon>{{ 'agenda.schedule-visit' | translate }}</a>
     <button class="al-btn al-btn--primary" (click)="print()"><mat-icon>print</mat-icon>{{ 'quotes.print' | translate }}</button>
   }
 </div>
