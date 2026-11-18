@@ -8,7 +8,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "api": "json-server --watch mock-api/db.json --routes mock-api/routes.json --port 3000"
+    "api": "node mock-api/server.cjs"
   },
   "private": true,
   "packageManager": "npm@11.12.1",
