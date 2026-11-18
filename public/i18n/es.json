@@ -79,7 +79,24 @@
     "go-prices": "Editar precios",
     "missing": "Sin precio: {{ count }}",
     "status": "Estado",
-    "new-glass-hint": "El vidrio nuevo aparecerá «Sin precio» hasta que el CEO le asigne precio."
+    "new-glass-hint": "El vidrio nuevo aparecerá «Sin precio» hasta que el CEO le asigne precio.",
+    "history": {
+      "title": "Historial de cambios",
+      "all-glass": "Todos los vidrios",
+      "all-lists": "Todas las listas",
+      "show-all": "Ver todo",
+      "change": "Anterior → nuevo",
+      "by": "Cambiado por",
+      "reason": "Motivo",
+      "first": "Primer precio",
+      "empty": "No hay cambios registrados para este filtro.",
+      "error": "No se pudo cargar el historial.",
+      "see": "Ver historial de este precio",
+      "reason-label": "Motivo del cambio (opcional)",
+      "reason-example": "Ej. Subió el proveedor",
+      "reason-hint": "Se adjunta a los precios que guardes mientras tenga texto.",
+      "clear-reason": "Quitar motivo"
+    }
   },
   "quoting": {
     "search-placeholder": "Buscar vidrio por nombre, espesor o color...",

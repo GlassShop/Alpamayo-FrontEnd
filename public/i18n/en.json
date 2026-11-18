@@ -79,7 +79,24 @@
     "go-prices": "Edit prices",
     "missing": "No price: {{ count }}",
     "status": "Status",
-    "new-glass-hint": "The new glass shows as \"No price\" until the CEO sets its price."
+    "new-glass-hint": "The new glass shows as \"No price\" until the CEO sets its price.",
+    "history": {
+      "title": "Change history",
+      "all-glass": "All glass types",
+      "all-lists": "All lists",
+      "show-all": "Show all",
+      "change": "Previous → new",
+      "by": "Changed by",
+      "reason": "Reason",
+      "first": "First price",
+      "empty": "No changes recorded for this filter.",
+      "error": "Could not load the history.",
+      "see": "See this price history",
+      "reason-label": "Reason for the change (optional)",
+      "reason-example": "e.g. Supplier raised prices",
+      "reason-hint": "Attached to the prices you save while it has text.",
+      "clear-reason": "Clear reason"
+    }
   },
   "quoting": {
     "search-placeholder": "Search glass by name, thickness or color...",
