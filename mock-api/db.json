@@ -15,5 +15,10 @@
     {"id": 1, "username": "ceo", "fullName": "Gerencia Alpamayo", "role": "CEO", "active": true, "passwordHash": "scrypt$4d21974091bc8f5f820b0cdada97c0c7$ad2194abef7906db3c9ccfc2cfa2fc61a5779d22d2327472f3018cebf5414b69b25891155a7b9ddbf57c7037272d2c8615521cead93aaa94eb2d66a83e3f17b9"},
     {"id": 2, "username": "vendedora", "fullName": "Vendedora Demo", "role": "SELLER", "active": true, "passwordHash": "scrypt$2c1489216e8225e78c2d99878e9015ac$880e918e533472768f30313e7561d8d450013c4235da6183568bc0d0880d4f4797e4b28401747d02a118c0e6051c526b596f9c1d0de465c30c09bf09375964c7"},
     {"id": 3, "username": "almacen", "fullName": "Almacén Demo", "role": "WAREHOUSE", "active": true, "passwordHash": "scrypt$5babe06beb303df63aaef9b8e76a14ce$7d0193e6e1bdddecefd09e5c4ee4423d2b3d3a00ca1e956dc21c0e015e27f5ed1459d117040a29a1906cc4d07a0e4b2893e54c224ec74247d9e903a2468b665d"}
+  ],
+  "quotes": [],
+  "document-directory": [
+    { "docType": "DNI", "docNumber": "45678912", "name": "Cliente Demo Uno", "address": "Jr. Ficticio 100, Huaraz" },
+    { "docType": "RUC", "docNumber": "20123456786", "name": "Constructora Demo S.A.C.", "address": "Av. Ficticia 123, Huaraz" }
   ]
 }
