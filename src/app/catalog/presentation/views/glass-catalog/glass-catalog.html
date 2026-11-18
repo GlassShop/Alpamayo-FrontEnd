@@ -3,8 +3,19 @@
     <h1 class="al-page-title">{{ 'catalog.title' | translate }}</h1>
     <p class="al-page-subtitle">{{ 'catalog.subtitle' | translate }}</p>
   </div>
-  <a class="al-btn al-btn--secondary" routerLink="/catalogo/precios"><mat-icon>price_change</mat-icon>{{ 'catalog.go-prices' | translate }}</a>
+  @if (iam.can('prices.manage')) {
+    <a class="al-btn al-btn--secondary" routerLink="/catalogo/precios"><mat-icon>price_change</mat-icon>{{ 'catalog.go-prices' | translate }}</a>
+  }
 </header>
+
+@if (catalog.error(); as error) {
+  @if (error !== 'catalog.error.load') {
+    <div class="al-alert al-alert--error" role="alert">
+      <mat-icon>error_outline</mat-icon><span>{{ error | translate }}</span>
+      <button class="al-icon-btn" (click)="catalog.clearError()" [attr.aria-label]="'common.close' | translate"><mat-icon>close</mat-icon></button>
+    </div>
+  }
+}
 
 <section class="al-card">
   @if (catalog.error() === 'catalog.error.load') {
@@ -59,3 +70,21 @@
     <footer class="gc-footer al-muted">{{ 'catalog.note' | translate }}</footer>
   }
 </section>
+
+@if (catalog.loaded() && iam.can('catalog.add-product')) {
+  <form class="al-card gc-new" [formGroup]="glassForm" (ngSubmit)="addGlassType()">
+    <div class="al-card-header"><h2 class="al-card-title"><mat-icon>layers</mat-icon>{{ 'catalog.prices.new-glass' | translate }}</h2></div>
+    <div class="al-card-body">
+      <div class="gc-row">
+        <label class="al-field"><span class="al-label">{{ 'catalog.glass' | translate }}</span>
+          <input class="al-input" formControlName="name" [placeholder]="'catalog.prices.glass-example' | translate"/></label>
+        <label class="al-field gc-thickness"><span class="al-label">{{ 'catalog.thickness' | translate }} (mm)</span>
+          <input class="al-input" type="number" min="0.1" step="0.1" formControlName="thicknessMm"/></label>
+        <label class="al-field"><span class="al-label">{{ 'catalog.color' | translate }}</span>
+          <input class="al-input" formControlName="color" [placeholder]="'catalog.prices.color-example' | translate"/></label>
+        <button class="al-btn al-btn--primary gc-add" type="submit" [disabled]="catalog.saving()"><mat-icon>add</mat-icon>{{ 'catalog.prices.add-glass' | translate }}</button>
+      </div>
+      @if (!iam.can('prices.manage')) { <p class="al-muted gc-hint">{{ 'catalog.new-glass-hint' | translate }}</p> }
+    </div>
+  </form>
+}

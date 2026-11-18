@@ -56,21 +56,6 @@
   </section>
 
   <div class="pe-forms">
-    <form class="al-card" [formGroup]="glassForm" (ngSubmit)="addGlassType()">
-      <div class="al-card-header"><h2 class="al-card-title"><mat-icon>layers</mat-icon>{{ 'catalog.prices.new-glass' | translate }}</h2></div>
-      <div class="al-card-body">
-        <label class="al-field"><span class="al-label">{{ 'catalog.glass' | translate }}</span>
-          <input class="al-input" formControlName="name" [placeholder]="'catalog.prices.glass-example' | translate"/></label>
-        <div class="pe-row">
-          <label class="al-field"><span class="al-label">{{ 'catalog.thickness' | translate }} (mm)</span>
-            <input class="al-input" type="number" min="0.1" step="0.1" formControlName="thicknessMm"/></label>
-          <label class="al-field"><span class="al-label">{{ 'catalog.color' | translate }}</span>
-            <input class="al-input" formControlName="color" [placeholder]="'catalog.prices.color-example' | translate"/></label>
-        </div>
-        <button class="al-btn al-btn--primary" type="submit" [disabled]="catalog.saving()"><mat-icon>add</mat-icon>{{ 'catalog.prices.add-glass' | translate }}</button>
-      </div>
-    </form>
-
     <form class="al-card" [formGroup]="listForm" (ngSubmit)="addPriceList()">
       <div class="al-card-header"><h2 class="al-card-title"><mat-icon>list_alt</mat-icon>{{ 'catalog.prices.new-list' | translate }}</h2></div>
       <div class="al-card-body">
@@ -79,6 +64,7 @@
         <button class="al-btn al-btn--primary" type="submit" [disabled]="catalog.saving()"><mat-icon>add</mat-icon>{{ 'catalog.prices.add-list' | translate }}</button>
       </div>
     </form>
+    <p class="al-muted pe-note">{{ 'catalog.prices.new-glass-note' | translate }}</p>
   </div>
 } @else if (catalog.loading()) {
   <section class="al-card"><div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div></section>

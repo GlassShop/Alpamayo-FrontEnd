@@ -9,3 +9,11 @@ a.al-btn { text-decoration: none; }
 .gc-name { display: flex; flex-direction: column; font-weight: 600; }
 .gc-name small { font-size: .75rem; font-weight: 400; color: var(--al-text-muted); text-transform: capitalize; }
 .gc-footer { padding: 12px 20px; font-size: .8rem; border-top: 1px solid var(--al-divider); }
+
+.gc-new { margin-top: 24px; }
+.gc-row { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.gc-row .al-field { min-width: 180px; }
+.gc-thickness { flex: 0 0 140px !important; min-width: 0 !important; }
+.gc-add { flex-shrink: 0; }
+.gc-hint { margin: 0; font-size: .8rem; }
+@media (max-width: 640px) { .gc-thickness { flex: 1 1 auto !important; } .gc-add { width: 100%; } }

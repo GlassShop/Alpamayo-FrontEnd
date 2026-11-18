@@ -5,11 +5,9 @@ import {TranslatePipe} from '@ngx-translate/core';
 import {CatalogStore} from '../../../application/catalog.store';
 
 /**
- * CEO view: sets the price per square foot of every glass type in every
- * price list, and adds glass types and price lists.
- *
- * @remarks
- * The route carries `data: { roles: ['CEO'] }`; the IAM role guard will enforce it.
+ * CEO view (permission `prices.manage`): sets the price per square foot of
+ * every glass type in every price list and creates price lists. New glass
+ * types are added from the catalog page by any role.
  */
 @Component({
   selector: 'app-price-editor',
@@ -19,12 +17,6 @@ import {CatalogStore} from '../../../application/catalog.store';
 })
 export class PriceEditor implements OnInit {
   readonly catalog = inject(CatalogStore);
-
-  readonly glassForm = new FormGroup({
-    name:        new FormControl('', {nonNullable: true, validators: [Validators.required]}),
-    thicknessMm: new FormControl<number | null>(null, {validators: [Validators.required, Validators.min(0.1)]}),
-    color:       new FormControl('', {nonNullable: true})
-  });
 
   readonly listForm = new FormGroup({
     name: new FormControl('', {nonNullable: true, validators: [Validators.required]})
@@ -44,13 +36,6 @@ export class PriceEditor implements OnInit {
     if (value === current) return;
     this.catalog.setPrice(glassTypeId, priceListId, value);
     if (!(value > 0)) input.value = current === null ? '' : current.toFixed(2);
-  }
-
-  addGlassType(): void {
-    if (this.glassForm.invalid) { this.glassForm.markAllAsTouched(); return; }
-    const {name, thicknessMm, color} = this.glassForm.getRawValue();
-    this.catalog.createGlassType(name, Number(thicknessMm), color);
-    this.glassForm.reset();
   }
 
   addPriceList(): void {

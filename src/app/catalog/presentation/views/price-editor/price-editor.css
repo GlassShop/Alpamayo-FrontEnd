@@ -7,6 +7,5 @@
 .pe-color { text-transform: capitalize; }
 .pe-price { width: 110px; text-align: right; background: var(--al-surface); }
 .pe-forms { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 24px; align-items: start; }
-.pe-row { display: flex; gap: 16px; }
 .pe-forms .al-btn { align-self: flex-start; }
-@media (max-width: 560px) { .pe-row { flex-direction: column; } }
+.pe-note { margin: 0; align-self: center; font-size: .85rem; }
