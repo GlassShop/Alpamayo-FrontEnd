@@ -9,7 +9,23 @@
       "title": "Sign in",
       "username": "Username",
       "password": "Password",
-      "submit": "Sign in"
+      "submit": "Sign in",
+      "tagline": "Wholesale sales",
+      "subtitle": "Sign in with the username and password the CEO gave you.",
+      "signing-in": "Signing in…",
+      "show-password": "Show password",
+      "hide-password": "Hide password",
+      "help": "Forgot your password? Ask the CEO to reset it.",
+      "error": {
+        "invalid-credentials": "Wrong username or password.",
+        "inactive": "Your account is deactivated. Talk to the CEO.",
+        "unavailable": "Could not reach the server. Please try again shortly."
+      }
+    },
+    "role": {
+      "CEO": "CEO",
+      "SELLER": "Seller",
+      "WAREHOUSE": "Warehouse"
     }
   },
   "configuration": {
@@ -35,7 +51,7 @@
     "thickness": "Thickness",
     "color": "Color",
     "empty": "There is no glass in the catalog yet.",
-    "note": "Only the CEO can change prices, from Prices.",
+    "note": "Only the CEO can change prices.",
     "prices": {
       "title": "Prices per square foot",
       "subtitle": "Set the price per square foot (IGV included) of each glass in each list. Saved when you leave the cell.",
@@ -48,7 +64,8 @@
       "list-name": "List name",
       "list-example": "e.g. Builders",
       "add-list": "Add list",
-      "matrix": "Price matrix"
+      "matrix": "Price matrix",
+      "new-glass-note": "New glass types are added from Catalog."
     },
     "error": {
       "load": "Could not load the catalog. Check that the API is available.",
@@ -61,7 +78,8 @@
     "complete": "All prices set",
     "go-prices": "Edit prices",
     "missing": "No price: {{ count }}",
-    "status": "Status"
+    "status": "Status",
+    "new-glass-hint": "The new glass shows as \"No price\" until the CEO sets its price."
   },
   "quoting": {
     "search-placeholder": "Search glass by name, thickness or color...",
@@ -158,6 +176,72 @@
         "no-header": "No measures table found. The Excel needs \"Tipo de vidrio\", \"Ancho\" and \"Alto\" columns; use the template.",
         "empty": "The Excel has no rows with measures."
       }
+    }
+  },
+  "forms": {
+    "error": {
+      "required": "This field is required.",
+      "minlength": "Must be at least {{ requiredLength }} characters.",
+      "maxlength": "Must be at most {{ requiredLength }} characters.",
+      "pattern": "Use only letters, numbers, dot, hyphen or underscore (no spaces).",
+      "invalid": "The value is not valid.",
+      "mismatch": "Passwords do not match."
+    }
+  },
+  "nav": {
+    "quote": "Quoter",
+    "catalog": "Catalog",
+    "prices": "Prices",
+    "users": "Users",
+    "settings": "Settings",
+    "sign-out": "Sign out",
+    "no-session": "Not signed in"
+  },
+  "users": {
+    "title": "Users",
+    "subtitle": "Create staff accounts, assign their role and hand over their username and password.",
+    "list-title": "Accounts",
+    "col-name": "Name",
+    "col-role": "Role",
+    "col-status": "Status",
+    "col-actions": "Actions",
+    "you": "You",
+    "active": "Active",
+    "inactive": "Deactivated",
+    "empty": "No accounts yet.",
+    "reset-password": "Reset password",
+    "deactivate": "Deactivate account",
+    "reactivate": "Reactivate account",
+    "reset-for": "New password for {{ name }}",
+    "new-password": "New password",
+    "confirm-password": "Repeat the password",
+    "save-password": "Save password",
+    "new-title": "New account",
+    "full-name": "Full name",
+    "full-name-example": "e.g. María Ruiz",
+    "username": "Username",
+    "username-example": "e.g. mruiz",
+    "username-hint": "Used to sign in. No spaces.",
+    "initial-password": "Initial password",
+    "password-hint": "At least {{ min }} characters.",
+    "create": "Create account",
+    "handover": "Hand over the username and password privately. If forgotten, reset it from the list.",
+    "error": {
+      "load": "Could not load the accounts.",
+      "save": "Could not save. Please try again.",
+      "duplicate-username": "An account with that username already exists.",
+      "invalid-user": "Check the name, username (no spaces) and role.",
+      "weak-password": "The password must have at least 8 characters.",
+      "self-demote": "You cannot remove your own CEO role.",
+      "self-deactivate": "You cannot deactivate your own account.",
+      "last-ceo": "At least one active CEO must remain."
+    },
+    "notice": {
+      "created": "Account created. Hand over the username and password.",
+      "role-changed": "Role updated.",
+      "deactivated": "Account deactivated: it can no longer sign in.",
+      "reactivated": "Account reactivated.",
+      "password-reset": "Password reset. Hand it over to the person."
     }
   }
 }

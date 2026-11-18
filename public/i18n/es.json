@@ -9,7 +9,23 @@
       "title": "Iniciar sesión",
       "username": "Usuario",
       "password": "Contraseña",
-      "submit": "Ingresar"
+      "submit": "Ingresar",
+      "tagline": "Ventas mayoristas",
+      "subtitle": "Ingresa con el usuario y la contraseña que te dio el CEO.",
+      "signing-in": "Ingresando…",
+      "show-password": "Mostrar contraseña",
+      "hide-password": "Ocultar contraseña",
+      "help": "¿Olvidaste tu contraseña? Pídele al CEO que la restablezca.",
+      "error": {
+        "invalid-credentials": "Usuario o contraseña incorrectos.",
+        "inactive": "Tu cuenta está desactivada. Habla con el CEO.",
+        "unavailable": "No se pudo conectar con el servidor. Inténtalo de nuevo en un momento."
+      }
+    },
+    "role": {
+      "CEO": "CEO",
+      "SELLER": "Vendedora",
+      "WAREHOUSE": "Almacén"
     }
   },
   "configuration": {
@@ -35,7 +51,7 @@
     "thickness": "Espesor",
     "color": "Color",
     "empty": "Todavía no hay vidrios en el catálogo.",
-    "note": "Solo el CEO puede cambiar precios, desde Precios.",
+    "note": "Solo el CEO puede cambiar precios.",
     "prices": {
       "title": "Precios por pie²",
       "subtitle": "Fija el precio por pie² (IGV incluido) de cada vidrio en cada lista. Se guarda al salir de la celda.",
@@ -48,7 +64,8 @@
       "list-name": "Nombre de la lista",
       "list-example": "Ej. Constructora",
       "add-list": "Agregar lista",
-      "matrix": "Matriz de precios"
+      "matrix": "Matriz de precios",
+      "new-glass-note": "Los tipos de vidrio nuevos se agregan desde Catálogo."
     },
     "error": {
       "load": "No se pudo cargar el catálogo. Revisa que la API esté disponible.",
@@ -61,7 +78,8 @@
     "complete": "Precios completos",
     "go-prices": "Editar precios",
     "missing": "Sin precio: {{ count }}",
-    "status": "Estado"
+    "status": "Estado",
+    "new-glass-hint": "El vidrio nuevo aparecerá «Sin precio» hasta que el CEO le asigne precio."
   },
   "quoting": {
     "search-placeholder": "Buscar vidrio por nombre, espesor o color...",
@@ -158,6 +176,72 @@
         "no-header": "No se encontró la tabla de medidas. El Excel debe tener columnas «Tipo de vidrio», «Ancho» y «Alto»; usa la plantilla.",
         "empty": "El Excel no tiene filas con medidas."
       }
+    }
+  },
+  "forms": {
+    "error": {
+      "required": "Este campo es obligatorio.",
+      "minlength": "Debe tener al menos {{ requiredLength }} caracteres.",
+      "maxlength": "Debe tener como máximo {{ requiredLength }} caracteres.",
+      "pattern": "Usa solo letras, números, punto, guion o guion bajo (sin espacios).",
+      "invalid": "El valor no es válido.",
+      "mismatch": "Las contraseñas no coinciden."
+    }
+  },
+  "nav": {
+    "quote": "Cotizador",
+    "catalog": "Catálogo",
+    "prices": "Precios",
+    "users": "Usuarios",
+    "settings": "Configuración",
+    "sign-out": "Cerrar sesión",
+    "no-session": "Sin sesión"
+  },
+  "users": {
+    "title": "Usuarios",
+    "subtitle": "Crea las cuentas del personal, asigna su rol y entrégales su usuario y contraseña.",
+    "list-title": "Cuentas",
+    "col-name": "Nombre",
+    "col-role": "Rol",
+    "col-status": "Estado",
+    "col-actions": "Acciones",
+    "you": "Tú",
+    "active": "Activa",
+    "inactive": "Desactivada",
+    "empty": "Aún no hay cuentas.",
+    "reset-password": "Restablecer contraseña",
+    "deactivate": "Desactivar cuenta",
+    "reactivate": "Reactivar cuenta",
+    "reset-for": "Nueva contraseña para {{ name }}",
+    "new-password": "Nueva contraseña",
+    "confirm-password": "Repite la contraseña",
+    "save-password": "Guardar contraseña",
+    "new-title": "Nueva cuenta",
+    "full-name": "Nombre completo",
+    "full-name-example": "Ej. María Ruiz",
+    "username": "Usuario",
+    "username-example": "Ej. mruiz",
+    "username-hint": "Con este usuario iniciará sesión. Sin espacios.",
+    "initial-password": "Contraseña inicial",
+    "password-hint": "Mínimo {{ min }} caracteres.",
+    "create": "Crear cuenta",
+    "handover": "Entrega el usuario y la contraseña a la persona en privado. Si la olvida, restablécela desde la lista.",
+    "error": {
+      "load": "No se pudieron cargar las cuentas.",
+      "save": "No se pudo guardar. Inténtalo de nuevo.",
+      "duplicate-username": "Ya existe una cuenta con ese usuario.",
+      "invalid-user": "Revisa el nombre, el usuario (sin espacios) y el rol.",
+      "weak-password": "La contraseña debe tener al menos 8 caracteres.",
+      "self-demote": "No puedes quitarte el rol de CEO a ti mismo.",
+      "self-deactivate": "No puedes desactivar tu propia cuenta.",
+      "last-ceo": "Debe quedar al menos un CEO activo."
+    },
+    "notice": {
+      "created": "Cuenta creada. Entrega el usuario y la contraseña a la persona.",
+      "role-changed": "Rol actualizado.",
+      "deactivated": "Cuenta desactivada: ya no puede iniciar sesión.",
+      "reactivated": "Cuenta reactivada.",
+      "password-reset": "Contraseña restablecida. Entrégasela a la persona."
     }
   }
 }
