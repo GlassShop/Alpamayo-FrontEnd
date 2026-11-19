@@ -273,7 +273,9 @@
     "no-session": "Not signed in",
     "quotes": "My quotes",
     "agenda": "Agenda",
-    "inventory": "Inventory"
+    "inventory": "Inventory",
+    "purchases": "Purchases",
+    "costs": "Costs"
   },
   "users": {
     "title": "Users",
@@ -621,7 +623,8 @@
       "error": "Could not load the movements.",
       "kinds": {
         "COUNT": "Count",
-        "ADJUSTMENT": "Entry / exit"
+        "ADJUSTMENT": "Entry / exit",
+        "PURCHASE": "Purchase"
       }
     },
     "error": {
@@ -633,6 +636,118 @@
       "invalid-size": "Enter width and height greater than zero, or leave both empty.",
       "invalid-pack": "If it comes in a crate, bundle or box, say how many units it holds (1 or more).",
       "duplicate-item": "That item already exists with the same colour and size."
+    }
+  },
+  "purchases": {
+    "title": "Purchases",
+    "subtitle": "Register what arrives at each site: the stock goes up when you save. The CEO types the costs.",
+    "subtitle-ceo": "What arrived at each site. Type the dollar price, the exchange rate, the freight and the transport to know the real cost.",
+    "search": "Search supplier",
+    "supplier": "Supplier",
+    "date": "Date",
+    "site": "Site",
+    "lines": "Items",
+    "units": "{{ units }} units",
+    "units-short": "pcs",
+    "packs": "packs",
+    "registered": "Registered by",
+    "registered-by": "Registered by {{ name }}",
+    "costed-by": "costed by {{ name }}",
+    "see": "See",
+    "empty": "No purchases registered yet.",
+    "pending-alert": "Purchases waiting for their costs: {{ count }}.",
+    "see-pending": "See pending",
+    "filter": {
+      "ALL": "All",
+      "PENDING_COST": "Cost pending",
+      "COSTED": "Costed"
+    },
+    "status": {
+      "PENDING_COST": "Cost pending",
+      "COSTED": "Costed"
+    },
+    "currency": {
+      "PEN": "S/",
+      "USD": "US$"
+    },
+    "arrival": {
+      "title": "Register arrival",
+      "supplier-example": "e.g. Vidrios Lima S.A.C.",
+      "add-item": "Add item",
+      "search": "Type at least 2 letters: product, colour or size",
+      "no-results": "No items with that text. If it is new, create it first in Inventory.",
+      "packs": "Packs",
+      "remove": "Remove item",
+      "total": "Total: {{ units }} units",
+      "empty": "Add the items that arrived.",
+      "notes-example": "e.g. Delivery note 001-4521",
+      "hint": "Type the units or the packs (e.g. 3 crates × 20). The pack size is saved on the item for next time. When saved, the units are added to the site's stock and the \"in transit\" mark is cleared.",
+      "save": "Register arrival",
+      "packs-count": "Number of packs",
+      "pack-kind": "Pack type",
+      "units-per-pack": "Units per pack",
+      "units-short": "u."
+    },
+    "costs": {
+      "add": "Add costs",
+      "exchange-rate": "Exchange rate (S/ per US$)",
+      "freight": "Shipment freight",
+      "transport": "Lima → Huaraz transport",
+      "currency": "Currency",
+      "hint": "Freight and transport are shared by the value of each item: expensive items carry more. Everything IGV included.",
+      "price-usd": "US$ per unit",
+      "value": "Value in S/",
+      "freight-share": "Freight + transport",
+      "unit-cost": "Cost per unit",
+      "total": "Total cost",
+      "ceo-only": "Only the CEO sees and types the costs of this purchase.",
+      "save": "Save costs",
+      "update": "Update costs"
+    },
+    "error": {
+      "load": "Could not load the purchases. Check that the API is available.",
+      "save": "Could not save. Please try again.",
+      "invalid-date": "Choose the arrival date.",
+      "missing-supplier": "Type the supplier.",
+      "no-lines": "Add at least one item.",
+      "invalid-quantity": "Each item needs a whole quantity above zero.",
+      "repeated-item": "An item is listed twice; put it in a single line.",
+      "invalid-costs": "Type the exchange rate, the dollar price of every item and freight and transport amounts of 0 or more.",
+      "invalid-pack": "If it came in packs, type how many arrived and how many units each one holds (whole numbers, 1 or more)."
+    }
+  },
+  "costs": {
+    "title": "Costs and margins",
+    "subtitle": "What each item costs once in the site, from its purchases, and the margin it leaves against the public price. Only the CEO sees it.",
+    "min-margin": "Minimum margin",
+    "min-margin-off": "No minimum",
+    "min-margin-hint-off": "Without a minimum there is no low-margin warning. Set it to see which items sell almost at cost.",
+    "min-margin-hint": "Items below {{ min }} % margin: {{ count }}.",
+    "save": "Save",
+    "turn-off": "Remove",
+    "stock-value": "Stock value at average cost",
+    "without-cost": "in stock without cost: {{ count }}",
+    "help": "Last cost, the previous one and the average of its purchases. The margin compares the last cost with the public price per unit.",
+    "help-glass": "Glass is bought by the sheet and sold by the square foot: the margin compares the sheet's cost per ft² with the price of the Pública list.",
+    "last": "Last cost",
+    "previous": "Previous",
+    "average": "Average",
+    "public-price": "Public price",
+    "margin": "Margin",
+    "sqft": "ft²",
+    "no-cost": "No costed purchases",
+    "purchases": "purchases: {{ count }}",
+    "empty": "No items for this filter.",
+    "filter": {
+      "ALL": "Every item",
+      "WITH_COST": "With cost",
+      "LOW_MARGIN": "Low margin",
+      "NO_COST": "In stock without cost"
+    },
+    "error": {
+      "settings-load": "Could not load the minimum margin.",
+      "settings-save": "Could not save the minimum margin.",
+      "invalid-margin": "The minimum margin must be between 0 and 100 %."
     }
   }
 }

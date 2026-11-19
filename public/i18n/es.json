@@ -273,7 +273,9 @@
     "no-session": "Sin sesión",
     "quotes": "Mis cotizaciones",
     "agenda": "Agenda",
-    "inventory": "Inventario"
+    "inventory": "Inventario",
+    "purchases": "Compras",
+    "costs": "Costos"
   },
   "users": {
     "title": "Usuarios",
@@ -621,7 +623,8 @@
       "error": "No se pudieron cargar los movimientos.",
       "kinds": {
         "COUNT": "Conteo",
-        "ADJUSTMENT": "Entrada / salida"
+        "ADJUSTMENT": "Entrada / salida",
+        "PURCHASE": "Compra"
       }
     },
     "error": {
@@ -633,6 +636,118 @@
       "invalid-size": "Escribe ancho y alto mayores que cero, o deja los dos vacíos.",
       "invalid-pack": "Si llega en jaba, paquete o caja, indica cuántas unidades trae (1 o más).",
       "duplicate-item": "Ya existe ese artículo con el mismo color y medida."
+    }
+  },
+  "purchases": {
+    "title": "Compras",
+    "subtitle": "Registra lo que llega a cada sede: el stock sube al guardar. Los costos los pone el CEO.",
+    "subtitle-ceo": "Lo que llegó a cada sede. Pon el precio en dólares, el tipo de cambio, el flete y el transporte para saber el costo real.",
+    "search": "Buscar proveedor",
+    "supplier": "Proveedor",
+    "date": "Fecha",
+    "site": "Sede",
+    "lines": "Artículos",
+    "units": "{{ units }} unidades",
+    "units-short": "unid.",
+    "packs": "empaques",
+    "registered": "Registrado por",
+    "registered-by": "Registró: {{ name }}",
+    "costed-by": "costeó: {{ name }}",
+    "see": "Ver",
+    "empty": "Todavía no hay compras registradas.",
+    "pending-alert": "Compras que esperan sus costos: {{ count }}.",
+    "see-pending": "Ver pendientes",
+    "filter": {
+      "ALL": "Todas",
+      "PENDING_COST": "Costo pendiente",
+      "COSTED": "Costeadas"
+    },
+    "status": {
+      "PENDING_COST": "Costo pendiente",
+      "COSTED": "Costeada"
+    },
+    "currency": {
+      "PEN": "S/",
+      "USD": "US$"
+    },
+    "arrival": {
+      "title": "Registrar llegada",
+      "supplier-example": "Ej. Vidrios Lima S.A.C.",
+      "add-item": "Agregar artículo",
+      "search": "Escribe al menos 2 letras: producto, color o medida",
+      "no-results": "No hay artículos con ese texto. Si es nuevo, créalo primero en Inventario.",
+      "packs": "Empaques",
+      "remove": "Quitar artículo",
+      "total": "Total: {{ units }} unidades",
+      "empty": "Agrega los artículos que llegaron.",
+      "notes-example": "Ej. Guía de remisión 001-4521",
+      "hint": "Puedes poner las unidades o los empaques (ej. 3 jabas × 20). El tamaño del empaque se guarda en el artículo para la próxima vez. Al guardar, las unidades se suman al stock de la sede y se quita la marca «en camino».",
+      "save": "Registrar llegada",
+      "packs-count": "Cantidad de empaques",
+      "pack-kind": "Tipo de empaque",
+      "units-per-pack": "Unidades por empaque",
+      "units-short": "u."
+    },
+    "costs": {
+      "add": "Poner costos",
+      "exchange-rate": "Tipo de cambio (S/ por US$)",
+      "freight": "Flete del envío",
+      "transport": "Transporte Lima → Huaraz",
+      "currency": "Moneda",
+      "hint": "El flete y el transporte se reparten según el valor de cada artículo: lo caro carga más. Todo con IGV incluido.",
+      "price-usd": "US$ por unidad",
+      "value": "Valor en S/",
+      "freight-share": "Flete + transporte",
+      "unit-cost": "Costo por unidad",
+      "total": "Costo total",
+      "ceo-only": "Los costos de esta compra los ve y los pone solo el CEO.",
+      "save": "Guardar costos",
+      "update": "Actualizar costos"
+    },
+    "error": {
+      "load": "No se pudieron cargar las compras. Revisa que la API esté disponible.",
+      "save": "No se pudo guardar. Inténtalo de nuevo.",
+      "invalid-date": "Elige la fecha de llegada.",
+      "missing-supplier": "Escribe el proveedor.",
+      "no-lines": "Agrega al menos un artículo.",
+      "invalid-quantity": "Cada artículo necesita una cantidad entera mayor que cero.",
+      "repeated-item": "Un artículo está dos veces; súmalo en una sola línea.",
+      "invalid-costs": "Escribe el tipo de cambio, el precio en dólares de cada artículo y montos de flete y transporte de 0 o más.",
+      "invalid-pack": "Si llegó en empaques, pon cuántos llegaron y cuántas unidades trae cada uno (números enteros, 1 o más)."
+    }
+  },
+  "costs": {
+    "title": "Costos y márgenes",
+    "subtitle": "Lo que cuesta cada artículo puesto en almacén, según sus compras, y el margen que deja frente al precio público. Solo lo ve el CEO.",
+    "min-margin": "Margen mínimo",
+    "min-margin-off": "Sin mínimo",
+    "min-margin-hint-off": "Sin mínimo, no se avisa de márgenes bajos. Ponlo para ver qué artículos venden casi a costo.",
+    "min-margin-hint": "Artículos con menos de {{ min }} % de margen: {{ count }}.",
+    "save": "Guardar",
+    "turn-off": "Quitar",
+    "stock-value": "Valor del stock al costo promedio",
+    "without-cost": "con stock y sin costo: {{ count }}",
+    "help": "Último costo, el anterior y el promedio de sus compras. El margen compara el último costo con el precio público por unidad.",
+    "help-glass": "El vidrio se compra por plancha y se vende por pie²: el margen compara el costo por pie² de la plancha con el precio de la lista Pública.",
+    "last": "Último costo",
+    "previous": "Anterior",
+    "average": "Promedio",
+    "public-price": "Precio público",
+    "margin": "Margen",
+    "sqft": "pie²",
+    "no-cost": "Sin compras costeadas",
+    "purchases": "compras: {{ count }}",
+    "empty": "No hay artículos para este filtro.",
+    "filter": {
+      "ALL": "Todos los artículos",
+      "WITH_COST": "Con costo",
+      "LOW_MARGIN": "Margen bajo",
+      "NO_COST": "Con stock y sin costo"
+    },
+    "error": {
+      "settings-load": "No se pudo cargar el margen mínimo.",
+      "settings-save": "No se pudo guardar el margen mínimo.",
+      "invalid-margin": "El margen mínimo debe estar entre 0 y 100 %."
     }
   }
 }
