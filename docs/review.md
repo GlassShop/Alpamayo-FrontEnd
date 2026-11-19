@@ -214,14 +214,30 @@ Parte de rehacer el Excel anterior de Dylan (`Vidrieria-Alpamayo-1.xlsm`) y su h
 
 ### 11. Compras y costo real
 
-- **Compras** (`/compras`, todos los roles): se registra la llegada con proveedor, fecha, sede y artículos, en unidades o en empaques (3 jabas × 20 = 60 planchas). Si el artículo aún no tiene su empaque, se elige ahí mismo (jaba, paquete o caja y cuántas unidades trae) y queda guardado para la próxima compra. Al guardar, el stock de la sede sube con un movimiento **Compra** y se quita la marca «en camino». La compra queda **«Costo pendiente»**.
+- **Compras** (hoy `/inventario/compras`, todos los roles): se registra la llegada con proveedor, fecha, sede y artículos, en unidades o en empaques (3 jabas × 20 = 60 planchas). Si el artículo aún no tiene su empaque, se elige ahí mismo (jaba, paquete o caja y cuántas unidades trae) y queda guardado para la próxima compra. Al guardar, el stock de la sede sube con un movimiento **Compra** y se quita la marca «en camino». La compra queda **«Costo pendiente»**.
 - **Costos de la compra** (solo CEO): tipo de cambio, precio en **dólares** por unidad, **flete** y **transporte Lima → Huaraz** (cada uno en S/ o US$). Flete y transporte se reparten **según el valor** de cada línea; el **costo por unidad puesto en almacén** se ve antes de guardar y lo calcula y guarda la API. Se pueden corregir después; las cantidades no (para eso, un ajuste de inventario).
-- **Costos y márgenes** (`/inventario/costos`, solo CEO): por artículo, último costo, el anterior con su variación, el promedio ponderado por unidades y el **margen** frente al precio público: (precio − costo) / precio. El vidrio se compara **por pie²** con la lista Pública. Una subida de costo se marca en rojo.
+- **Costos y márgenes** (solo CEO; desde el sprint 12, dentro de Inventario): por artículo, último costo, el anterior con su variación, el promedio ponderado por unidades y el **margen** frente al precio público: (precio − costo) / precio. El vidrio se compara **por pie²** con la lista Pública. Una subida de costo se marca en rojo.
 - **Margen mínimo** que fija el CEO: los artículos por debajo se resaltan y cada pestaña cuenta cuántos hay. Sin mínimo, no hay aviso.
 - **Valor del stock por sede** al costo promedio, con cuántos artículos con stock todavía no tienen costo.
 - **Seguridad**: la API de prueba quita dólares, tipo de cambio, flete y costos de toda respuesta a Vendedora y Almacén; no basta con esconderlos en pantalla.
 - La búsqueda de inventario, compras y costos encuentra cada palabra en cualquier orden («pestillo negro»).
 - Datos: las planchas escritas como 214 × 330 en una sede y 330 × 214 en la otra eran dos artículos; ahora son uno (medida mayor primero), con stock en las dos sedes.
+- Commits: `a8a9e83`, `6e00fa7`, `a98fa33`, `ab38532`, `150f0be`, `cf43858`, `abe8f52`.
+
+### 12. Menú más simple
+
+El menú pasó de 10 opciones a 5 (4 para Vendedora y Almacén). Las páginas que mostraban lo mismo se juntaron; las direcciones viejas llevan a su nuevo lugar.
+
+| Menú | Qué junta | Cómo |
+| --- | --- | --- |
+| **Cotizar** | Cotizador + Cotizaciones | Pestañas «Nueva cotización» y «Guardadas» |
+| **Agenda** | — | Igual |
+| **Catálogo** | Catálogo + Precios | El CEO pulsa **Editar precios** en la misma página y conserva la pestaña; `/catalogo/precios` abre ese modo |
+| **Inventario** | Inventario + Compras + Costos | Pestañas «Stock» y «Compras» (con el número de compras sin costo para el CEO). El CEO ve en Stock el valor por sede, el margen mínimo y las columnas **Último costo** y **Margen**, con filtros «Margen bajo» y «Con stock y sin costo» |
+| **Ajustes** | Configuración + Usuarios | Pestañas «Preferencias» y, para el CEO, «Usuarios» |
+
+- Los costos llegan a Inventario por un puerto (`INVENTORY_COSTS`) que Compras provee en sus rutas: Inventario no depende de Compras y, sin el puerto o sin permiso, no muestra montos.
+- En la tabla de stock el código pasó debajo del nombre para que entren las columnas del CEO.
 
 ## Decisiones del negocio
 
@@ -252,13 +268,14 @@ Tomadas por Dylan durante los sprints. Si alguna cambia, hay que avisar antes de
 | Costos | Precio en dólares, tipo de cambio, flete y transporte Lima → Huaraz por envío, repartidos según el valor; IGV incluido; se muestran el último costo y el promedio |
 | Compras: sede | Cada compra llega a una sola sede; si un envío se reparte, se registran dos llegadas |
 | Margen mínimo | Lo fija el CEO; mientras no lo ponga, no hay aviso de margen bajo |
+| Menú | Una opción por tema (Cotizar, Agenda, Catálogo, Inventario, Ajustes); lo que es solo del CEO se muestra como columnas o modos según el rol, no como pantallas aparte |
 
 ## Cómo probarlo
 
 ```bash
 npm ci
 npm run dev     # API de prueba (puerto 3000) + app (http://localhost:4200)
-npm test        # 233 pruebas automáticas
+npm test        # 237 pruebas automáticas
 npm run build   # build de producción sin errores ni advertencias
 ```
 
