@@ -22,5 +22,7 @@ export const environment = {
   sitesEndpointPath: '/sites',
   inventoryItemsEndpointPath: '/inventory-items',
   stockLevelsEndpointPath: '/stock-levels',
-  stockMovementsEndpointPath: '/stock-movements'
+  stockMovementsEndpointPath: '/stock-movements',
+  purchasesEndpointPath: '/purchases',
+  costSettingsEndpointPath: '/cost-settings'
 };
