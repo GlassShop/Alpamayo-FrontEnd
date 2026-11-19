@@ -210,6 +210,7 @@ Parte de rehacer el Excel anterior de Dylan (`Vidrieria-Alpamayo-1.xlsm`) y su h
 - **Movimientos**: la cantidad solo cambia registrando un **conteo**, una **entrada** o una **salida**, con motivo. Las entradas se pueden escribir en empaques (por ejemplo, 2 jabas de 20 = 40 planchas). El historial no se edita ni se borra y nunca deja el stock en negativo.
 - **Datos de prueba** cargados desde la hoja de inventario (`mock-api/inventory-seed.json`): 47 vidrios nuevos con sus precios público y vidriero, 9 series, 428 productos, 531 artículos y el stock de 275 de ellos. La API los agrega al arrancar solo si faltan.
 - Correcciones a la hoja al cargarla (anotadas para Dylan): precios público y plancha intercambiados en el incoloro semidoble, cantidad «19-19», medidas de acrílicos autocompletadas (181…187 × 120), nombres con errores en la Serie 25 y un código «2» en el policarbonato. Cuando un producto tenía precios distintos por color o por sede, se tomó el mayor.
+- Commits: `729e831`, `b283860`, `ec0c8ce`, `45cda8d`, `3c75257`, `4e3f885`, `567316b`, `6fe91a8`, `8c98d5e`, `d8477ea`.
 
 ## Decisiones del negocio
 
