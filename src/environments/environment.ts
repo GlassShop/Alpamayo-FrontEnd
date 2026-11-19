@@ -14,5 +14,12 @@ export const environment = {
   quotesEndpointPath: '/quotes',
   documentLookupEndpointPath: '/document-lookup',
   techniciansEndpointPath: '/technicians',
-  visitsEndpointPath: '/visits'
+  visitsEndpointPath: '/visits',
+  seriesEndpointPath: '/series',
+  productsEndpointPath: '/products',
+  productPriceHistoryEndpointPath: '/product-price-history',
+  sitesEndpointPath: '/sites',
+  inventoryItemsEndpointPath: '/inventory-items',
+  stockLevelsEndpointPath: '/stock-levels',
+  stockMovementsEndpointPath: '/stock-movements'
 };
