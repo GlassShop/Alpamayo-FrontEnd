@@ -11,7 +11,7 @@
 .iv-name { display: block; font-weight: 600; }
 .iv-variant { display: block; font-size: .8rem; color: var(--al-text-muted); }
 .iv-pack { display: block; font-size: .72rem; color: var(--al-text-muted); }
-.iv-sku { font-size: .8rem; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--al-text-muted); }
+.iv-sku { display: block; font-size: .72rem; font-variant-numeric: tabular-nums; color: var(--al-text-muted); }
 .iv-stock { white-space: nowrap; }
 .iv-stock-btn {
   display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; max-width: 220px;
@@ -29,3 +29,12 @@
 .iv-empty { text-align: center; color: var(--al-text-muted); padding: 24px !important; }
 .iv-more { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 20px; border-top: 1px solid var(--al-divider); font-size: .85rem; }
 @media (max-width: 600px) { .iv-search { min-width: 0; width: 100%; } .iv-new { width: 100%; } }
+/* CEO cost column: a cost going up hurts the margin (red); going down is good (green). */
+.iv-cost { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.iv-cost small { display: block; font-size: .72rem; }
+.iv-up { color: var(--al-primary-strong); font-weight: 700; }
+.iv-down { color: var(--al-success); font-weight: 700; }
+/* Tighter cells so the CEO's two cost columns fit next to both sites. */
+.iv-table th, .iv-table td { padding-left: 12px; padding-right: 12px; }
+.iv-table td:first-child { min-width: 180px; }
+.iv-site-head { white-space: normal !important; max-width: 140px; }

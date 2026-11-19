@@ -1,4 +1,5 @@
 import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
+import {DecimalPipe, NgComponentOutlet} from '@angular/common';
 import {MatDialog} from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
@@ -13,20 +14,27 @@ import {InventoryRows, matchesSearch} from '../../inventory-rows';
 import {StockDialog, StockDialogData} from '../../components/stock-dialog/stock-dialog';
 import {ItemDialog, ItemDialogData} from '../../components/item-dialog/item-dialog';
 import {MovementsPanel} from '../../components/movements-panel/movements-panel';
+import {INVENTORY_COSTS} from '../../../application/inventory-costs';
+import {IamStore} from '../../../../iam/application/iam.store';
 
-/** ALL; items to buy again (out of stock or at the minimum); never counted; on their way. */
-type StockFilter = 'ALL' | 'TO_BUY' | 'UNKNOWN' | 'IN_TRANSIT';
+/**
+ * ALL; items to buy again (out of stock or at the minimum); never counted; on their way.
+ * The CEO also filters by cost: margin below the minimum, or stock without a costed purchase.
+ */
+type StockFilter = 'ALL' | 'TO_BUY' | 'UNKNOWN' | 'IN_TRANSIT' | 'LOW_MARGIN' | 'NO_COST';
 
 const PAGE_SIZE = 60;
 
 /**
  * Stock of every item in every site, for every role: see it by category,
  * search it, find what must be bought again, record counts, entries and
- * exits, and add or edit items. Costs are not shown here.
+ * exits, and add or edit items. The CEO also sees the cost and margin of
+ * each item when the purchasing context provides INVENTORY_COSTS; nobody
+ * else gets amounts (the API removes them too).
  */
 @Component({
   selector: 'app-inventory',
-  imports: [TranslatePipe, MatIconModule, MatTooltipModule, TabBar, MovementsPanel],
+  imports: [DecimalPipe, NgComponentOutlet, TranslatePipe, MatIconModule, MatTooltipModule, TabBar, MovementsPanel],
   templateUrl: './inventory.html',
   styleUrl: './inventory.css'
 })
@@ -37,8 +45,14 @@ export class Inventory implements OnInit {
   private readonly catalog = inject(CatalogStore);
   private readonly products = inject(ProductsStore);
   private readonly dialog = inject(MatDialog);
+  private readonly iam = inject(IamStore);
+  private readonly costSource = inject(INVENTORY_COSTS, {optional: true});
 
-  readonly filters: readonly StockFilter[] = ['ALL', 'TO_BUY', 'UNKNOWN', 'IN_TRANSIT'];
+  /** Cost columns, filters and summary: CEO only, and only where costs are provided. */
+  readonly costs = this.iam.can('costs.manage') ? this.costSource : null;
+  readonly filters: readonly StockFilter[] = this.costs
+    ? ['ALL', 'TO_BUY', 'UNKNOWN', 'IN_TRANSIT', 'LOW_MARGIN', 'NO_COST']
+    : ['ALL', 'TO_BUY', 'UNKNOWN', 'IN_TRANSIT'];
   readonly tab = signal<CatalogTab>('GLASS');
   readonly filter = signal<StockFilter>('ALL');
   readonly search = signal('');
@@ -68,6 +82,8 @@ export class Inventory implements OnInit {
       if (filter === 'TO_BUY') return stock.some(s => s.status === 'OUT' || s.status === 'LOW');
       if (filter === 'UNKNOWN') return stock.some(s => s.status === 'UNKNOWN');
       if (filter === 'IN_TRANSIT') return stock.some(s => s.inTransit);
+      if (filter === 'LOW_MARGIN') return !!this.costs?.costOf(row.item.id)?.lowMargin;
+      if (filter === 'NO_COST') return (row.total ?? 0) > 0 && this.costs?.costOf(row.item.id)?.last == null;
       return true;
     });
   });
@@ -86,6 +102,7 @@ export class Inventory implements OnInit {
     this.rowsService.ensureLoaded();
     this.movements.showFor(null);
     this.movements.load();
+    this.costs?.ensureLoaded();
   }
 
   onSearch(event: Event): void { this.search.set((event.target as HTMLInputElement).value); }
