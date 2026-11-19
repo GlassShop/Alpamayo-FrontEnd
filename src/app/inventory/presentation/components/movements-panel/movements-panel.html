@@ -1,0 +1,51 @@
+<section class="al-card" id="stock-movements" aria-labelledby="mp-title">
+  <div class="al-card-header mp-header">
+    <h2 class="al-card-title" id="mp-title"><mat-icon>history</mat-icon>{{ 'inventory.movements.title' | translate }}</h2>
+    @if (filteredItem(); as row) {
+      <span class="al-chip mp-chip">{{ row.name }}@if (row.variant) { · {{ row.variant }} }</span>
+      <button type="button" class="al-btn al-btn--secondary mp-all" (click)="movements.showFor(null)">{{ 'inventory.movements.show-all' | translate }}</button>
+    }
+  </div>
+
+  @if (movements.error()) {
+    <div class="al-empty al-empty--error">
+      <mat-icon>cloud_off</mat-icon>{{ 'inventory.movements.error' | translate }}
+      <button class="al-btn al-btn--secondary" (click)="movements.load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (movements.loading() && movements.movements().length === 0) {
+    <div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div>
+  } @else {
+    <div class="al-table-wrapper mp-scroll">
+      <table class="al-table">
+        <thead>
+          <tr>
+            <th>{{ 'quotes.date' | translate }}</th>
+            <th>{{ 'inventory.movements.item' | translate }}</th>
+            <th>{{ 'inventory.site' | translate }}</th>
+            <th>{{ 'inventory.movements.kind' | translate }}</th>
+            <th class="al-num">{{ 'inventory.movements.change' | translate }}</th>
+            <th class="al-num">{{ 'inventory.movements.after' | translate }}</th>
+            <th>{{ 'inventory.movements.by' | translate }}</th>
+            <th>{{ 'catalog.history.reason' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (m of movements.movements(); track m.id) {
+            <tr>
+              <td class="mp-date">{{ m.at | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ itemName(m.itemId) }}</td>
+              <td>{{ siteName(m.siteId) }}</td>
+              <td>{{ (m.kind === 'COUNT' ? 'inventory.stock.mode.COUNT' : m.delta > 0 ? 'inventory.stock.mode.IN' : 'inventory.stock.mode.OUT') | translate }}</td>
+              <td class="al-num mp-delta" [class.mp-in]="m.delta > 0" [class.mp-out]="m.delta < 0">{{ m.delta > 0 ? '+' : '' }}{{ m.delta }}</td>
+              <td class="al-num"><strong>{{ m.quantityAfter }}</strong></td>
+              <td>{{ m.by.fullName }}</td>
+              <td class="mp-reason">{{ m.reason ?? '—' }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="8" class="mp-empty">{{ 'inventory.movements.empty' | translate }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

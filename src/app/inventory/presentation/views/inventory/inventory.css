@@ -1,0 +1,31 @@
+:host { display: block; max-width: 1280px; }
+.iv-saving { display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; font-weight: 700; color: var(--al-primary); }
+.iv-saving mat-icon { font-size: 18px; width: 18px; height: 18px; }
+.iv-tabs { margin-bottom: 16px; }
+.iv-toolbar { flex-wrap: wrap; gap: 12px; }
+.iv-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.iv-search { height: 36px; min-width: 240px; background: var(--al-surface); }
+.iv-select { height: 36px; min-width: 170px; background-color: var(--al-surface); }
+.iv-new { flex-shrink: 0; }
+
+.iv-name { display: block; font-weight: 600; }
+.iv-variant { display: block; font-size: .8rem; color: var(--al-text-muted); }
+.iv-pack { display: block; font-size: .72rem; color: var(--al-text-muted); }
+.iv-sku { font-size: .8rem; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--al-text-muted); }
+.iv-stock { white-space: nowrap; }
+.iv-stock-btn {
+  display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; max-width: 220px;
+  padding: 6px 8px; border: 1px solid transparent; border-radius: var(--al-radius); background: transparent; cursor: pointer; font: inherit;
+}
+.iv-stock-btn:hover { border-color: var(--al-border); background: var(--al-surface); }
+.iv-stock-btn:focus-visible { outline: 2px solid var(--al-primary); outline-offset: 1px; }
+.iv-qty { min-width: 32px; font-size: 1rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.iv-qty--unknown { font-weight: 400; color: #b6bcc4; }
+.iv-pill--transit { color: var(--al-slate); background: #e8eef7; }
+.iv-notes { display: block; max-width: 220px; margin-left: auto; overflow: hidden; text-overflow: ellipsis; font-size: .72rem; color: var(--al-text-muted); }
+.iv-total, .iv-min { font-variant-numeric: tabular-nums; }
+.iv-total { font-weight: 700; }
+.iv-actions { white-space: nowrap; text-align: right; }
+.iv-empty { text-align: center; color: var(--al-text-muted); padding: 24px !important; }
+.iv-more { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 20px; border-top: 1px solid var(--al-divider); font-size: .85rem; }
+@media (max-width: 600px) { .iv-search { min-width: 0; width: 100%; } .iv-new { width: 100%; } }

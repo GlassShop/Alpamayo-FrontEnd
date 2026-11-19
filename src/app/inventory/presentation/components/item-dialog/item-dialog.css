@@ -1,0 +1,10 @@
+.id-title { display: flex; align-items: center; gap: 8px; }
+.id-content { display: flex; flex-direction: column; gap: 14px; }
+.id-picker { display: flex; flex-direction: column; gap: 6px; }
+.id-select { height: auto; padding: 4px; background-image: none; }
+.id-select option { padding: 4px 8px; }
+.id-name { margin: 0; }
+.id-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.id-initial { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 12px; border: 1px solid var(--al-divider); border-radius: var(--al-radius); }
+.id-initial legend { padding: 0 4px; }
+@media (max-width: 520px) { .id-grid, .id-initial { grid-template-columns: 1fr; } }

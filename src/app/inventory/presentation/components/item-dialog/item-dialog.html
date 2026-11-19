@@ -1,0 +1,69 @@
+<h2 mat-dialog-title class="id-title"><mat-icon>{{ creating ? 'add_box' : 'edit' }}</mat-icon>{{ title | translate }}</h2>
+<mat-dialog-content class="id-content">
+  @if (creating) {
+    <div class="id-picker">
+      <label class="al-field">
+        <span class="al-label">{{ (isGlass ? 'inventory.item.glass' : 'inventory.item.product') | translate }}</span>
+        <input class="al-input" type="search" [value]="search()" (input)="onSearch($event)"
+               [placeholder]="'inventory.item.search' | translate"/>
+      </label>
+      <select class="al-select id-select" size="6" (change)="onTarget($event)" [attr.aria-label]="(isGlass ? 'inventory.item.glass' : 'inventory.item.product') | translate">
+        @for (o of shownOptions(); track o.id) { <option [value]="o.id" [selected]="o.id === targetId()">{{ o.label }}</option> }
+      </select>
+      @if (options().length > shownOptions().length) {
+        <span class="al-hint">{{ 'inventory.item.narrow' | translate: {shown: shownOptions().length, total: options().length} }}</span>
+      }
+      @if (submitted() && missingTarget()) { <span class="al-error-text">{{ 'inventory.item.choose' | translate }}</span> }
+      <span class="al-hint">{{ 'inventory.item.not-listed' | translate }}</span>
+    </div>
+  } @else {
+    <p class="id-name"><strong>{{ editingName }}</strong></p>
+  }
+
+  <div class="id-grid">
+    @if (!isGlass) {
+      <label class="al-field"><span class="al-label">{{ 'inventory.item.color' | translate }}</span>
+        <input class="al-input" list="id-colors" [value]="color()" (input)="onText('color', $event)" placeholder="Negro"/>
+        <datalist id="id-colors">@for (c of knownColors(); track c) { <option [value]="c"></option> }</datalist>
+      </label>
+    }
+    <label class="al-field"><span class="al-label">{{ 'inventory.item.sku' | translate }} ({{ 'agenda.optional' | translate }})</span>
+      <input class="al-input" [value]="sku()" (input)="onText('sku', $event)" placeholder="0017"/></label>
+    @if (hasSize) {
+      <label class="al-field"><span class="al-label">{{ 'inventory.item.width' | translate }}</span>
+        <input class="al-input" type="number" min="1" step="1" [value]="widthCm() ?? ''" (input)="onNumber('widthCm', $event)" placeholder="330"/></label>
+      <label class="al-field"><span class="al-label">{{ 'inventory.item.height' | translate }}</span>
+        <input class="al-input" type="number" min="1" step="1" [value]="heightCm() ?? ''" (input)="onNumber('heightCm', $event)" placeholder="214"/></label>
+    }
+    <label class="al-field"><span class="al-label">{{ 'inventory.item.pack' | translate }}</span>
+      <select class="al-select" (change)="onPack($event)">
+        <option value="" [selected]="packKind() === null">{{ 'inventory.item.no-pack' | translate }}</option>
+        @for (k of packKinds; track k) { <option [value]="k" [selected]="packKind() === k">{{ ('inventory.pack.' + k) | translate }}</option> }
+      </select>
+    </label>
+    @if (packKind()) {
+      <label class="al-field"><span class="al-label">{{ 'inventory.item.units-per-pack' | translate }}</span>
+        <input class="al-input" type="number" min="1" step="1" [value]="unitsPerPack() ?? ''" (input)="onNumber('unitsPerPack', $event)" placeholder="20"/></label>
+    }
+    <label class="al-field"><span class="al-label">{{ 'inventory.item.min-stock' | translate }} ({{ 'agenda.optional' | translate }})</span>
+      <input class="al-input" type="number" min="0" step="1" [value]="minStock() ?? ''" (input)="onNumber('minStock', $event)" placeholder="5"/></label>
+  </div>
+  <span class="al-hint">{{ 'inventory.item.min-hint' | translate }}</span>
+
+  @if (problem(); as error) { <p class="al-error-text" role="alert">{{ error | translate }}</p> }
+
+  @if (creating) {
+    <fieldset class="id-initial">
+      <legend class="al-label">{{ 'inventory.item.initial' | translate }}</legend>
+      @for (site of inventory.sites(); track site.id) {
+        <label class="al-field"><span class="al-label">{{ site.name }}</span>
+          <input class="al-input" type="number" min="0" step="1" [value]="initial()[site.id] ?? ''" (input)="onInitial(site.id, $event)"
+                 [placeholder]="'inventory.item.not-counted' | translate"/></label>
+      }
+    </fieldset>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button type="button" class="al-btn al-btn--secondary" mat-dialog-close>{{ 'common.cancel' | translate }}</button>
+  <button type="button" class="al-btn al-btn--primary" (click)="save()"><mat-icon>check</mat-icon>{{ (creating ? 'inventory.item.add' : 'inventory.item.save') | translate }}</button>
+</mat-dialog-actions>

@@ -1,0 +1,11 @@
+:host { display: block; margin-top: 24px; scroll-margin-top: 24px; }
+.mp-header { flex-wrap: wrap; gap: 8px; }
+.mp-chip { margin-left: auto; }
+.mp-all { height: 34px; padding: 0 12px; font-size: .78rem; }
+.mp-scroll { max-height: 420px; overflow-y: auto; }
+.mp-date { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.mp-delta { font-weight: 700; font-variant-numeric: tabular-nums; }
+.mp-in { color: var(--al-success); }
+.mp-out { color: var(--al-primary-strong); }
+.mp-reason { max-width: 240px; }
+.mp-empty { text-align: center; color: var(--al-text-muted); padding: 24px !important; }

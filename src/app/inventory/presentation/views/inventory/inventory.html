@@ -1,0 +1,115 @@
+<header class="al-page-header">
+  <div>
+    <h1 class="al-page-title">{{ 'inventory.title' | translate }}</h1>
+    <p class="al-page-subtitle">{{ 'inventory.subtitle' | translate }}</p>
+  </div>
+  @if (inventory.saving()) { <span class="iv-saving"><mat-icon>sync</mat-icon>{{ 'common.saving' | translate }}</span> }
+</header>
+
+@if (error(); as error) {
+  <div class="al-alert al-alert--error" role="alert">
+    <mat-icon>error_outline</mat-icon><span>{{ error | translate }}</span>
+    @if (!rowsService.ready()) {
+      <button class="al-btn al-btn--secondary" (click)="retry()">{{ 'common.retry' | translate }}</button>
+    } @else {
+      <button class="al-icon-btn" (click)="clearError()" [attr.aria-label]="'common.close' | translate"><mat-icon>close</mat-icon></button>
+    }
+  </div>
+}
+
+@if (rowsService.ready()) {
+  <app-tab-bar class="iv-tabs" idPrefix="iv" [tabs]="tabs()" [active]="tab()" (selected)="tab.set($event)"
+               [label]="'inventory.title' | translate"/>
+
+  <section class="al-card" role="tabpanel" id="iv-panel" [attr.aria-labelledby]="'iv-tab-' + tab()">
+    <div class="al-card-header iv-toolbar">
+      <div class="iv-filters">
+        <label>
+          <span class="sr-only">{{ 'inventory.search' | translate }}</span>
+          <input class="al-input iv-search" type="search" [value]="search()" (input)="onSearch($event)"
+                 [placeholder]="'inventory.search' | translate"/>
+        </label>
+        <label>
+          <span class="sr-only">{{ 'inventory.site' | translate }}</span>
+          <select class="al-select iv-select" (change)="onSite($event)" [attr.aria-label]="'inventory.site' | translate">
+            <option value="" [selected]="siteId() === null">{{ 'inventory.all-sites' | translate }}</option>
+            @for (site of inventory.sites(); track site.id) { <option [value]="site.id" [selected]="siteId() === site.id">{{ site.name }}</option> }
+          </select>
+        </label>
+        <label>
+          <span class="sr-only">{{ 'inventory.status-filter' | translate }}</span>
+          <select class="al-select iv-select" (change)="onFilter($event)" [attr.aria-label]="'inventory.status-filter' | translate">
+            @for (f of filters; track f) { <option [value]="f" [selected]="filter() === f">{{ ('inventory.filter.' + f) | translate }}</option> }
+          </select>
+        </label>
+      </div>
+      <button type="button" class="al-btn al-btn--primary iv-new" (click)="openNewItem()"><mat-icon>add</mat-icon>{{ 'inventory.item.new' | translate }}</button>
+    </div>
+
+    <div class="al-table-wrapper">
+      <table class="al-table iv-table">
+        <thead>
+          <tr>
+            <th>{{ 'inventory.item.label' | translate }}</th>
+            <th>{{ 'inventory.item.sku' | translate }}</th>
+            @for (site of sites(); track site.id) { <th class="al-num">{{ site.name }}</th> }
+            @if (sites().length > 1) { <th class="al-num">{{ 'inventory.total' | translate }}</th> }
+            <th class="al-num">{{ 'inventory.item.min-stock' | translate }}</th>
+            <th><span class="sr-only">{{ 'inventory.actions' | translate }}</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows(); track row.item.id) {
+            <tr>
+              <td>
+                <span class="iv-name">{{ row.name }}</span>
+                @if (row.variant) { <span class="iv-variant">{{ row.variant }}</span> }
+                @if (row.item.packKind && row.item.unitsPerPack) {
+                  <span class="iv-pack">{{ ('inventory.pack.' + row.item.packKind) | translate }} · {{ row.item.unitsPerPack }} {{ ('inventory.unit.' + row.unit) | translate }}</span>
+                }
+              </td>
+              <td class="iv-sku">{{ row.item.sku || '—' }}</td>
+              @for (site of sites(); track site.id) {
+                @let stock = row.stock[inventory.sites().indexOf(site)];
+                <td class="al-num iv-stock">
+                  <button type="button" class="iv-stock-btn" (click)="openStock(row.item.id, site.id)"
+                          [matTooltip]="(stock.status === 'UNKNOWN' ? 'inventory.status.UNKNOWN' : 'inventory.stock.title') | translate"
+                          [attr.aria-label]="('inventory.stock.title' | translate) + ': ' + row.name + ' ' + row.variant + ' — ' + site.name">
+                    @if (stock.status === 'UNKNOWN') {
+                      <span class="iv-qty iv-qty--unknown">—<span class="sr-only">{{ 'inventory.status.UNKNOWN' | translate }}</span></span>
+                    } @else {
+                      <span class="iv-qty">{{ stock.quantity }}</span>
+                      <span class="al-pill {{ statusClass(stock.status) }}">{{ ('inventory.status.' + stock.status) | translate }}</span>
+                    }
+                    @if (stock.inTransit) { <span class="al-pill iv-pill--transit">{{ 'inventory.status.IN_TRANSIT' | translate }}</span> }
+                  </button>
+                  @if (stock.notes) { <span class="iv-notes" [title]="stock.notes">{{ stock.notes }}</span> }
+                </td>
+              }
+              @if (sites().length > 1) { <td class="al-num iv-total">{{ row.total ?? '—' }}</td> }
+              <td class="al-num iv-min">{{ row.item.minStock ?? '—' }}</td>
+              <td class="iv-actions">
+                <button type="button" class="al-icon-btn" (click)="openEditItem(row.item.id)" [matTooltip]="'inventory.item.edit' | translate"
+                        [attr.aria-label]="('inventory.item.edit' | translate) + ': ' + row.name + ' ' + row.variant"><mat-icon>edit</mat-icon></button>
+                <button type="button" class="al-icon-btn" (click)="showMovements(row.item.id)" [matTooltip]="'inventory.movements.see' | translate"
+                        [attr.aria-label]="('inventory.movements.see' | translate) + ': ' + row.name + ' ' + row.variant"><mat-icon>history</mat-icon></button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td [attr.colspan]="sites().length + 5" class="iv-empty">{{ 'inventory.empty' | translate }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (filtered().length > rows().length) {
+      <div class="iv-more">
+        <span class="al-muted">{{ 'catalog.products.showing' | translate: {shown: rows().length, total: filtered().length} }}</span>
+        <button type="button" class="al-btn al-btn--secondary" (click)="showMore()">{{ 'catalog.products.show-more' | translate }}</button>
+      </div>
+    }
+  </section>
+
+  <app-movements-panel/>
+} @else if (!error()) {
+  <section class="al-card"><div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div></section>
+}

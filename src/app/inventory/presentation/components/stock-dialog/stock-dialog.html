@@ -1,0 +1,70 @@
+<h2 mat-dialog-title class="sd-title"><mat-icon>inventory_2</mat-icon>{{ 'inventory.stock.title' | translate }}</h2>
+<mat-dialog-content class="sd-content">
+  @if (row(); as r) {
+    <p class="sd-item"><strong>{{ r.name }}</strong>@if (r.variant) { <span class="al-muted"> · {{ r.variant }}</span> }</p>
+  }
+
+  <label class="al-field">
+    <span class="al-label">{{ 'inventory.site' | translate }}</span>
+    <select class="al-select" (change)="onSite($event)">
+      @for (site of inventory.sites(); track site.id) {
+        <option [value]="site.id" [selected]="site.id === siteId()">{{ site.name }}</option>
+      }
+    </select>
+  </label>
+  <p class="sd-current">
+    {{ 'inventory.stock.now' | translate }}
+    <strong>{{ current() ?? ('inventory.status.UNKNOWN' | translate) }}</strong>
+  </p>
+
+  <fieldset class="sd-modes">
+    <legend class="al-label">{{ 'inventory.stock.what' | translate }}</legend>
+    @for (m of modes; track m) {
+      <label class="sd-mode" [class.sd-mode--active]="mode() === m">
+        <input type="radio" name="sd-mode" [checked]="mode() === m" (change)="setMode(m)"/>
+        <span><strong>{{ ('inventory.stock.mode.' + m) | translate }}</strong><small>{{ ('inventory.stock.mode-hint.' + m) | translate }}</small></span>
+      </label>
+    }
+  </fieldset>
+
+  <div class="sd-row">
+    <label class="al-field">
+      <span class="al-label">{{ (mode() === 'COUNT' ? 'inventory.stock.counted' : 'inventory.stock.units') | translate }}</span>
+      <input class="al-input" type="number" min="0" step="1" inputmode="numeric" [value]="quantity() ?? ''"
+             (input)="onNumber('quantity', $event)" [disabled]="packs() !== null && mode() === 'IN'"/>
+    </label>
+    @if (mode() === 'IN' && packSize(); as size) {
+      <label class="al-field">
+        <span class="al-label">{{ 'inventory.stock.packs' | translate: {kind: (('inventory.pack.' + item()?.packKind) | translate), size} }}</span>
+        <input class="al-input" type="number" min="0" step="1" inputmode="numeric" [value]="packs() ?? ''" (input)="onNumber('packs', $event)"/>
+      </label>
+    }
+  </div>
+  @if (after() !== null && !problem()) {
+    <p class="sd-after">{{ 'inventory.stock.after' | translate: {quantity: after()} }}</p>
+  }
+  @if (problem() && (submitted() || units() !== null)) {
+    <p class="al-error-text" role="alert">{{ problem()! | translate }}</p>
+  }
+
+  <label class="al-field">
+    <span class="al-label">{{ 'inventory.stock.reason' | translate }}</span>
+    <input class="al-input" [attr.maxlength]="maxReason" [value]="reason()" (input)="text('reason', $event)"
+           [placeholder]="('inventory.stock.reason-example.' + mode()) | translate"/>
+  </label>
+
+  <div class="sd-flags">
+    <label class="sd-check">
+      <input type="checkbox" [checked]="inTransit()" (change)="inTransit.set($any($event.target).checked)"/>
+      {{ 'inventory.stock.in-transit' | translate }}
+    </label>
+    <label class="al-field">
+      <span class="al-label">{{ 'inventory.stock.notes' | translate }}</span>
+      <textarea class="al-input sd-notes" rows="2" maxlength="200" [value]="notes()" (input)="text('notes', $event)"></textarea>
+    </label>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button type="button" class="al-btn al-btn--secondary" mat-dialog-close>{{ 'common.cancel' | translate }}</button>
+  <button type="button" class="al-btn al-btn--primary" (click)="save()" [disabled]="!canSave()"><mat-icon>check</mat-icon>{{ 'inventory.stock.save' | translate }}</button>
+</mat-dialog-actions>

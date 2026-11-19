@@ -1,0 +1,20 @@
+.sd-title { display: flex; align-items: center; gap: 8px; }
+.sd-content { display: flex; flex-direction: column; gap: 14px; }
+.sd-item { margin: 0; }
+.sd-current { margin: -4px 0 0; font-size: .85rem; color: var(--al-text-muted); }
+.sd-current strong { color: var(--al-text); font-variant-numeric: tabular-nums; }
+.sd-modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; border: 0; }
+.sd-modes legend { margin-bottom: 6px; }
+.sd-mode {
+  display: flex; gap: 8px; align-items: flex-start; padding: 10px; cursor: pointer;
+  border: 1px solid var(--al-divider); border-radius: var(--al-radius); background: var(--al-surface);
+}
+.sd-mode--active { border-color: var(--al-primary); background: var(--al-primary-soft); }
+.sd-mode span { display: flex; flex-direction: column; gap: 2px; font-size: .85rem; }
+.sd-mode small { color: var(--al-text-muted); font-size: .72rem; }
+.sd-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.sd-after { margin: -6px 0 0; font-size: .85rem; font-weight: 600; color: var(--al-success); }
+.sd-flags { display: flex; flex-direction: column; gap: 10px; padding-top: 12px; border-top: 1px solid var(--al-divider); }
+.sd-check { display: inline-flex; align-items: center; gap: 8px; font-size: .88rem; cursor: pointer; }
+.sd-notes { height: auto; padding: 8px 12px; resize: vertical; font: inherit; }
+@media (max-width: 520px) { .sd-modes { grid-template-columns: 1fr; } }
