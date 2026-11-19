@@ -10,6 +10,7 @@
  * This is NOT production security: tokens live in memory and the seed
  * accounts are for development only (see README.md).
  */
+const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const jsonServer = require('json-server');
@@ -19,8 +20,55 @@ const SESSION_MS = 8 * 60 * 60 * 1000;
 const MIN_PASSWORD = 8;
 const ROLES = ['CEO', 'SELLER', 'WAREHOUSE'];
 
+const DB_FILE = path.join(__dirname, 'db.json');
+
+/**
+ * Seed taken from Dylan's inventory sheet (inventory-seed.json), applied to
+ * db.json before json-server reads it (its router only serves the collections
+ * present at start). A collection is added only when it is missing, so
+ * whatever was typed in the app is kept. The collections of the first
+ * "project costs" screen are removed.
+ */
+function applyInventorySeed(file) {
+  const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const seed = require('./inventory-seed.json');
+  const before = JSON.stringify(data);
+  const nextIn = (list) => list.reduce((max, item) => Math.max(max, item.id), 0) + 1;
+  const lower = (v) => String(v ?? '').trim().toLowerCase();
+  for (const key of ['aluminum-colors', 'aluminum-profiles', 'profile-costs', 'accessories', 'glass-sheet-costs', 'cost-history']) delete data[key];
+  if ((data.series ?? []).some(s => 'colorIds' in s)) delete data.series;
+  data.sites ??= seed.sites;
+  data.series ??= seed.series;
+  data.products ??= seed.products;
+  if (!data['inventory-items']) {
+    // Glass of the sheet: reuse the catalog glass type with the same name, thickness and colour, or add it with its prices.
+    data['glass-types'] ??= [];
+    data.prices ??= [];
+    const lists = Object.fromEntries((data['price-lists'] ?? []).map(l => [lower(l.name), l.id]));
+    const glassIds = {};
+    for (const g of seed.glassTypes) {
+      const same = data['glass-types'].find(t => lower(t.name) === lower(g.name) && Number(t.thicknessMm) === g.thicknessMm && lower(t.color) === lower(g.color));
+      if (same) { glassIds[g.key] = same.id; continue; }
+      const glass = {id: nextIn(data['glass-types']), name: g.name, thicknessMm: g.thicknessMm, color: g.color};
+      data['glass-types'].push(glass);
+      glassIds[g.key] = glass.id;
+      for (const [listName, price] of Object.entries(g.prices ?? {})) {
+        const priceListId = lists[lower(listName)];
+        if (priceListId) data.prices.push({id: nextIn(data.prices), glassTypeId: glass.id, priceListId, pricePerSqFt: price});
+      }
+    }
+    data['inventory-items'] = seed.items.map(({glassKey, ...item}) => (glassKey ? {...item, glassTypeId: glassIds[glassKey]} : item));
+    data['stock-levels'] = seed.stockLevels.map(level => ({...level, inTransit: false, notes: ''}));
+  }
+  data['stock-levels'] ??= [];
+  data['stock-movements'] ??= [];
+  data['product-price-history'] ??= [];
+  if (JSON.stringify(data) !== before) fs.writeFileSync(file, JSON.stringify(data, null, 2));
+}
+applyInventorySeed(DB_FILE);
+
 const server = jsonServer.create();
-const router = jsonServer.router(path.join(__dirname, 'db.json'));
+const router = jsonServer.router(DB_FILE);
 const db = router.db;
 /** token → { userId, expiresAt } */
 const sessions = new Map();
@@ -97,7 +145,10 @@ server.use((req, res, next) => {
     req.path.startsWith('/price-history') ||
     (writes && req.path.startsWith('/technicians')) ||
     (writes && (req.path.startsWith('/prices') || req.path.startsWith('/price-lists'))) ||
-    (writes && req.path.startsWith('/glass-types') && req.method !== 'POST');
+    (writes && req.path.startsWith('/glass-types') && req.method !== 'POST') ||
+    // Products: anyone adds one (without price); only the CEO prices them and reads their price history.
+    (writes && req.path.startsWith('/products') && req.method !== 'POST') ||
+    req.path.startsWith('/product-price-history');
   if (ceoOnly && !isCeo) return res.status(403).json({code: 'forbidden'});
   next();
 });
@@ -205,6 +256,216 @@ server.get('/price-history', (req, res) => {
 
 // The history is append-only: it cannot be edited or deleted.
 server.all(['/price-history', '/price-history/:id'], (req, res) => res.status(405).json({code: 'not-allowed'}));
+
+// ── sale products and inventory ──────────────────────────────────────────
+// Products besides glass (aluminium, accessories, acrylics…) have ONE public
+// price set by the CEO; every role may add a product without price. The
+// inventory keeps each exact item (colour, size) and its stock per site;
+// quantities only change through movements, which are never edited.
+const PRODUCT_CATEGORIES = ['ALUMINUM_SERIES', 'ALUMINUM_TRADITIONAL', 'ACCESSORY', 'OTHER'];
+const WEIGHT_CLASSES = ['LIGHT', 'SEMI_HEAVY', 'HEAVY'];
+const PACK_KINDS = ['CRATE', 'BUNDLE', 'BOX'];
+const MOVEMENT_KINDS = ['COUNT', 'ADJUSTMENT'];
+const MAX_NOTES = 200;
+const nextId = (collection) => db.get(collection).value().reduce((max, item) => Math.max(max, item.id), 0) + 1;
+const isPositiveNumber = (v) => typeof v === 'number' && Number.isFinite(v) && v > 0;
+const isWholeNumber = (v) => Number.isInteger(v) && v >= 0;
+const trimmed = (v) => String(v ?? '').trim();
+
+// Products
+function productLabel(p) {
+  const series = p.seriesId ? db.get('series').find({id: p.seriesId}).value()?.name : null;
+  return [series, [p.code, p.name].filter(Boolean).join(' '), p.brand].filter(Boolean).join(' · ');
+}
+
+server.post('/products', (req, res) => {
+  const {category, code, name, seriesId = null, brand, weightClass = null, publicPrice = null} = req.body ?? {};
+  const fields = {
+    category, code: trimmed(code), name: trimmed(name),
+    seriesId: category === 'ALUMINUM_SERIES' ? seriesId : null,
+    brand: category === 'ACCESSORY' ? trimmed(brand) : '',
+    weightClass: category === 'ALUMINUM_TRADITIONAL' ? weightClass ?? 'LIGHT' : null,
+  };
+  if (!PRODUCT_CATEGORIES.includes(category) || !fields.name) return res.status(400).json({code: 'invalid-product'});
+  if (category === 'ALUMINUM_SERIES' && !db.get('series').find({id: seriesId}).value()) return res.status(400).json({code: 'invalid-product'});
+  if (fields.weightClass !== null && !WEIGHT_CLASSES.includes(fields.weightClass)) return res.status(400).json({code: 'invalid-product'});
+  const same = (a, b) => trimmed(a).toLowerCase() === trimmed(b).toLowerCase();
+  const duplicate = db.get('products').find(p => p.category === category && (p.seriesId ?? null) === fields.seriesId && same(p.brand, fields.brand)
+    && (fields.code ? same(p.code, fields.code) : !trimmed(p.code) && same(p.name, fields.name))).value();
+  if (duplicate) return res.status(409).json({code: 'duplicate'});
+  // Only the CEO prices products; anyone else adds them without price.
+  const price = req.currentUser.role === 'CEO' && isPositiveNumber(publicPrice) ? round2(publicPrice) : null;
+  const product = {id: nextId('products'), ...fields, publicPrice: price};
+  db.get('products').push(product).write();
+  if (price !== null) recordProductPrice(product, null, req.currentUser, req.body.changeReason);
+  res.status(201).json(product);
+});
+
+function recordProductPrice(product, previousPrice, user, rawReason) {
+  const reason = trimmed(rawReason).slice(0, MAX_REASON);
+  db.get('product-price-history').push({
+    id: nextId('product-price-history'), productId: product.id, label: productLabel(product), previousPrice,
+    newPrice: product.publicPrice, ...(reason ? {reason} : {}),
+    changedAt: new Date().toISOString(), changedBy: {id: user.id, fullName: user.fullName},
+  }).write();
+}
+
+// The CEO changes the public price; the history keeps the previous one (read before writing: assign() mutates).
+server.all('/products/:id', (req, res, next) => {
+  if (req.method === 'DELETE') return res.status(405).json({code: 'not-allowed'});
+  if (!['PUT', 'PATCH'].includes(req.method)) return next();
+  const existing = db.get('products').find({id: Number(req.params.id)}).value();
+  if (!existing) return res.status(404).json({code: 'not-found'});
+  const {publicPrice, changeReason} = req.body ?? {};
+  if (!isPositiveNumber(publicPrice)) return res.status(400).json({code: 'invalid-price'});
+  const previous = existing.publicPrice ?? null;
+  const newPrice = round2(publicPrice);
+  if (newPrice === previous) return res.json(existing);
+  const updated = {...existing, publicPrice: newPrice};
+  db.get('products').find({id: existing.id}).assign(updated).write();
+  recordProductPrice(updated, previous, req.currentUser, changeReason);
+  res.json(updated);
+});
+
+server.get('/product-price-history', (req, res) => {
+  res.json(db.get('product-price-history').orderBy(['changedAt', 'id'], ['desc', 'desc']).value());
+});
+server.all(['/product-price-history', '/product-price-history/:id'], (req, res) => res.status(405).json({code: 'not-allowed'}));
+
+// Sites and series are reference data in this sprint.
+server.all(['/sites', '/sites/:id', '/series', '/series/:id'], (req, res, next) =>
+  req.method === 'GET' ? next() : res.status(405).json({code: 'not-allowed'}));
+
+// Inventory items
+function itemProblem(item) {
+  const hasSize = item.widthCm !== null || item.heightCm !== null;
+  if (hasSize && !(isPositiveNumber(item.widthCm) && isPositiveNumber(item.heightCm))) return 'invalid-size';
+  if (item.packKind === null ? item.unitsPerPack !== null : !PACK_KINDS.includes(item.packKind) || !(Number.isInteger(item.unitsPerPack) && item.unitsPerPack >= 1)) {
+    return 'invalid-pack';
+  }
+  if (item.minStock !== null && !isWholeNumber(item.minStock)) return 'invalid-quantity';
+  return null;
+}
+
+function itemFields(body) {
+  const num = (v) => (v === undefined || v === null || v === '' ? null : Number(v));
+  return {
+    color: trimmed(body.color), sku: trimmed(body.sku), widthCm: num(body.widthCm), heightCm: num(body.heightCm),
+    packKind: body.packKind ?? null, unitsPerPack: num(body.unitsPerPack), minStock: num(body.minStock),
+  };
+}
+
+server.post('/inventory-items', (req, res) => {
+  const {glassTypeId = null, productId = null} = req.body ?? {};
+  const owner = glassTypeId !== null
+    ? productId === null && db.get('glass-types').find({id: glassTypeId}).value()
+    : db.get('products').find({id: productId}).value();
+  if (!owner) return res.status(400).json({code: 'invalid-item'});
+  const fields = itemFields(req.body);
+  const problem = itemProblem(fields);
+  if (problem) return res.status(400).json({code: problem});
+  const duplicate = db.get('inventory-items').find(i => (i.glassTypeId ?? null) === glassTypeId && (i.productId ?? null) === productId
+    && trimmed(i.color).toLowerCase() === fields.color.toLowerCase()
+    && (i.widthCm ?? null) === fields.widthCm && (i.heightCm ?? null) === fields.heightCm).value();
+  if (duplicate) return res.status(409).json({code: 'duplicate-item'});
+  const item = {id: nextId('inventory-items'), glassTypeId, productId, ...fields};
+  db.get('inventory-items').push(item).write();
+  res.status(201).json(item);
+});
+
+// Details may change; the product or glass type an item belongs to may not.
+server.all('/inventory-items/:id', (req, res, next) => {
+  if (req.method === 'DELETE') return res.status(405).json({code: 'not-allowed'});
+  if (!['PUT', 'PATCH'].includes(req.method)) return next();
+  const existing = db.get('inventory-items').find({id: Number(req.params.id)}).value();
+  if (!existing) return res.status(404).json({code: 'not-found'});
+  const fields = itemFields({...existing, ...req.body});
+  const problem = itemProblem(fields);
+  if (problem) return res.status(400).json({code: problem});
+  const updated = {id: existing.id, glassTypeId: existing.glassTypeId ?? null, productId: existing.productId ?? null, ...fields};
+  db.set('inventory-items', db.get('inventory-items').map(i => (i.id === existing.id ? updated : i)).value()).write();
+  res.json(updated);
+});
+
+// Stock levels: quantities change only through movements; "en camino" and notes are typed by hand.
+function levelFlags(body) {
+  const out = {};
+  if (body?.inTransit !== undefined) out.inTransit = body.inTransit === true;
+  if (body?.notes !== undefined) out.notes = trimmed(body.notes).slice(0, MAX_NOTES);
+  return out;
+}
+
+function findLevel(itemId, siteId) {
+  return db.get('stock-levels').find({itemId, siteId}).value();
+}
+
+function siteAndItemExist(itemId, siteId) {
+  return db.get('inventory-items').find({id: itemId}).value() && db.get('sites').find({id: siteId}).value();
+}
+
+// Creates the level of an item never counted in a site; if it already exists, the flags are applied to it.
+server.post('/stock-levels', (req, res) => {
+  const {itemId, siteId} = req.body ?? {};
+  if (!siteAndItemExist(itemId, siteId)) return res.status(400).json({code: 'invalid-level'});
+  const existing = findLevel(itemId, siteId);
+  if (existing) {
+    const updated = {...existing, ...levelFlags(req.body)};
+    db.get('stock-levels').find({id: existing.id}).assign(updated).write();
+    return res.json(updated);
+  }
+  const level = {id: nextId('stock-levels'), itemId, siteId, quantity: null, inTransit: false, notes: '', ...levelFlags(req.body)};
+  db.get('stock-levels').push(level).write();
+  res.status(201).json(level);
+});
+
+server.all('/stock-levels/:id', (req, res, next) => {
+  if (['PUT', 'DELETE'].includes(req.method)) return res.status(405).json({code: 'not-allowed'});
+  if (req.method !== 'PATCH') return next();
+  const existing = db.get('stock-levels').find({id: Number(req.params.id)}).value();
+  if (!existing) return res.status(404).json({code: 'not-found'});
+  const updated = {...existing, ...levelFlags(req.body)};
+  db.get('stock-levels').find({id: existing.id}).assign(updated).write();
+  res.json(updated);
+});
+
+// Movements: a COUNT sets the quantity counted, an ADJUSTMENT adds or removes units.
+server.post('/stock-movements', (req, res) => {
+  const {itemId, siteId, kind, quantity, reason} = req.body ?? {};
+  if (!siteAndItemExist(itemId, siteId) || !MOVEMENT_KINDS.includes(kind)) return res.status(400).json({code: 'invalid-movement'});
+  const level = findLevel(itemId, siteId);
+  const current = level?.quantity ?? null;
+  let after;
+  if (kind === 'COUNT') {
+    if (!isWholeNumber(quantity)) return res.status(400).json({code: 'invalid-quantity'});
+    after = quantity;
+  } else {
+    if (!Number.isInteger(quantity) || quantity === 0 || (current ?? 0) + quantity < 0) return res.status(400).json({code: 'invalid-adjustment'});
+    after = (current ?? 0) + quantity;
+  }
+  let saved;
+  if (level) {
+    saved = {...level, quantity: after};
+    db.get('stock-levels').find({id: level.id}).assign(saved).write();
+  } else {
+    saved = {id: nextId('stock-levels'), itemId, siteId, quantity: after, inTransit: false, notes: ''};
+    db.get('stock-levels').push(saved).write();
+  }
+  const cleanReason = trimmed(reason).slice(0, MAX_REASON);
+  const movement = {
+    id: nextId('stock-movements'), itemId, siteId, kind, delta: after - (current ?? 0), quantityAfter: after,
+    ...(cleanReason ? {reason: cleanReason} : {}), at: new Date().toISOString(), by: actor(req.currentUser),
+  };
+  db.get('stock-movements').push(movement).write();
+  res.status(201).json({movement, level: saved});
+});
+
+server.get('/stock-movements', (req, res) => {
+  const itemId = req.query.itemId ? Number(req.query.itemId) : null;
+  res.json(db.get('stock-movements').filter(m => itemId === null || m.itemId === itemId)
+    .orderBy(['at', 'id'], ['desc', 'desc']).value());
+});
+server.all('/stock-movements/:id', (req, res, next) => (req.method === 'GET' ? next() : res.status(405).json({code: 'not-allowed'})));
+server.all('/stock-movements', (req, res) => res.status(405).json({code: 'not-allowed'}));
 
 // ── quotes ───────────────────────────────────────────────────────────────
 // Sellers and warehouse staff see only their own quotes; the CEO sees all.
