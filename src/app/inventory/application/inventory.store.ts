@@ -210,6 +210,13 @@ export class InventoryStore {
 
   clearError(): void { this.errorSignal.set(null); }
 
+  /** Takes the stock levels changed by a registered purchase, so the inventory shows the new units at once. */
+  applyPurchaseLevels(levels: readonly StockLevel[]): void {
+    if (!levels.length) return;
+    levels.forEach(level => this.putLevel(level));
+    this.movementsSignal.update(n => n + 1);
+  }
+
   private record(command: MovementCommand): void {
     this.save(this.api.recordMovement(command), ({level}) => {
       this.putLevel(level);

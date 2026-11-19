@@ -29,6 +29,15 @@ export interface InventoryRow {
 }
 
 /**
+ * True when every word typed appears somewhere in the row, in any order:
+ * "pestillo negro" finds "Pestillo · Alemar · Negro".
+ */
+export function matchesSearch(row: Pick<InventoryRow, 'searchText'>, term: string): boolean {
+  const words = term.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  return words.every(word => row.searchText.includes(word));
+}
+
+/**
  * Joins inventory items with the catalog (glass types and products) so the
  * inventory screen and its dialogs show the same names.
  */

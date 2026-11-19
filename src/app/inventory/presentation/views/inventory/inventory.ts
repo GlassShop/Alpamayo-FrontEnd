@@ -9,7 +9,7 @@ import {CatalogStore} from '../../../../catalog/application/catalog.store';
 import {ProductsStore} from '../../../../catalog/application/products.store';
 import {CatalogTab, catalogTabs} from '../../../../catalog/presentation/catalog-tabs';
 import {TabBar} from '../../../../shared/presentation/components/tab-bar/tab-bar';
-import {InventoryRows} from '../../inventory-rows';
+import {InventoryRows, matchesSearch} from '../../inventory-rows';
 import {StockDialog, StockDialogData} from '../../components/stock-dialog/stock-dialog';
 import {ItemDialog, ItemDialogData} from '../../components/item-dialog/item-dialog';
 import {MovementsPanel} from '../../components/movements-panel/movements-panel';
@@ -63,7 +63,7 @@ export class Inventory implements OnInit {
     const site = this.siteId();
     return this.rowsService.rows().filter(row => {
       if (row.category !== this.tab()) return false;
-      if (term && !row.searchText.includes(term)) return false;
+      if (term && !matchesSearch(row, term)) return false;
       const stock = row.stock.filter(s => site === null || s.siteId === site);
       if (filter === 'TO_BUY') return stock.some(s => s.status === 'OUT' || s.status === 'LOW');
       if (filter === 'UNKNOWN') return stock.some(s => s.status === 'UNKNOWN');

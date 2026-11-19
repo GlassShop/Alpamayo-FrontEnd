@@ -35,7 +35,7 @@
               <td class="mp-date">{{ m.at | date:'dd/MM/yyyy HH:mm' }}</td>
               <td>{{ itemName(m.itemId) }}</td>
               <td>{{ siteName(m.siteId) }}</td>
-              <td>{{ (m.kind === 'COUNT' ? 'inventory.stock.mode.COUNT' : m.delta > 0 ? 'inventory.stock.mode.IN' : 'inventory.stock.mode.OUT') | translate }}</td>
+              <td>{{ (m.kind === 'PURCHASE' ? 'inventory.movements.kinds.PURCHASE' : m.kind === 'COUNT' ? 'inventory.stock.mode.COUNT' : m.delta > 0 ? 'inventory.stock.mode.IN' : 'inventory.stock.mode.OUT') | translate }}</td>
               <td class="al-num mp-delta" [class.mp-in]="m.delta > 0" [class.mp-out]="m.delta < 0">{{ m.delta > 0 ? '+' : '' }}{{ m.delta }}</td>
               <td class="al-num"><strong>{{ m.quantityAfter }}</strong></td>
               <td>{{ m.by.fullName }}</td>

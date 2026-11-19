@@ -3,9 +3,9 @@ import {BaseEntity} from '../../../shared/domain/model/base-entity';
 /**
  * COUNT: someone counted the item and typed the real quantity.
  * ADJUSTMENT: units added or removed (breakage, a sale outside the system…).
- * Purchases will add their own kind in the next sprint.
+ * PURCHASE: units that arrived with a registered purchase (written by the server).
  */
-export type MovementKind = 'COUNT' | 'ADJUSTMENT';
+export type MovementKind = 'COUNT' | 'ADJUSTMENT' | 'PURCHASE';
 
 /** One change of the stock of an item in a site, written by the server. Never edited or deleted. */
 export interface StockMovement extends BaseEntity {
@@ -16,6 +16,8 @@ export interface StockMovement extends BaseEntity {
   delta: number;
   quantityAfter: number;
   reason?: string;
+  /** Purchase that brought the units, for PURCHASE movements. */
+  purchaseId?: number;
   /** ISO-8601 date-time. */
   at: string;
   by: {id: number; fullName: string};

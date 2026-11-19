@@ -37,6 +37,7 @@ export interface StockMovementResource extends BaseResource {
   delta: number;
   quantityAfter: number;
   reason?: string | null;
+  purchaseId?: number | null;
   at: string;
   by: {id: number; fullName: string};
 }
