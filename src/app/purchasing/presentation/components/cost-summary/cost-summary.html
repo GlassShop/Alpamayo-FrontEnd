@@ -1,0 +1,36 @@
+@if (costs.settingsError(); as error) {
+  <div class="al-alert al-alert--error" role="alert">
+    <mat-icon>error_outline</mat-icon><span>{{ error | translate }}</span>
+    <button class="al-btn al-btn--secondary" (click)="costs.loadSettings()">{{ 'common.retry' | translate }}</button>
+  </div>
+}
+<div class="cs-grid">
+  <section class="al-card cs-card" aria-labelledby="cs-margin-title">
+    <h2 class="cs-title" id="cs-margin-title"><mat-icon>percent</mat-icon>{{ 'costs.min-margin' | translate }}</h2>
+    <div class="cs-margin-row">
+      <input class="al-input cs-margin-input" type="number" min="0" max="100" step="1" inputmode="numeric"
+             [value]="minMarginDraft()" (input)="onMinMargin($event)" (keydown.enter)="saveMinMargin()"
+             [placeholder]="'costs.min-margin-off' | translate" [attr.aria-label]="'costs.min-margin' | translate"/>
+      <span class="cs-percent">%</span>
+      <button type="button" class="al-btn al-btn--primary" (click)="saveMinMargin()" [disabled]="costs.saving()">{{ 'costs.save' | translate }}</button>
+      @if (costs.minMarginPercent() !== null) {
+        <button type="button" class="al-btn al-btn--secondary" (click)="clearMinMargin()" [disabled]="costs.saving()">{{ 'costs.turn-off' | translate }}</button>
+      }
+    </div>
+    <p class="al-hint cs-hint">
+      @if (costs.minMarginPercent() === null) { {{ 'costs.min-margin-hint-off' | translate }} }
+      @else { {{ 'costs.min-margin-hint' | translate: {count: costs.lowMarginCount(), min: costs.minMarginPercent()} }} }
+    </p>
+  </section>
+
+  @for (site of costs.siteValues(); track site.siteId) {
+    <section class="al-card cs-card">
+      <h2 class="cs-title"><mat-icon>warehouse</mat-icon>{{ siteName(site.siteId) }}</h2>
+      <p class="cs-amount">S/ {{ site.value | number:'1.2-2' }}</p>
+      <p class="al-hint cs-hint">
+        {{ 'costs.stock-value' | translate }}
+        @if (site.withoutCost) { · <span class="cs-warn">{{ 'costs.without-cost' | translate: {count: site.withoutCost} }}</span> }
+      </p>
+    </section>
+  }
+</div>

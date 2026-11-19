@@ -1,0 +1,12 @@
+:host { display: block; margin-bottom: 20px; }
+.cs-grid { display: grid; grid-template-columns: minmax(300px, 1.4fr) repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cs-card { padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; }
+.cs-title { display: flex; align-items: center; gap: 8px; margin: 0; font-size: .9rem; font-weight: 700; }
+.cs-title mat-icon { color: var(--al-primary); font-size: 20px; width: 20px; height: 20px; }
+.cs-margin-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cs-margin-input { width: 110px; text-align: right; background: var(--al-surface); }
+.cs-percent { font-weight: 700; color: var(--al-text-muted); }
+.cs-hint { margin: 0; }
+.cs-amount { margin: 0; font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.cs-warn { color: var(--al-warning); font-weight: 600; }
+@media (max-width: 600px) { .cs-grid { grid-template-columns: 1fr; } }
