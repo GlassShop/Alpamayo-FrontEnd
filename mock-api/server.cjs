@@ -63,6 +63,8 @@ function applyInventorySeed(file) {
   data['stock-levels'] ??= [];
   data['stock-movements'] ??= [];
   data['product-price-history'] ??= [];
+  data.purchases ??= [];
+  data['cost-settings'] ??= {minMarginPercent: null};
   if (JSON.stringify(data) !== before) fs.writeFileSync(file, JSON.stringify(data, null, 2));
 }
 applyInventorySeed(DB_FILE);
@@ -148,7 +150,10 @@ server.use((req, res, next) => {
     (writes && req.path.startsWith('/glass-types') && req.method !== 'POST') ||
     // Products: anyone adds one (without price); only the CEO prices them and reads their price history.
     (writes && req.path.startsWith('/products') && req.method !== 'POST') ||
-    req.path.startsWith('/product-price-history');
+    req.path.startsWith('/product-price-history') ||
+    // Purchase costs and margins: only the CEO types or reads them.
+    /^\/purchases\/\d+\/costs/.test(req.path) ||
+    req.path.startsWith('/cost-settings');
   if (ceoOnly && !isCeo) return res.status(403).json({code: 'forbidden'});
   next();
 });
@@ -466,6 +471,116 @@ server.get('/stock-movements', (req, res) => {
 });
 server.all('/stock-movements/:id', (req, res, next) => (req.method === 'GET' ? next() : res.status(405).json({code: 'not-allowed'})));
 server.all('/stock-movements', (req, res) => res.status(405).json({code: 'not-allowed'}));
+
+// ── purchases and their costs ────────────────────────────────────────────
+// Any role registers an arrival: the stock of the site goes up at once and
+// the purchase waits for its costs. Only the CEO types the dollars, exchange
+// rate, freight and Lima → Huaraz transport; the landed cost of each unit is
+// worked out here (freight and transport shared by value). Amounts are
+// removed from every answer to other roles.
+const CURRENCIES = ['PEN', 'USD'];
+const purchases = () => db.get('purchases');
+const isDate = (v) => /^\d{4}-\d{2}-\d{2}$/.test(String(v ?? ''));
+const round4 = (n) => Math.round((Number(n) + Number.EPSILON) * 10000) / 10000;
+
+function forRole(purchase, user) {
+  if (user.role === 'CEO') return purchase;
+  const {costs, costedBy, costedAt, ...rest} = purchase;
+  return {...rest, lines: purchase.lines.map(({unitPriceUsd, unitCost, ...line}) => line)};
+}
+
+function toSoles(money, rate) {
+  return money.currency === 'USD' ? money.amount * rate : money.amount;
+}
+
+/** Same rule as the frontend preview (landed-cost.ts). */
+function landedUnitCosts(lines, prices, rate, freight, transport) {
+  const values = lines.map((line, i) => line.quantity * prices[i] * rate);
+  const total = values.reduce((sum, v) => sum + v, 0);
+  const extra = toSoles(freight, rate) + toSoles(transport, rate);
+  return lines.map((line, i) => round4((values[i] + extra * (total > 0 ? values[i] / total : 0)) / line.quantity));
+}
+
+server.get('/purchases', (req, res) => {
+  res.json(purchases().orderBy(['date', 'id'], ['desc', 'desc']).value().map(p => forRole(p, req.currentUser)));
+});
+
+server.get('/purchases/:id', (req, res) => {
+  const purchase = purchases().find({id: Number(req.params.id)}).value();
+  if (!purchase) return res.status(404).json({code: 'not-found'});
+  res.json(forRole(purchase, req.currentUser));
+});
+
+server.post('/purchases', (req, res) => {
+  const {date, supplier, siteId, notes, lines} = req.body ?? {};
+  if (!isDate(date) || !trimmed(supplier) || !db.get('sites').find({id: siteId}).value()) return res.status(400).json({code: 'invalid-purchase'});
+  if (!Array.isArray(lines) || lines.length === 0) return res.status(400).json({code: 'no-lines'});
+  const itemIds = lines.map(l => l.itemId);
+  if (new Set(itemIds).size !== itemIds.length) return res.status(400).json({code: 'repeated-item'});
+  for (const line of lines) {
+    if (!db.get('inventory-items').find({id: line.itemId}).value() || !Number.isInteger(line.quantity) || line.quantity < 1) {
+      return res.status(400).json({code: 'invalid-line'});
+    }
+  }
+  const now = new Date().toISOString();
+  const purchase = {
+    id: nextId('purchases'), date, supplier: trimmed(supplier), siteId, notes: trimmed(notes).slice(0, MAX_NOTES),
+    status: 'PENDING_COST', costs: null, costedBy: null, costedAt: null, createdBy: actor(req.currentUser), createdAt: now,
+    lines: lines.map(l => ({itemId: l.itemId, quantity: l.quantity, packs: Number.isInteger(l.packs) ? l.packs : null, unitPriceUsd: null, unitCost: null})),
+  };
+  purchases().push(purchase).write();
+  // The goods are in the site now: add them to the stock and clear "en camino".
+  const levels = purchase.lines.map(line => {
+    const level = findLevel(line.itemId, siteId);
+    const before = level?.quantity ?? 0;
+    const saved = level
+      ? {...level, quantity: before + line.quantity, inTransit: false}
+      : {id: nextId('stock-levels'), itemId: line.itemId, siteId, quantity: line.quantity, inTransit: false, notes: ''};
+    if (level) db.get('stock-levels').find({id: level.id}).assign(saved).write();
+    else db.get('stock-levels').push(saved).write();
+    db.get('stock-movements').push({
+      id: nextId('stock-movements'), itemId: line.itemId, siteId, kind: 'PURCHASE', delta: line.quantity, quantityAfter: saved.quantity,
+      reason: `Compra a ${purchase.supplier}`, purchaseId: purchase.id, at: now, by: actor(req.currentUser),
+    }).write();
+    return saved;
+  });
+  res.status(201).json({purchase: forRole(purchase, req.currentUser), levels});
+});
+
+// Costs (CEO only, see the authorisation middleware). They may be corrected later; quantities may not.
+server.put('/purchases/:id/costs', (req, res) => {
+  const existing = purchases().find({id: Number(req.params.id)}).value();
+  if (!existing) return res.status(404).json({code: 'not-found'});
+  const {exchangeRate, freight, transport, unitPricesUsd} = req.body ?? {};
+  const validMoney = (m) => m && CURRENCIES.includes(m.currency) && typeof m.amount === 'number' && Number.isFinite(m.amount) && m.amount >= 0;
+  if (!isPositiveNumber(exchangeRate) || !validMoney(freight) || !validMoney(transport)
+    || !Array.isArray(unitPricesUsd) || unitPricesUsd.length !== existing.lines.length || !unitPricesUsd.every(isPositiveNumber)) {
+    return res.status(400).json({code: 'invalid-costs'});
+  }
+  const unitCosts = landedUnitCosts(existing.lines, unitPricesUsd, exchangeRate, freight, transport);
+  const updated = {
+    ...existing, status: 'COSTED',
+    costs: {exchangeRate, freight: {amount: round2(freight.amount), currency: freight.currency}, transport: {amount: round2(transport.amount), currency: transport.currency}},
+    lines: existing.lines.map((line, i) => ({...line, unitPriceUsd: unitPricesUsd[i], unitCost: unitCosts[i]})),
+    costedBy: actor(req.currentUser), costedAt: new Date().toISOString(),
+  };
+  db.set('purchases', purchases().map(p => (p.id === existing.id ? updated : p)).value()).write();
+  res.json(updated);
+});
+
+server.all(['/purchases', '/purchases/:id', '/purchases/:id/costs'], (req, res) => res.status(405).json({code: 'not-allowed'}));
+
+// Minimum margin that raises the low-margin warning (CEO only); null keeps it off.
+server.get('/cost-settings', (req, res) => res.json(db.get('cost-settings').value() ?? {minMarginPercent: null}));
+server.put('/cost-settings', (req, res) => {
+  const {minMarginPercent} = req.body ?? {};
+  if (minMarginPercent !== null && !(typeof minMarginPercent === 'number' && minMarginPercent >= 0 && minMarginPercent <= 100)) {
+    return res.status(400).json({code: 'invalid-margin'});
+  }
+  db.set('cost-settings', {minMarginPercent}).write();
+  res.json({minMarginPercent});
+});
+server.all('/cost-settings', (req, res) => res.status(405).json({code: 'not-allowed'}));
 
 // ── quotes ───────────────────────────────────────────────────────────────
 // Sellers and warehouse staff see only their own quotes; the CEO sees all.
