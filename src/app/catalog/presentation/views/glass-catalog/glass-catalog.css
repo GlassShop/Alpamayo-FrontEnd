@@ -1,5 +1,6 @@
 :host { display: block; max-width: 1280px; }
 a.al-btn { text-decoration: none; }
+.gc-tabs { margin-bottom: 16px; }
 .gc-glass { display: flex; align-items: center; gap: 14px; }
 .gc-icon {
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;

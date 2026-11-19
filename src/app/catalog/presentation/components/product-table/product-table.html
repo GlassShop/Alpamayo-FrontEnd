@@ -1,0 +1,88 @@
+<section class="al-card">
+  <div class="al-card-header pt-header">
+    <h2 class="al-card-title"><mat-icon>sell</mat-icon>{{ ('catalog.tabs.' + category()) | translate }}</h2>
+    <div class="pt-filters">
+      <label>
+        <span class="sr-only">{{ 'catalog.products.search' | translate }}</span>
+        <input class="al-input pt-search" type="search" [value]="search()" (input)="onSearch($event)"
+               [placeholder]="'catalog.products.search' | translate"/>
+      </label>
+      @if (isSeries()) {
+        <label>
+          <span class="sr-only">{{ 'catalog.products.series' | translate }}</span>
+          <select class="al-select pt-select" (change)="onSeries($event)" [attr.aria-label]="'catalog.products.series' | translate">
+            <option value="" [selected]="seriesId() === null">{{ 'catalog.products.all-series' | translate }}</option>
+            @for (s of products.series(); track s.id) {
+              <option [value]="s.id" [selected]="seriesId() === s.id">{{ s.name }}</option>
+            }
+          </select>
+        </label>
+      }
+      <label class="pt-check">
+        <input type="checkbox" [checked]="onlyMissing()" (change)="onlyMissing.set($any($event.target).checked)"/>
+        {{ 'catalog.products.only-missing' | translate }}
+      </label>
+    </div>
+  </div>
+  <p class="al-muted pt-help">
+    {{ (editable() ? 'catalog.products.help-edit' : 'catalog.products.help') | translate: {unit: (unitKey() | translate)} }}
+    @if (missing(); as count) {
+      <span class="al-pill al-pill--warning">{{ 'catalog.missing' | translate: {count} }}</span>
+    }
+  </p>
+
+  <div class="al-table-wrapper">
+    <table class="al-table">
+      <thead>
+        <tr>
+          <th>{{ 'catalog.products.code' | translate }}</th>
+          <th>{{ 'catalog.products.product' | translate }}</th>
+          <th>{{ (isSeries() ? 'catalog.products.series' : category() === 'ALUMINUM_TRADITIONAL' ? 'catalog.products.weight' : 'catalog.products.brand') | translate }}</th>
+          <th class="al-num">{{ 'catalog.products.public-price' | translate }} <span class="pt-unit">/ {{ unitKey() | translate }}</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (product of rows(); track product.id) {
+          <tr>
+            <td class="pt-code">{{ product.code || '—' }}</td>
+            <td class="pt-name">{{ product.name }}</td>
+            <td class="pt-details">
+              @if (product.weightClass) { {{ ('catalog.products.weight-class.' + product.weightClass) | translate }} }
+              @else { {{ details(product) || '—' }} }
+            </td>
+            <td class="al-num pt-price">
+              @if (editable()) {
+                <div class="pt-cell">
+                  <input class="al-input pt-input" type="number" min="0.01" step="0.01" inputmode="decimal"
+                         [value]="product.publicPrice?.toFixed(2) ?? ''"
+                         [placeholder]="'catalog.prices.unset' | translate"
+                         [attr.aria-label]="product.name + ' — ' + ('catalog.products.public-price' | translate)"
+                         (change)="onPriceCommit(product, $event)" (keydown.enter)="$any($event.target).blur()"/>
+                  @if (history.hasHistory(product.id)) {
+                    <button type="button" class="al-icon-btn" (click)="showHistory(product.id)"
+                            [matTooltip]="'catalog.history.see' | translate"
+                            [attr.aria-label]="('catalog.history.see' | translate) + ': ' + product.name">
+                      <mat-icon>history</mat-icon>
+                    </button>
+                  } @else { <span class="pt-gap" aria-hidden="true"></span> }
+                </div>
+              } @else if (product.publicPrice !== null) {
+                S/ {{ product.publicPrice | number:'1.2-2' }}
+              } @else {
+                <span class="al-muted">{{ 'catalog.prices.unset' | translate }}</span>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="4" class="pt-empty">{{ 'catalog.products.empty' | translate }}</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  @if (filtered().length > rows().length) {
+    <div class="pt-more">
+      <span class="al-muted">{{ 'catalog.products.showing' | translate: {shown: rows().length, total: filtered().length} }}</span>
+      <button type="button" class="al-btn al-btn--secondary" (click)="showMore()">{{ 'catalog.products.show-more' | translate }}</button>
+    </div>
+  }
+</section>

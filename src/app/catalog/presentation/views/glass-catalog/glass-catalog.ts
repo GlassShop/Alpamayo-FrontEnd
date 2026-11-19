@@ -1,26 +1,41 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {DecimalPipe} from '@angular/common';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {RouterLink} from '@angular/router';
 import {MatIconModule} from '@angular/material/icon';
 import {TranslatePipe} from '@ngx-translate/core';
 import {CatalogStore} from '../../../application/catalog.store';
+import {ProductsStore} from '../../../application/products.store';
 import {IamStore} from '../../../../iam/application/iam.store';
+import {TabBar} from '../../../../shared/presentation/components/tab-bar/tab-bar';
+import {ProductTable} from '../../components/product-table/product-table';
+import {NewProductForm} from '../../components/new-product-form/new-product-form';
+import {CatalogTab, catalogTabs} from '../../catalog-tabs';
 
 /**
- * Catalog for every role: glass types with their price in each list.
- * Staff with `catalog.add-product` can add a glass type; it stays
- * "Sin precio" until the CEO prices it.
+ * Catalog for every role: glass types with their price in each list, and
+ * the other sale products (aluminium, accessories, acrylics…) with their
+ * public price. Staff with `catalog.add-product` can add glass types and
+ * products; they stay "Sin precio" until the CEO prices them.
  */
 @Component({
   selector: 'app-glass-catalog',
-  imports: [DecimalPipe, ReactiveFormsModule, RouterLink, TranslatePipe, MatIconModule],
+  imports: [DecimalPipe, ReactiveFormsModule, RouterLink, TranslatePipe, MatIconModule, TabBar, ProductTable, NewProductForm],
   templateUrl: './glass-catalog.html',
   styleUrl: './glass-catalog.css'
 })
 export class GlassCatalog implements OnInit {
   readonly catalog = inject(CatalogStore);
+  readonly products = inject(ProductsStore);
   readonly iam = inject(IamStore);
+
+  readonly tab = signal<CatalogTab>('GLASS');
+  readonly tabs = computed(() => catalogTabs(() => null));
+  /** The tab as a product category, or null on the glass tab. */
+  readonly productCategory = computed(() => {
+    const tab = this.tab();
+    return tab === 'GLASS' ? null : tab;
+  });
 
   readonly glassForm = new FormGroup({
     name:        new FormControl('', {nonNullable: true, validators: [Validators.required]}),
@@ -28,7 +43,10 @@ export class GlassCatalog implements OnInit {
     color:       new FormControl('', {nonNullable: true})
   });
 
-  ngOnInit(): void { this.catalog.ensureLoaded(); }
+  ngOnInit(): void {
+    this.catalog.ensureLoaded();
+    this.products.ensureLoaded();
+  }
 
   /** How many price lists still have no price for this glass type. */
   missingPrices(glassTypeId: number): number {

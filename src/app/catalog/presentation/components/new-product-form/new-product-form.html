@@ -1,0 +1,34 @@
+<form class="al-card" [formGroup]="form" (ngSubmit)="submit()" aria-labelledby="np-title">
+  <div class="al-card-header">
+    <h2 class="al-card-title" id="np-title"><mat-icon>add_box</mat-icon>{{ ('catalog.products.new.' + category()) | translate }}</h2>
+  </div>
+  <div class="al-card-body">
+    <div class="np-row">
+      @if (needsSeries()) {
+        <label class="al-field np-short"><span class="al-label">{{ 'catalog.products.series' | translate }}</span>
+          <select class="al-select" formControlName="seriesId">
+            <option [ngValue]="null" disabled>{{ 'catalog.products.choose-series' | translate }}</option>
+            @for (s of products.series(); track s.id) { <option [ngValue]="s.id">{{ s.name }}</option> }
+          </select>
+        </label>
+      }
+      <label class="al-field np-short"><span class="al-label">{{ 'catalog.products.code' | translate }} ({{ 'agenda.optional' | translate }})</span>
+        <input class="al-input" formControlName="code" [placeholder]="'catalog.products.code-example' | translate"/></label>
+      <label class="al-field np-wide"><span class="al-label">{{ 'catalog.products.name' | translate }}</span>
+        <input class="al-input" formControlName="name" [placeholder]="('catalog.products.name-example.' + category()) | translate"/></label>
+      @if (hasBrand()) {
+        <label class="al-field np-short"><span class="al-label">{{ 'catalog.products.brand' | translate }} ({{ 'agenda.optional' | translate }})</span>
+          <input class="al-input" formControlName="brand" placeholder="Parma"/></label>
+      }
+      @if (hasWeight()) {
+        <label class="al-field np-short"><span class="al-label">{{ 'catalog.products.weight' | translate }}</span>
+          <select class="al-select" formControlName="weightClass">
+            @for (w of weightClasses; track w) { <option [value]="w">{{ ('catalog.products.weight-class.' + w) | translate }}</option> }
+          </select>
+        </label>
+      }
+      <button class="al-btn al-btn--primary np-add" type="submit" [disabled]="products.saving()"><mat-icon>add</mat-icon>{{ 'catalog.products.add' | translate }}</button>
+    </div>
+    <p class="al-muted np-hint">{{ (iam.can('prices.manage') ? 'catalog.products.new-hint-ceo' : 'catalog.products.new-hint') | translate }}</p>
+  </div>
+</form>

@@ -1,0 +1,55 @@
+<section class="al-card" id="product-price-history" aria-labelledby="pph-title">
+  <div class="al-card-header ph-header">
+    <h2 class="al-card-title" id="pph-title"><mat-icon>history</mat-icon>{{ 'catalog.history.title' | translate }}</h2>
+    @if (history.isFiltered()) {
+      <button type="button" class="al-btn al-btn--secondary ph-all" (click)="showCategory()">{{ 'catalog.history.show-all' | translate }}</button>
+    }
+  </div>
+
+  @if (history.error()) {
+    <div class="al-empty al-empty--error">
+      <mat-icon>cloud_off</mat-icon>{{ 'catalog.history.error' | translate }}
+      <button class="al-btn al-btn--secondary" (click)="history.load()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else if (history.loading() && history.changes().length === 0) {
+    <div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div>
+  } @else {
+    <div class="al-table-wrapper ph-scroll">
+      <table class="al-table">
+        <thead>
+          <tr>
+            <th>{{ 'quotes.date' | translate }}</th>
+            <th>{{ 'catalog.products.product' | translate }}</th>
+            <th class="al-num">{{ 'catalog.history.change' | translate }}</th>
+            <th class="al-num">%</th>
+            <th>{{ 'catalog.history.by' | translate }}</th>
+            <th>{{ 'catalog.history.reason' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (change of history.changes(); track change.id) {
+            <tr>
+              <td class="ph-date">{{ change.changedAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ change.label }}</td>
+              <td class="al-num ph-values">
+                @if (change.previousPrice !== null) { <span class="al-muted">S/ {{ change.previousPrice | number:'1.2-2' }}</span> → }
+                <strong>S/ {{ change.newPrice | number:'1.2-2' }}</strong>
+              </td>
+              <td class="al-num">
+                @if (percent(change); as p) {
+                  <span [class.ph-up]="p > 0" [class.ph-down]="p < 0">{{ p > 0 ? '+' : '' }}{{ p | number:'1.1-1' }}%</span>
+                } @else if (change.previousPrice === null) {
+                  <span class="al-pill al-pill--success">{{ 'catalog.history.first' | translate }}</span>
+                } @else { <span class="al-muted">0.0%</span> }
+              </td>
+              <td>{{ change.changedBy.fullName }}</td>
+              <td class="ph-reason">{{ change.reason ?? '—' }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="ph-empty">{{ 'catalog.history.empty' | translate }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

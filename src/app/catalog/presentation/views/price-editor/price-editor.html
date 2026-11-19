@@ -3,9 +3,42 @@
     <h1 class="al-page-title">{{ 'catalog.prices.title' | translate }}</h1>
     <p class="al-page-subtitle">{{ 'catalog.prices.subtitle' | translate }}</p>
   </div>
-  @if (catalog.saving()) { <span class="pe-saving"><mat-icon>sync</mat-icon>{{ 'common.saving' | translate }}</span> }
+  @if (catalog.saving() || products.saving()) { <span class="pe-saving"><mat-icon>sync</mat-icon>{{ 'common.saving' | translate }}</span> }
 </header>
 
+<app-tab-bar class="pe-tabs" idPrefix="pe" [tabs]="tabs()" [active]="tab()" (selected)="selectTab($event)"
+             [label]="'catalog.prices.title' | translate"/>
+
+<div role="tabpanel" id="pe-panel" [attr.aria-labelledby]="'pe-tab-' + tab()">
+@if (productCategory(); as category) {
+  @if (products.error(); as error) {
+    <div class="al-alert al-alert--error" role="alert">
+      <mat-icon>error_outline</mat-icon><span>{{ error | translate }}</span>
+      @if (error === 'catalog.products.error.load') {
+        <button class="al-btn al-btn--secondary" (click)="products.load()">{{ 'common.retry' | translate }}</button>
+      } @else {
+        <button class="al-icon-btn" (click)="products.clearError()" [attr.aria-label]="'common.close' | translate"><mat-icon>close</mat-icon></button>
+      }
+    </div>
+  }
+  @if (products.loaded()) {
+    <section class="al-card pe-reason pe-reason--card">
+      <div class="al-field">
+        <label class="al-label" for="pe-product-reason">{{ 'catalog.history.reason-label' | translate }}</label>
+        <input class="al-input" id="pe-product-reason" maxlength="140" [value]="reason()" (input)="onReason($event)"
+               [placeholder]="'catalog.history.reason-example' | translate" aria-describedby="pe-product-reason-hint"/>
+        <span class="al-hint" id="pe-product-reason-hint">{{ 'catalog.history.reason-hint' | translate }}</span>
+      </div>
+      @if (reason()) {
+        <button type="button" class="al-btn al-btn--secondary pe-reason-clear" (click)="reason.set('')">{{ 'catalog.history.clear-reason' | translate }}</button>
+      }
+    </section>
+    <app-product-table [category]="category" [editable]="true" [reason]="reason()"/>
+    <app-product-price-history-panel/>
+  } @else if (products.loading()) {
+    <section class="al-card"><div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div></section>
+  }
+} @else {
 @if (catalog.error(); as error) {
   <div class="al-alert al-alert--error" role="alert">
     <mat-icon>error_outline</mat-icon>
@@ -89,3 +122,5 @@
 } @else if (catalog.loading()) {
   <section class="al-card"><div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div></section>
 }
+}
+</div>

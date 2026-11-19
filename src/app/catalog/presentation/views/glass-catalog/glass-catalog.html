@@ -8,6 +8,28 @@
   }
 </header>
 
+<app-tab-bar class="gc-tabs" idPrefix="gc" [tabs]="tabs()" [active]="tab()" (selected)="tab.set($event)"
+             [label]="'catalog.title' | translate"/>
+
+<div role="tabpanel" id="gc-panel" class="gc-panel" [attr.aria-labelledby]="'gc-tab-' + tab()">
+@if (productCategory(); as category) {
+  @if (products.error(); as error) {
+    <div class="al-alert al-alert--error" role="alert">
+      <mat-icon>error_outline</mat-icon><span>{{ error | translate }}</span>
+      @if (error === 'catalog.products.error.load') {
+        <button class="al-btn al-btn--secondary" (click)="products.load()">{{ 'common.retry' | translate }}</button>
+      } @else {
+        <button class="al-icon-btn" (click)="products.clearError()" [attr.aria-label]="'common.close' | translate"><mat-icon>close</mat-icon></button>
+      }
+    </div>
+  }
+  @if (products.loaded()) {
+    <app-product-table [category]="category"/>
+    @if (iam.can('catalog.add-product')) { <app-new-product-form [category]="category"/> }
+  } @else if (products.loading()) {
+    <section class="al-card"><div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div></section>
+  }
+} @else {
 @if (catalog.error(); as error) {
   @if (error !== 'catalog.error.load') {
     <div class="al-alert al-alert--error" role="alert">
@@ -88,3 +110,5 @@
     </div>
   </form>
 }
+}
+</div>

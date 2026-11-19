@@ -1,0 +1,7 @@
+:host { display: block; margin-top: 24px; }
+.np-row { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.np-short { flex: 0 1 180px !important; min-width: 150px; }
+.np-wide { flex: 1 1 260px; }
+.np-add { flex-shrink: 0; }
+.np-hint { margin: 0; font-size: .8rem; }
+@media (max-width: 640px) { .np-short { flex: 1 1 100% !important; } .np-add { width: 100%; } }
