@@ -1,18 +1,26 @@
 <header class="al-page-header">
   <div>
-    <h1 class="al-page-title">{{ 'catalog.title' | translate }}</h1>
-    <p class="al-page-subtitle">{{ 'catalog.subtitle' | translate }}</p>
+    <h1 class="al-page-title">{{ (editing() ? 'catalog.prices.title' : 'catalog.title') | translate }}</h1>
+    <p class="al-page-subtitle">{{ (editing() ? 'catalog.prices.subtitle' : 'catalog.subtitle') | translate }}</p>
   </div>
-  @if (iam.can('prices.manage')) {
-    <a class="al-btn al-btn--secondary" routerLink="/catalogo/precios"><mat-icon>price_change</mat-icon>{{ 'catalog.go-prices' | translate }}</a>
-  }
+  <div class="gc-actions">
+    @if (editing() && (catalog.saving() || products.saving())) { <span class="gc-saving"><mat-icon>sync</mat-icon>{{ 'common.saving' | translate }}</span> }
+    @if (canEditPrices) {
+      <button type="button" class="al-btn" [class.al-btn--primary]="editing()" [class.al-btn--secondary]="!editing()"
+              [attr.aria-pressed]="editing()" (click)="toggleEditing()">
+        <mat-icon>{{ editing() ? 'check' : 'price_change' }}</mat-icon>{{ (editing() ? 'catalog.done-editing' : 'catalog.edit-prices') | translate }}
+      </button>
+    }
+  </div>
 </header>
 
 <app-tab-bar class="gc-tabs" idPrefix="gc" [tabs]="tabs()" [active]="tab()" (selected)="tab.set($event)"
              [label]="'catalog.title' | translate"/>
 
 <div role="tabpanel" id="gc-panel" class="gc-panel" [attr.aria-labelledby]="'gc-tab-' + tab()">
-@if (productCategory(); as category) {
+@if (editing()) {
+  <app-price-editor [tab]="tab()"/>
+} @else if (productCategory(); as category) {
   @if (products.error(); as error) {
     <div class="al-alert al-alert--error" role="alert">
       <mat-icon>error_outline</mat-icon><span>{{ error | translate }}</span>

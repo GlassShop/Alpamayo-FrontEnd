@@ -1,4 +1,4 @@
-import {Component, computed, inject, OnInit, signal} from '@angular/core';
+import {Component, computed, effect, inject, input, OnInit, signal} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
@@ -10,20 +10,20 @@ import {ProductPriceHistoryStore} from '../../../application/product-price-histo
 import {PriceHistoryPanel} from '../../components/price-history-panel/price-history-panel';
 import {ProductTable} from '../../components/product-table/product-table';
 import {ProductPriceHistoryPanel} from '../../components/product-price-history-panel/product-price-history-panel';
-import {TabBar} from '../../../../shared/presentation/components/tab-bar/tab-bar';
-import {CatalogTab, catalogTabs} from '../../catalog-tabs';
+import {CatalogTab} from '../../catalog-tabs';
 
 /**
- * CEO view (permission `prices.manage`): sets the price per square foot of
- * every glass type in every price list, creates price lists, sets the public
- * price of the other products (aluminium, accessories, acrylics…) and reviews
- * both price histories. New glass types and products are added from the
- * catalog page by any role.
+ * The catalog in "Editar precios" mode (CEO, permission `prices.manage`):
+ * sets the price per square foot of every glass type in every price list,
+ * creates price lists, sets the public price of the other products
+ * (aluminium, accessories, acrylics…) and reviews both price histories, for
+ * the tab chosen in the catalog. New glass types and products are added in
+ * the normal mode by any role.
  */
 @Component({
   selector: 'app-price-editor',
   imports: [ReactiveFormsModule, TranslatePipe, MatIconModule, MatTooltipModule, PriceHistoryPanel, ProductTable,
-    ProductPriceHistoryPanel, TabBar],
+    ProductPriceHistoryPanel],
   templateUrl: './price-editor.html',
   styleUrl: './price-editor.css'
 })
@@ -33,9 +33,8 @@ export class PriceEditor implements OnInit {
   readonly products = inject(ProductsStore);
   readonly productHistory = inject(ProductPriceHistoryStore);
 
-  readonly tab = signal<CatalogTab>('GLASS');
-  /** Each product tab shows how many products still have no price. */
-  readonly tabs = computed(() => catalogTabs(tab => tab === 'GLASS' || !this.products.loaded() ? null : this.products.missingPrices(tab)));
+  /** Tab chosen in the catalog. */
+  readonly tab = input.required<CatalogTab>();
   readonly productCategory = computed(() => {
     const tab = this.tab();
     return tab === 'GLASS' ? null : tab;
@@ -48,17 +47,19 @@ export class PriceEditor implements OnInit {
     name: new FormControl('', {nonNullable: true, validators: [Validators.required]})
   });
 
+  constructor() {
+    effect(() => {
+      const tab = this.tab();
+      if (tab !== 'GLASS') this.productHistory.showCategory(tab);
+    });
+  }
+
   ngOnInit(): void {
     this.catalog.ensureLoaded();
     this.products.ensureLoaded();
     this.history.showAll();
     this.history.load();
     this.productHistory.load();
-  }
-
-  selectTab(tab: CatalogTab): void {
-    this.tab.set(tab);
-    if (tab !== 'GLASS') this.productHistory.showCategory(tab);
   }
 
   onReason(event: Event): void { this.reason.set((event.target as HTMLInputElement).value); }

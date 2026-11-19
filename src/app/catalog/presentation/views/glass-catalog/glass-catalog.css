@@ -1,5 +1,7 @@
 :host { display: block; max-width: 1280px; }
-a.al-btn { text-decoration: none; }
+.gc-actions { display: flex; align-items: center; gap: 12px; }
+.gc-saving { display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; font-weight: 700; color: var(--al-primary); }
+.gc-saving mat-icon { font-size: 18px; width: 18px; height: 18px; }
 .gc-tabs { margin-bottom: 16px; }
 .gc-glass { display: flex; align-items: center; gap: 14px; }
 .gc-icon {
