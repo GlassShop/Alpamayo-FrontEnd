@@ -121,7 +121,7 @@ Registro del trabajo hecho con Claude Code a partir de este prompt, actualizado 
 | 3. Inicio de sesión activo | Cumplido. Sesión de 8 horas, sin registro público | `src/app/iam` |
 | 4. Cada ruta protegida con guardia y rol | Cumplida. Guardia de sesión y guardia de permiso en todas las rutas | `src/app/app.routes.ts`, `iam/domain/model/permission.ts` |
 | 5. Código en inglés, textos en español con traducciones | Cumplida. Español e inglés | `public/i18n/es.json`, `en.json` |
-| 6. Pruebas en cada tienda y regla de cálculo | Cumplida. 202 pruebas automáticas, todas pasan | `npm test` |
+| 6. Pruebas en cada tienda y regla de cálculo | Cumplida. 233 pruebas automáticas, todas pasan | `npm test` |
 | 7. Un sprint por vez, con plan aprobado | Cumplida | Este registro |
 | 8. Preguntar lo que falta, no inventarlo | Cumplida. Las decisiones están abajo | Sección «Decisiones del negocio» |
 
@@ -212,6 +212,17 @@ Parte de rehacer el Excel anterior de Dylan (`Vidrieria-Alpamayo-1.xlsm`) y su h
 - Correcciones a la hoja al cargarla (anotadas para Dylan): precios público y plancha intercambiados en el incoloro semidoble, cantidad «19-19», medidas de acrílicos autocompletadas (181…187 × 120), nombres con errores en la Serie 25 y un código «2» en el policarbonato. Cuando un producto tenía precios distintos por color o por sede, se tomó el mayor.
 - Commits: `729e831`, `b283860`, `ec0c8ce`, `45cda8d`, `3c75257`, `4e3f885`, `567316b`, `6fe91a8`, `8c98d5e`, `d8477ea`.
 
+### 11. Compras y costo real
+
+- **Compras** (`/compras`, todos los roles): se registra la llegada con proveedor, fecha, sede y artículos, en unidades o en empaques (3 jabas × 20 = 60 planchas). Si el artículo aún no tiene su empaque, se elige ahí mismo (jaba, paquete o caja y cuántas unidades trae) y queda guardado para la próxima compra. Al guardar, el stock de la sede sube con un movimiento **Compra** y se quita la marca «en camino». La compra queda **«Costo pendiente»**.
+- **Costos de la compra** (solo CEO): tipo de cambio, precio en **dólares** por unidad, **flete** y **transporte Lima → Huaraz** (cada uno en S/ o US$). Flete y transporte se reparten **según el valor** de cada línea; el **costo por unidad puesto en almacén** se ve antes de guardar y lo calcula y guarda la API. Se pueden corregir después; las cantidades no (para eso, un ajuste de inventario).
+- **Costos y márgenes** (`/inventario/costos`, solo CEO): por artículo, último costo, el anterior con su variación, el promedio ponderado por unidades y el **margen** frente al precio público: (precio − costo) / precio. El vidrio se compara **por pie²** con la lista Pública. Una subida de costo se marca en rojo.
+- **Margen mínimo** que fija el CEO: los artículos por debajo se resaltan y cada pestaña cuenta cuántos hay. Sin mínimo, no hay aviso.
+- **Valor del stock por sede** al costo promedio, con cuántos artículos con stock todavía no tienen costo.
+- **Seguridad**: la API de prueba quita dólares, tipo de cambio, flete y costos de toda respuesta a Vendedora y Almacén; no basta con esconderlos en pantalla.
+- La búsqueda de inventario, compras y costos encuentra cada palabra en cualquier orden («pestillo negro»).
+- Datos: las planchas escritas como 214 × 330 en una sede y 330 × 214 en la otra eran dos artículos; ahora son uno (medida mayor primero), con stock en las dos sedes.
+
 ## Decisiones del negocio
 
 Tomadas por Dylan durante los sprints. Si alguna cambia, hay que avisar antes de tocar el código.
@@ -237,15 +248,17 @@ Tomadas por Dylan durante los sprints. Si alguna cambia, hay que avisar antes de
 | Precio de productos | Un precio público por producto (no por color), IGV incluido; lo fija el CEO |
 | Cotizar proyectos | Con los precios al público del catálogo más mano de obra; la vendedora solo pone medidas, serie y hojas (fijas, corredizas, proyectantes) y ve el precio final |
 | Inventario | Por artículo exacto (color y medida) y por sede: Principal y Almacén Los Libertadores. Stock en unidades; el empaque (jaba, paquete, caja) solo al ingresar |
-| Inventario: permisos | Vendedora y Almacén ven y registran cantidades y jabas; solo el CEO verá dólares, flete y márgenes (sprint 11) |
-| Costos (sprint 11) | Precio en dólares, tipo de cambio, flete y transporte Lima → Huaraz por envío, repartidos según el valor; se muestran el último costo y el promedio |
+| Inventario: permisos | Vendedora y Almacén ven y registran cantidades y jabas; solo el CEO ve dólares, flete y márgenes |
+| Costos | Precio en dólares, tipo de cambio, flete y transporte Lima → Huaraz por envío, repartidos según el valor; IGV incluido; se muestran el último costo y el promedio |
+| Compras: sede | Cada compra llega a una sola sede; si un envío se reparte, se registran dos llegadas |
+| Margen mínimo | Lo fija el CEO; mientras no lo ponga, no hay aviso de margen bajo |
 
 ## Cómo probarlo
 
 ```bash
 npm ci
 npm run dev     # API de prueba (puerto 3000) + app (http://localhost:4200)
-npm test        # 202 pruebas automáticas
+npm test        # 233 pruebas automáticas
 npm run build   # build de producción sin errores ni advertencias
 ```
 
