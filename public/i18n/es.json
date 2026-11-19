@@ -134,7 +134,6 @@
       "duplicate-list": "Ya existe una lista con ese nombre."
     },
     "complete": "Precios completos",
-    "go-prices": "Editar precios",
     "missing": "Sin precio: {{ count }}",
     "status": "Estado",
     "new-glass-hint": "El vidrio nuevo aparecerá «Sin precio» hasta que el CEO le asigne precio.",
@@ -154,7 +153,9 @@
       "reason-example": "Ej. Subió el proveedor",
       "reason-hint": "Se adjunta a los precios que guardes mientras tenga texto.",
       "clear-reason": "Quitar motivo"
-    }
+    },
+    "edit-prices": "Editar precios",
+    "done-editing": "Terminar edición"
   },
   "quoting": {
     "search-placeholder": "Buscar vidrio por nombre, espesor o color...",
@@ -264,18 +265,19 @@
     }
   },
   "nav": {
-    "quote": "Cotizador",
+    "quote": "Cotizar",
     "catalog": "Catálogo",
-    "prices": "Precios",
     "users": "Usuarios",
-    "settings": "Configuración",
+    "settings": "Ajustes",
     "sign-out": "Cerrar sesión",
     "no-session": "Sin sesión",
-    "quotes": "Mis cotizaciones",
+    "quotes": "Guardadas",
     "agenda": "Agenda",
     "inventory": "Inventario",
     "purchases": "Compras",
-    "costs": "Costos"
+    "new-quote": "Nueva cotización",
+    "preferences": "Preferencias",
+    "stock": "Stock"
   },
   "users": {
     "title": "Usuarios",
@@ -539,7 +541,9 @@
       "ALL": "Todos los estados",
       "TO_BUY": "Por comprar",
       "UNKNOWN": "Sin contar",
-      "IN_TRANSIT": "En camino"
+      "IN_TRANSIT": "En camino",
+      "LOW_MARGIN": "Margen bajo",
+      "NO_COST": "Con stock y sin costo"
     },
     "status": {
       "UNKNOWN": "Sin contar",
@@ -717,8 +721,6 @@
     }
   },
   "costs": {
-    "title": "Costos y márgenes",
-    "subtitle": "Lo que cuesta cada artículo puesto en almacén, según sus compras, y el margen que deja frente al precio público. Solo lo ve el CEO.",
     "min-margin": "Margen mínimo",
     "min-margin-off": "Sin mínimo",
     "min-margin-hint-off": "Sin mínimo, no se avisa de márgenes bajos. Ponlo para ver qué artículos venden casi a costo.",
@@ -727,27 +729,18 @@
     "turn-off": "Quitar",
     "stock-value": "Valor del stock al costo promedio",
     "without-cost": "con stock y sin costo: {{ count }}",
-    "help": "Último costo, el anterior y el promedio de sus compras. El margen compara el último costo con el precio público por unidad.",
-    "help-glass": "El vidrio se compra por plancha y se vende por pie²: el margen compara el costo por pie² de la plancha con el precio de la lista Pública.",
     "last": "Último costo",
-    "previous": "Anterior",
-    "average": "Promedio",
-    "public-price": "Precio público",
     "margin": "Margen",
     "sqft": "pie²",
     "no-cost": "Sin compras costeadas",
-    "purchases": "compras: {{ count }}",
-    "empty": "No hay artículos para este filtro.",
-    "filter": {
-      "ALL": "Todos los artículos",
-      "WITH_COST": "Con costo",
-      "LOW_MARGIN": "Margen bajo",
-      "NO_COST": "Con stock y sin costo"
-    },
     "error": {
       "settings-load": "No se pudo cargar el margen mínimo.",
       "settings-save": "No se pudo guardar el margen mínimo.",
       "invalid-margin": "El margen mínimo debe estar entre 0 y 100 %."
-    }
+    },
+    "average-short": "Prom. S/ {{ value }}",
+    "change-tooltip": "Cambio frente a la compra anterior",
+    "margin-tooltip": "Precio público: S/ {{ price }}",
+    "margin-tooltip-glass": "Precio público: S/ {{ price }} por pie²"
   }
 }
