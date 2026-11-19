@@ -45,16 +45,74 @@
     "cancel": "Cancelar"
   },
   "catalog": {
-    "title": "Catálogo de vidrios",
-    "subtitle": "Tipos de vidrio y precio por pie² en cada lista. Los precios incluyen IGV.",
+    "title": "Catálogo",
+    "subtitle": "Vidrios con su precio por pie² en cada lista, y aluminios, accesorios y demás productos con su precio público. Los precios incluyen IGV.",
+    "tabs": {
+      "GLASS": "Vidrios",
+      "ALUMINUM_SERIES": "Aluminios por serie",
+      "ALUMINUM_TRADITIONAL": "Aluminios tradicionales",
+      "ACCESSORY": "Accesorios",
+      "OTHER": "Acrílicos y otros"
+    },
+    "products": {
+      "search": "Buscar por código, nombre o marca",
+      "series": "Serie",
+      "all-series": "Todas las series",
+      "choose-series": "Elige la serie",
+      "only-missing": "Solo sin precio",
+      "help": "Un precio público por producto, sea cual sea su color o medida, por {{ unit }}. Lo usan las ventas y los proyectos.",
+      "help-edit": "Escribe el precio público por {{ unit }}, IGV incluido. Es uno solo para todos los colores y se guarda al salir de la celda.",
+      "code": "Código",
+      "code-example": "Ej. 6001",
+      "product": "Producto",
+      "name": "Nombre",
+      "brand": "Marca",
+      "weight": "Tipo",
+      "public-price": "Precio público",
+      "empty": "No hay productos para este filtro.",
+      "showing": "Se muestran {{ shown }} de {{ total }}.",
+      "show-more": "Ver más",
+      "add": "Agregar",
+      "new-hint": "El producto nuevo aparecerá «Sin precio» hasta que el CEO le asigne precio.",
+      "new-hint-ceo": "El producto nuevo aparece «Sin precio»; ponle precio en Precios.",
+      "unit": {
+        "BAR": "varilla",
+        "UNIT": "unidad",
+        "SHEET": "plancha"
+      },
+      "weight-class": {
+        "LIGHT": "Ligero",
+        "SEMI_HEAVY": "Semipesado",
+        "HEAVY": "Pesado"
+      },
+      "new": {
+        "ALUMINUM_SERIES": "Nuevo perfil de serie",
+        "ALUMINUM_TRADITIONAL": "Nuevo aluminio tradicional",
+        "ACCESSORY": "Nuevo accesorio",
+        "OTHER": "Nuevo producto"
+      },
+      "name-example": {
+        "ALUMINUM_SERIES": "Ej. Marco doble corredizo",
+        "ALUMINUM_TRADITIONAL": "Ej. Tubo cuadrado 25.4 x 25.4",
+        "ACCESSORY": "Ej. Bisagra 3\" x 3\"",
+        "OTHER": "Ej. Policarbonato 6 mm · 580 × 210 cm"
+      },
+      "error": {
+        "load": "No se pudieron cargar los productos. Revisa que la API esté disponible.",
+        "save": "No se pudo guardar. Inténtalo de nuevo.",
+        "invalid-price": "El precio debe ser mayor que cero.",
+        "invalid-product": "Escribe el nombre y, en aluminios por serie, elige la serie.",
+        "duplicate": "Ese producto ya está en el catálogo."
+      }
+    },
     "glass": "Vidrio",
     "thickness": "Espesor",
     "color": "Color",
     "empty": "Todavía no hay vidrios en el catálogo.",
     "note": "Solo el CEO puede cambiar precios.",
     "prices": {
-      "title": "Precios por pie²",
-      "subtitle": "Fija el precio por pie² (IGV incluido) de cada vidrio en cada lista. Se guarda al salir de la celda.",
+      "title": "Precios",
+      "subtitle": "Fija el precio por pie² de cada vidrio en cada lista y el precio público de aluminios, accesorios y demás productos. IGV incluido; se guarda al salir de la celda.",
       "unset": "Sin precio",
       "new-glass": "Nuevo tipo de vidrio",
       "glass-example": "Ej. Laminado",
@@ -214,7 +272,8 @@
     "sign-out": "Cerrar sesión",
     "no-session": "Sin sesión",
     "quotes": "Mis cotizaciones",
-    "agenda": "Agenda"
+    "agenda": "Agenda",
+    "inventory": "Inventario"
   },
   "users": {
     "title": "Usuarios",
@@ -463,5 +522,117 @@
       "technicians-invalid": "Escribe el nombre y un teléfono válido."
     },
     "optional": "opcional"
+  },
+  "inventory": {
+    "title": "Inventario",
+    "subtitle": "Stock de cada artículo en cada sede. El estado sale de la cantidad: 0 es agotado y en el mínimo hay que volver a comprar.",
+    "search": "Buscar artículo, color, medida o código",
+    "site": "Sede",
+    "all-sites": "Todas las sedes",
+    "status-filter": "Estado",
+    "total": "Total",
+    "actions": "Acciones",
+    "empty": "No hay artículos para este filtro.",
+    "filter": {
+      "ALL": "Todos los estados",
+      "TO_BUY": "Por comprar",
+      "UNKNOWN": "Sin contar",
+      "IN_TRANSIT": "En camino"
+    },
+    "status": {
+      "UNKNOWN": "Sin contar",
+      "OUT": "Agotado",
+      "LOW": "Volver a comprar",
+      "IN_STOCK": "En stock",
+      "IN_TRANSIT": "En camino"
+    },
+    "pack": {
+      "CRATE": "Jaba",
+      "BUNDLE": "Paquete",
+      "BOX": "Caja"
+    },
+    "unit": {
+      "SHEET": "planchas",
+      "BAR": "varillas",
+      "UNIT": "unid."
+    },
+    "item": {
+      "label": "Artículo",
+      "new": "Nuevo artículo",
+      "edit": "Editar artículo",
+      "glass": "Vidrio",
+      "product": "Producto",
+      "search": "Escribe para buscar",
+      "narrow": "Se muestran {{ shown }} de {{ total }}; escribe para encontrar el tuyo.",
+      "choose": "Elige el producto al que pertenece.",
+      "not-listed": "¿No está? Agrégalo primero en Catálogo.",
+      "color": "Color",
+      "sku": "Código",
+      "width": "Ancho (cm)",
+      "height": "Alto (cm)",
+      "pack": "Llega en",
+      "no-pack": "Unidades sueltas",
+      "units-per-pack": "Unidades por empaque",
+      "min-stock": "Mínimo",
+      "min-hint": "En el mínimo o por debajo, el artículo aparece como «Volver a comprar».",
+      "initial": "Stock inicial por sede",
+      "not-counted": "Sin contar",
+      "add": "Agregar artículo",
+      "save": "Guardar cambios"
+    },
+    "stock": {
+      "title": "Registrar stock",
+      "now": "Ahora hay:",
+      "what": "¿Qué pasó?",
+      "mode": {
+        "COUNT": "Conteo",
+        "IN": "Entrada",
+        "OUT": "Salida"
+      },
+      "mode-hint": {
+        "COUNT": "Contaste y escribes la cantidad real",
+        "IN": "Llegaron unidades",
+        "OUT": "Salieron o se rompieron"
+      },
+      "counted": "Cantidad contada",
+      "units": "Unidades",
+      "packs": "O cantidad de empaques ({{ kind }} de {{ size }})",
+      "after": "Quedarán {{ quantity }}.",
+      "reason": "Motivo (opcional)",
+      "reason-example": {
+        "COUNT": "Ej. Conteo de fin de mes",
+        "IN": "Ej. Llegó pedido de Lima",
+        "OUT": "Ej. Plancha rota al descargar"
+      },
+      "in-transit": "Hay un pedido en camino",
+      "notes": "Notas",
+      "save": "Guardar"
+    },
+    "movements": {
+      "title": "Movimientos de stock",
+      "see": "Ver movimientos",
+      "show-all": "Ver todos",
+      "item": "Artículo",
+      "kind": "Tipo",
+      "change": "Cambio",
+      "after": "Quedó",
+      "by": "Registrado por",
+      "empty": "Todavía no hay movimientos.",
+      "error": "No se pudieron cargar los movimientos.",
+      "kinds": {
+        "COUNT": "Conteo",
+        "ADJUSTMENT": "Entrada / salida"
+      }
+    },
+    "error": {
+      "load": "No se pudo cargar el inventario. Revisa que la API esté disponible.",
+      "save": "No se pudo guardar. Inténtalo de nuevo.",
+      "invalid-quantity": "La cantidad debe ser un número entero, 0 o más.",
+      "invalid-adjustment": "Escribe unidades enteras mayores que cero; el stock no puede quedar negativo.",
+      "invalid-item": "Elige el producto o vidrio al que pertenece el artículo.",
+      "invalid-size": "Escribe ancho y alto mayores que cero, o deja los dos vacíos.",
+      "invalid-pack": "Si llega en jaba, paquete o caja, indica cuántas unidades trae (1 o más).",
+      "duplicate-item": "Ya existe ese artículo con el mismo color y medida."
+    }
   }
 }

@@ -45,16 +45,74 @@
     "cancel": "Cancel"
   },
   "catalog": {
-    "title": "Glass catalog",
-    "subtitle": "Glass types and price per square foot in each list. Prices include IGV.",
+    "title": "Catalog",
+    "subtitle": "Glass with its price per square foot in each list, and aluminium, accessories and other products with their public price. Prices include IGV.",
+    "tabs": {
+      "GLASS": "Glass",
+      "ALUMINUM_SERIES": "Aluminium by series",
+      "ALUMINUM_TRADITIONAL": "Traditional aluminium",
+      "ACCESSORY": "Accessories",
+      "OTHER": "Acrylics and others"
+    },
+    "products": {
+      "search": "Search by code, name or brand",
+      "series": "Series",
+      "all-series": "Every series",
+      "choose-series": "Choose the series",
+      "only-missing": "Only without price",
+      "help": "One public price per product, whatever its colour or size, per {{ unit }}. Sales and projects use it.",
+      "help-edit": "Type the public price per {{ unit }}, IGV included. It is one for every colour and is saved when you leave the cell.",
+      "code": "Code",
+      "code-example": "e.g. 6001",
+      "product": "Product",
+      "name": "Name",
+      "brand": "Brand",
+      "weight": "Type",
+      "public-price": "Public price",
+      "empty": "No products for this filter.",
+      "showing": "Showing {{ shown }} of {{ total }}.",
+      "show-more": "Show more",
+      "add": "Add",
+      "new-hint": "The new product shows «No price» until the CEO prices it.",
+      "new-hint-ceo": "The new product shows «No price»; price it in Prices.",
+      "unit": {
+        "BAR": "bar",
+        "UNIT": "piece",
+        "SHEET": "sheet"
+      },
+      "weight-class": {
+        "LIGHT": "Light",
+        "SEMI_HEAVY": "Semi-heavy",
+        "HEAVY": "Heavy"
+      },
+      "new": {
+        "ALUMINUM_SERIES": "New series profile",
+        "ALUMINUM_TRADITIONAL": "New traditional aluminium",
+        "ACCESSORY": "New accessory",
+        "OTHER": "New product"
+      },
+      "name-example": {
+        "ALUMINUM_SERIES": "e.g. Double sliding frame",
+        "ALUMINUM_TRADITIONAL": "e.g. Square tube 25.4 x 25.4",
+        "ACCESSORY": "e.g. Hinge 3\" x 3\"",
+        "OTHER": "e.g. Polycarbonate 6 mm · 580 × 210 cm"
+      },
+      "error": {
+        "load": "Could not load the products. Check that the API is available.",
+        "save": "Could not save. Please try again.",
+        "invalid-price": "The price must be greater than zero.",
+        "invalid-product": "Enter the name and, for aluminium by series, choose the series.",
+        "duplicate": "That product is already in the catalog."
+      }
+    },
     "glass": "Glass",
     "thickness": "Thickness",
     "color": "Color",
     "empty": "There is no glass in the catalog yet.",
     "note": "Only the CEO can change prices.",
     "prices": {
-      "title": "Prices per square foot",
-      "subtitle": "Set the price per square foot (IGV included) of each glass in each list. Saved when you leave the cell.",
+      "title": "Prices",
+      "subtitle": "Set the price per square foot of each glass in each list and the public price of aluminium, accessories and other products. IGV included; saved when you leave the cell.",
       "unset": "No price",
       "new-glass": "New glass type",
       "glass-example": "e.g. Laminated",
@@ -214,7 +272,8 @@
     "sign-out": "Sign out",
     "no-session": "Not signed in",
     "quotes": "My quotes",
-    "agenda": "Agenda"
+    "agenda": "Agenda",
+    "inventory": "Inventory"
   },
   "users": {
     "title": "Users",
@@ -463,5 +522,117 @@
       "technicians-invalid": "Enter the name and a valid phone."
     },
     "optional": "optional"
+  },
+  "inventory": {
+    "title": "Inventory",
+    "subtitle": "Stock of each item in each site. The status comes from the quantity: 0 is out of stock and at the minimum it must be bought again.",
+    "search": "Search item, colour, size or code",
+    "site": "Site",
+    "all-sites": "Every site",
+    "status-filter": "Status",
+    "total": "Total",
+    "actions": "Actions",
+    "empty": "No items for this filter.",
+    "filter": {
+      "ALL": "Every status",
+      "TO_BUY": "To buy",
+      "UNKNOWN": "Not counted",
+      "IN_TRANSIT": "On the way"
+    },
+    "status": {
+      "UNKNOWN": "Not counted",
+      "OUT": "Out of stock",
+      "LOW": "Buy again",
+      "IN_STOCK": "In stock",
+      "IN_TRANSIT": "On the way"
+    },
+    "pack": {
+      "CRATE": "Crate",
+      "BUNDLE": "Bundle",
+      "BOX": "Box"
+    },
+    "unit": {
+      "SHEET": "sheets",
+      "BAR": "bars",
+      "UNIT": "pcs"
+    },
+    "item": {
+      "label": "Item",
+      "new": "New item",
+      "edit": "Edit item",
+      "glass": "Glass",
+      "product": "Product",
+      "search": "Type to search",
+      "narrow": "Showing {{ shown }} of {{ total }}; type to find yours.",
+      "choose": "Choose the product it belongs to.",
+      "not-listed": "Not there? Add it first in Catalog.",
+      "color": "Colour",
+      "sku": "Code",
+      "width": "Width (cm)",
+      "height": "Height (cm)",
+      "pack": "Comes in",
+      "no-pack": "Loose units",
+      "units-per-pack": "Units per pack",
+      "min-stock": "Minimum",
+      "min-hint": "At or below the minimum the item shows «Buy again».",
+      "initial": "Initial stock per site",
+      "not-counted": "Not counted",
+      "add": "Add item",
+      "save": "Save changes"
+    },
+    "stock": {
+      "title": "Record stock",
+      "now": "Now there are:",
+      "what": "What happened?",
+      "mode": {
+        "COUNT": "Count",
+        "IN": "Entry",
+        "OUT": "Exit"
+      },
+      "mode-hint": {
+        "COUNT": "You counted and type the real quantity",
+        "IN": "Units arrived",
+        "OUT": "Units left or broke"
+      },
+      "counted": "Quantity counted",
+      "units": "Units",
+      "packs": "Or number of packs ({{ kind }} of {{ size }})",
+      "after": "{{ quantity }} will be left.",
+      "reason": "Reason (optional)",
+      "reason-example": {
+        "COUNT": "e.g. End-of-month count",
+        "IN": "e.g. Order from Lima arrived",
+        "OUT": "e.g. Sheet broken while unloading"
+      },
+      "in-transit": "An order is on its way",
+      "notes": "Notes",
+      "save": "Save"
+    },
+    "movements": {
+      "title": "Stock movements",
+      "see": "See movements",
+      "show-all": "See all",
+      "item": "Item",
+      "kind": "Type",
+      "change": "Change",
+      "after": "Left",
+      "by": "Recorded by",
+      "empty": "No movements yet.",
+      "error": "Could not load the movements.",
+      "kinds": {
+        "COUNT": "Count",
+        "ADJUSTMENT": "Entry / exit"
+      }
+    },
+    "error": {
+      "load": "Could not load the inventory. Check that the API is available.",
+      "save": "Could not save. Please try again.",
+      "invalid-quantity": "The quantity must be a whole number, 0 or more.",
+      "invalid-adjustment": "Type whole units greater than zero; the stock cannot go below zero.",
+      "invalid-item": "Choose the product or glass the item belongs to.",
+      "invalid-size": "Enter width and height greater than zero, or leave both empty.",
+      "invalid-pack": "If it comes in a crate, bundle or box, say how many units it holds (1 or more).",
+      "duplicate-item": "That item already exists with the same colour and size."
+    }
   }
 }
