@@ -15,7 +15,8 @@ export type Permission =
   | 'agenda'              // see the agenda and schedule technical visits
   | 'visits.edit-all'     // change visits scheduled by other users
   | 'technicians.manage'  // register and edit technicians
-  | 'inventory'           // see stock per site, count it, adjust it and add items
+  | 'inventory'           // see stock per site, count it, adjust it, add items and register arrivals
+  | 'costs.manage'        // type purchase costs (dollars, freight, transport) and see costs and margins
   | 'settings';           // interface preferences
 
 const EVERYONE: readonly Permission[] = ['quote', 'catalog.view', 'catalog.add-product', 'agenda', 'inventory', 'settings'];
@@ -25,7 +26,7 @@ const EVERYONE: readonly Permission[] = ['quote', 'catalog.view', 'catalog.add-p
  * role tells them apart. The CEO holds every permission.
  */
 export const ROLE_PERMISSIONS: Readonly<Record<Role, readonly Permission[]>> = {
-  CEO: [...EVERYONE, 'prices.manage', 'users.manage', 'quotes.view-all', 'visits.edit-all', 'technicians.manage'],
+  CEO: [...EVERYONE, 'prices.manage', 'users.manage', 'quotes.view-all', 'visits.edit-all', 'technicians.manage', 'costs.manage'],
   SELLER: EVERYONE,
   WAREHOUSE: EVERYONE,
 };

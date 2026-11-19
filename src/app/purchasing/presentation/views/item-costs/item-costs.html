@@ -1,0 +1,131 @@
+<header class="al-page-header">
+  <div>
+    <h1 class="al-page-title">{{ 'costs.title' | translate }}</h1>
+    <p class="al-page-subtitle">{{ 'costs.subtitle' | translate }}</p>
+  </div>
+</header>
+
+@if (error(); as error) {
+  <div class="al-alert al-alert--error" role="alert">
+    <mat-icon>error_outline</mat-icon><span>{{ error | translate }}</span>
+    <button class="al-btn al-btn--secondary" (click)="retry()">{{ 'common.retry' | translate }}</button>
+  </div>
+}
+
+@if (ready()) {
+  <div class="ic-summary">
+    <section class="al-card ic-margin" aria-labelledby="ic-margin-title">
+      <h2 class="ic-card-title" id="ic-margin-title"><mat-icon>percent</mat-icon>{{ 'costs.min-margin' | translate }}</h2>
+      <div class="ic-margin-row">
+        <input class="al-input ic-margin-input" type="number" min="0" max="100" step="1" inputmode="numeric"
+               [value]="minMarginDraft()" (input)="onMinMargin($event)" (keydown.enter)="saveMinMargin()"
+               [placeholder]="'costs.min-margin-off' | translate" [attr.aria-label]="'costs.min-margin' | translate"/>
+        <span class="ic-percent">%</span>
+        <button type="button" class="al-btn al-btn--primary" (click)="saveMinMargin()" [disabled]="costs.saving()">{{ 'costs.save' | translate }}</button>
+        @if (costs.minMarginPercent() !== null) {
+          <button type="button" class="al-btn al-btn--secondary" (click)="clearMinMargin()" [disabled]="costs.saving()">{{ 'costs.turn-off' | translate }}</button>
+        }
+      </div>
+      <p class="al-hint ic-hint">
+        @if (costs.minMarginPercent() === null) { {{ 'costs.min-margin-hint-off' | translate }} }
+        @else { {{ 'costs.min-margin-hint' | translate: {count: costs.lowMarginCount(), min: costs.minMarginPercent()} }} }
+      </p>
+    </section>
+
+    @for (site of costs.siteValues(); track site.siteId) {
+      <section class="al-card ic-value">
+        <h2 class="ic-card-title"><mat-icon>warehouse</mat-icon>{{ siteName(site.siteId) }}</h2>
+        <p class="ic-amount">S/ {{ site.value | number:'1.2-2' }}</p>
+        <p class="al-hint">
+          {{ 'costs.stock-value' | translate }}
+          @if (site.withoutCost) { · <span class="ic-warn">{{ 'costs.without-cost' | translate: {count: site.withoutCost} }}</span> }
+        </p>
+      </section>
+    }
+  </div>
+
+  <app-tab-bar class="ic-tabs" idPrefix="ic" [tabs]="tabs()" [active]="tab()" (selected)="tab.set($event)" [label]="'costs.title' | translate"/>
+
+  <section class="al-card" role="tabpanel" id="ic-panel" [attr.aria-labelledby]="'ic-tab-' + tab()">
+    <div class="al-card-header ic-toolbar">
+      <label>
+        <span class="sr-only">{{ 'inventory.search' | translate }}</span>
+        <input class="al-input ic-search" type="search" [value]="search()" (input)="onSearch($event)" [placeholder]="'inventory.search' | translate"/>
+      </label>
+      <label>
+        <span class="sr-only">{{ 'inventory.status-filter' | translate }}</span>
+        <select class="al-select ic-select" (change)="onFilter($event)" [attr.aria-label]="'inventory.status-filter' | translate">
+          @for (f of filters; track f) { <option [value]="f" [selected]="filter() === f">{{ ('costs.filter.' + f) | translate }}</option> }
+        </select>
+      </label>
+    </div>
+    <p class="al-muted ic-help">{{ (tab() === 'GLASS' ? 'costs.help-glass' : 'costs.help') | translate }}</p>
+
+    <div class="al-table-wrapper">
+      <table class="al-table">
+        <thead>
+          <tr>
+            <th>{{ 'inventory.item.label' | translate }}</th>
+            <th class="al-num">{{ 'costs.last' | translate }}</th>
+            <th class="al-num">{{ 'costs.previous' | translate }}</th>
+            <th class="al-num">{{ 'costs.average' | translate }}</th>
+            <th class="al-num">{{ 'costs.public-price' | translate }}</th>
+            <th class="al-num">{{ 'costs.margin' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (entry of rows(); track entry.row.item.id) {
+            @let s = entry.cost.summary;
+            <tr [class.ic-low]="entry.cost.lowMargin">
+              <td>
+                <span class="ic-name">{{ entry.row.name }}</span>
+                @if (entry.row.variant) { <span class="ic-variant">{{ entry.row.variant }}</span> }
+              </td>
+              <td class="al-num ic-figure">
+                @if (s) {
+                  <strong>S/ {{ s.last | number:'1.2-4' }}</strong>
+                  @if (entry.cost.perSqFt && entry.cost.comparableCost !== null) { <small>S/ {{ entry.cost.comparableCost | number:'1.2-2' }} / {{ 'costs.sqft' | translate }}</small> }
+                  <small class="al-muted">{{ s.lastDate | date:'dd/MM/yyyy' }}</small>
+                } @else { <span class="al-muted">{{ 'costs.no-cost' | translate }}</span> }
+              </td>
+              <td class="al-num ic-figure">
+                @if (s?.previous !== null && s?.previous !== undefined) {
+                  S/ {{ s!.previous | number:'1.2-4' }}
+                  @if (s!.changePercent !== null) {
+                    <small [class.ic-up]="s!.changePercent > 0" [class.ic-down]="s!.changePercent < 0">{{ s!.changePercent > 0 ? '+' : '' }}{{ s!.changePercent | number:'1.1-1' }} %</small>
+                  }
+                } @else { <span class="al-muted">—</span> }
+              </td>
+              <td class="al-num ic-figure">
+                @if (s) { S/ {{ s.average | number:'1.2-4' }} <small class="al-muted">{{ 'costs.purchases' | translate: {count: s.purchases} }}</small> }
+                @else { <span class="al-muted">—</span> }
+              </td>
+              <td class="al-num ic-figure">
+                @if (entry.cost.salePrice !== null) {
+                  S/ {{ entry.cost.salePrice | number:'1.2-2' }}
+                  @if (entry.cost.perSqFt) { <small class="al-muted">/ {{ 'costs.sqft' | translate }}</small> }
+                } @else { <span class="al-muted">{{ 'catalog.prices.unset' | translate }}</span> }
+              </td>
+              <td class="al-num">
+                @if (entry.cost.margin !== null) {
+                  <span class="al-pill" [class.al-pill--danger]="entry.cost.lowMargin || entry.cost.margin < 0"
+                        [class.al-pill--success]="!entry.cost.lowMargin && entry.cost.margin >= 0">{{ entry.cost.margin * 100 | number:'1.1-1' }} %</span>
+                } @else { <span class="al-muted">—</span> }
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="ic-empty">{{ 'costs.empty' | translate }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (filtered().length > rows().length) {
+      <div class="ic-more">
+        <span class="al-muted">{{ 'catalog.products.showing' | translate: {shown: rows().length, total: filtered().length} }}</span>
+        <button type="button" class="al-btn al-btn--secondary" (click)="showMore()">{{ 'catalog.products.show-more' | translate }}</button>
+      </div>
+    }
+  </section>
+} @else if (!error()) {
+  <section class="al-card"><div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div></section>
+}

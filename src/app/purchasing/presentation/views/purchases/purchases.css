@@ -1,0 +1,17 @@
+:host { display: block; max-width: 1280px; }
+.pu-saving { display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; font-weight: 700; color: var(--al-primary); }
+.pu-saving mat-icon { font-size: 18px; width: 18px; height: 18px; }
+.pu-pending { margin-bottom: 16px; }
+.pu-pending .al-btn { margin-left: auto; }
+.pu-toolbar { flex-wrap: wrap; gap: 12px; }
+.pu-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.pu-search { height: 36px; min-width: 220px; background: var(--al-surface); }
+.pu-select { height: 36px; min-width: 170px; background-color: var(--al-surface); }
+.pu-date { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pu-supplier { font-weight: 600; }
+.pu-total { white-space: nowrap; font-weight: 700; font-variant-numeric: tabular-nums; }
+.pu-by { font-size: .82rem; }
+.pu-actions { text-align: right; white-space: nowrap; }
+.pu-actions .al-btn { height: 34px; padding: 0 12px; font-size: .8rem; }
+.pu-empty { text-align: center; color: var(--al-text-muted); padding: 24px !important; }
+@media (max-width: 600px) { .pu-search { min-width: 0; width: 100%; } }

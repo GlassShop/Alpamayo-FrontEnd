@@ -24,7 +24,9 @@ const NAV_OPTIONS: readonly NavOption[] = [
   {link: '/agenda',           labelKey: 'nav.agenda',   icon: 'calendar_month', permission: 'agenda'},
   {link: '/catalogo',         labelKey: 'nav.catalog',  icon: 'window',       permission: 'catalog.view', exact: true},
   {link: '/catalogo/precios', labelKey: 'nav.prices',   icon: 'price_change', permission: 'prices.manage'},
-  {link: '/inventario',       labelKey: 'nav.inventory', icon: 'inventory_2', permission: 'inventory'},
+  {link: '/inventario',       labelKey: 'nav.inventory', icon: 'inventory_2', permission: 'inventory', exact: true},
+  {link: '/compras',          labelKey: 'nav.purchases', icon: 'local_shipping', permission: 'inventory'},
+  {link: '/inventario/costos', labelKey: 'nav.costs',    icon: 'paid',         permission: 'costs.manage'},
   {link: '/usuarios',         labelKey: 'nav.users',    icon: 'group',        permission: 'users.manage'},
   {link: '/configuracion',    labelKey: 'nav.settings', icon: 'settings',     permission: 'settings'},
 ];

@@ -1,0 +1,91 @@
+<header class="al-page-header">
+  <div>
+    <h1 class="al-page-title">{{ 'purchases.title' | translate }}</h1>
+    <p class="al-page-subtitle">{{ (canCost ? 'purchases.subtitle-ceo' : 'purchases.subtitle') | translate }}</p>
+  </div>
+  @if (purchases.saving()) { <span class="pu-saving"><mat-icon>sync</mat-icon>{{ 'common.saving' | translate }}</span> }
+</header>
+
+@if (error(); as error) {
+  <div class="al-alert al-alert--error" role="alert">
+    <mat-icon>error_outline</mat-icon><span>{{ error | translate }}</span>
+    @if (!ready()) {
+      <button class="al-btn al-btn--secondary" (click)="retry()">{{ 'common.retry' | translate }}</button>
+    } @else {
+      <button class="al-icon-btn" (click)="clearError()" [attr.aria-label]="'common.close' | translate"><mat-icon>close</mat-icon></button>
+    }
+  </div>
+}
+
+@if (ready()) {
+  @if (canCost && purchases.pendingCount()) {
+    <div class="al-alert al-alert--info pu-pending" role="status">
+      <mat-icon>pending_actions</mat-icon>
+      <span>{{ 'purchases.pending-alert' | translate: {count: purchases.pendingCount()} }}</span>
+      <button type="button" class="al-btn al-btn--secondary" (click)="filter.set('PENDING_COST')">{{ 'purchases.see-pending' | translate }}</button>
+    </div>
+  }
+
+  <section class="al-card">
+    <div class="al-card-header pu-toolbar">
+      <div class="pu-filters">
+        <label>
+          <span class="sr-only">{{ 'purchases.search' | translate }}</span>
+          <input class="al-input pu-search" type="search" [value]="search()" (input)="onSearch($event)" [placeholder]="'purchases.search' | translate"/>
+        </label>
+        <label>
+          <span class="sr-only">{{ 'inventory.status-filter' | translate }}</span>
+          <select class="al-select pu-select" (change)="onFilter($event)" [attr.aria-label]="'inventory.status-filter' | translate">
+            @for (f of filters; track f) { <option [value]="f" [selected]="filter() === f">{{ ('purchases.filter.' + f) | translate }}</option> }
+          </select>
+        </label>
+      </div>
+      <button type="button" class="al-btn al-btn--primary" (click)="openArrival()"><mat-icon>add</mat-icon>{{ 'purchases.arrival.title' | translate }}</button>
+    </div>
+
+    <div class="al-table-wrapper">
+      <table class="al-table">
+        <thead>
+          <tr>
+            <th>{{ 'purchases.date' | translate }}</th>
+            <th>{{ 'purchases.supplier' | translate }}</th>
+            <th>{{ 'purchases.site' | translate }}</th>
+            <th class="al-num">{{ 'purchases.lines' | translate }}</th>
+            <th>{{ 'inventory.status-filter' | translate }}</th>
+            @if (canCost) { <th class="al-num">{{ 'purchases.costs.total' | translate }}</th> }
+            <th>{{ 'purchases.registered' | translate }}</th>
+            <th><span class="sr-only">{{ 'inventory.actions' | translate }}</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of list(); track p.id) {
+            <tr>
+              <td class="pu-date">{{ p.date | date:'dd/MM/yyyy' }}</td>
+              <td class="pu-supplier">{{ p.supplier }}</td>
+              <td>{{ siteName(p.siteId) }}</td>
+              <td class="al-num">{{ p.lines.length }} <small class="al-muted">· {{ units(p) }} {{ 'purchases.units-short' | translate }}</small></td>
+              <td>
+                <span class="al-pill" [class.al-pill--warning]="p.status === 'PENDING_COST'" [class.al-pill--success]="p.status === 'COSTED'">{{ ('purchases.status.' + p.status) | translate }}</span>
+              </td>
+              @if (canCost) {
+                <td class="al-num pu-total">@if (total(p); as t) { S/ {{ t | number:'1.2-2' }} } @else { — }</td>
+              }
+              <td class="al-muted pu-by">{{ p.createdBy.fullName }}</td>
+              <td class="pu-actions">
+                <button type="button" class="al-btn" [class.al-btn--primary]="canCost && p.status === 'PENDING_COST'"
+                        [class.al-btn--secondary]="!(canCost && p.status === 'PENDING_COST')" (click)="openPurchase(p.id)">
+                  <mat-icon>{{ canCost && p.status === 'PENDING_COST' ? 'paid' : 'visibility' }}</mat-icon>
+                  {{ (canCost && p.status === 'PENDING_COST' ? 'purchases.costs.add' : 'purchases.see') | translate }}
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td [attr.colspan]="canCost ? 8 : 7" class="pu-empty">{{ 'purchases.empty' | translate }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+} @else if (!error()) {
+  <section class="al-card"><div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div></section>
+}

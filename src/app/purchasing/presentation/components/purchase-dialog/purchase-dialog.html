@@ -1,0 +1,95 @@
+@if (purchase(); as p) {
+  <h2 mat-dialog-title class="pd-title"><mat-icon>receipt_long</mat-icon>{{ p.supplier }}</h2>
+  <mat-dialog-content class="pd-content">
+    <p class="pd-meta">
+      {{ p.date | date:'dd/MM/yyyy' }} · {{ siteName() }} · {{ 'purchases.units' | translate: {units: units()} }}
+      <span class="al-pill" [class.al-pill--warning]="p.status === 'PENDING_COST'" [class.al-pill--success]="p.status === 'COSTED'">{{ ('purchases.status.' + p.status) | translate }}</span>
+    </p>
+    <p class="al-muted pd-by">
+      {{ 'purchases.registered-by' | translate: {name: p.createdBy.fullName} }}
+      @if (p.costedBy && canCost) { · {{ 'purchases.costed-by' | translate: {name: p.costedBy.fullName} }} }
+    </p>
+    @if (p.notes) { <p class="pd-notes">{{ p.notes }}</p> }
+
+    @if (canCost) {
+      <div class="pd-costs">
+        <label class="al-field"><span class="al-label">{{ 'purchases.costs.exchange-rate' | translate }}</span>
+          <input class="al-input" type="number" min="0.001" step="0.001" inputmode="decimal" [value]="exchangeRate() ?? ''" (input)="onNumber('exchangeRate', $event)" placeholder="3.75"/></label>
+        <div class="al-field">
+          <label class="al-label" for="pd-freight">{{ 'purchases.costs.freight' | translate }}</label>
+          <div class="pd-money">
+            <input class="al-input" id="pd-freight" type="number" min="0" step="0.01" inputmode="decimal" [value]="freightAmount() ?? ''" (input)="onNumber('freightAmount', $event)"/>
+            <select class="al-select" (change)="onCurrency('freightCurrency', $event)" [attr.aria-label]="'purchases.costs.currency' | translate">
+              @for (c of currencies; track c) { <option [value]="c" [selected]="freightCurrency() === c">{{ ('purchases.currency.' + c) | translate }}</option> }
+            </select>
+          </div>
+        </div>
+        <div class="al-field">
+          <label class="al-label" for="pd-transport">{{ 'purchases.costs.transport' | translate }}</label>
+          <div class="pd-money">
+            <input class="al-input" id="pd-transport" type="number" min="0" step="0.01" inputmode="decimal" [value]="transportAmount() ?? ''" (input)="onNumber('transportAmount', $event)"/>
+            <select class="al-select" (change)="onCurrency('transportCurrency', $event)" [attr.aria-label]="'purchases.costs.currency' | translate">
+              @for (c of currencies; track c) { <option [value]="c" [selected]="transportCurrency() === c">{{ ('purchases.currency.' + c) | translate }}</option> }
+            </select>
+          </div>
+        </div>
+      </div>
+      <p class="al-hint">{{ 'purchases.costs.hint' | translate }}</p>
+    }
+
+    <div class="al-table-wrapper pd-lines">
+      <table class="al-table">
+        <thead>
+          <tr>
+            <th>{{ 'inventory.item.label' | translate }}</th>
+            <th class="al-num">{{ 'inventory.stock.units' | translate }}</th>
+            @if (canCost) {
+              <th class="al-num">{{ 'purchases.costs.price-usd' | translate }}</th>
+              <th class="al-num">{{ 'purchases.costs.value' | translate }}</th>
+              <th class="al-num">{{ 'purchases.costs.freight-share' | translate }}</th>
+              <th class="al-num">{{ 'purchases.costs.unit-cost' | translate }}</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (line of p.lines; track line.itemId; let i = $index) {
+            @let names = lineNames()[i];
+            @let cost = preview()?.[i];
+            <tr>
+              <td><span class="pd-name">{{ names.name }}</span>@if (names.variant) { <span class="pd-variant">{{ names.variant }}</span> }</td>
+              <td class="al-num pd-qty">
+                {{ line.quantity }}
+                @if (line.packs !== null) { <small class="al-muted">({{ line.packs }} {{ 'purchases.packs' | translate }})</small> }
+              </td>
+              @if (canCost) {
+                <td class="al-num"><input class="al-input pd-price" type="number" min="0.0001" step="0.01" inputmode="decimal" [value]="prices()[i] ?? ''"
+                                          (input)="onPrice(i, $event)" [attr.aria-label]="names.name + ' — ' + ('purchases.costs.price-usd' | translate)"/></td>
+                <td class="al-num pd-figure">@if (cost) { S/ {{ cost.valuePen | number:'1.2-2' }} } @else { — }</td>
+                <td class="al-num pd-figure">@if (cost) { S/ {{ (cost.freightPen + cost.transportPen) | number:'1.2-2' }} <small class="al-muted">{{ cost.share * 100 | number:'1.0-1' }} %</small> } @else { — }</td>
+                <td class="al-num pd-unit">@if (cost) { S/ {{ cost.unitCost | number:'1.2-4' }} } @else if (line.unitCost !== null) { S/ {{ line.unitCost | number:'1.2-4' }} } @else { — }</td>
+              }
+            </tr>
+          }
+        </tbody>
+        @if (canCost && previewTotal() !== null) {
+          <tfoot>
+            <tr>
+              <td colspan="5" class="al-num pd-total-label">{{ 'purchases.costs.total' | translate }}</td>
+              <td class="al-num pd-total">S/ {{ previewTotal()! | number:'1.2-2' }}</td>
+            </tr>
+          </tfoot>
+        }
+      </table>
+    </div>
+    @if (!canCost) { <p class="al-muted pd-note">{{ 'purchases.costs.ceo-only' | translate }}</p> }
+    @if (problem(); as error) { <p class="al-error-text" role="alert">{{ error | translate }}</p> }
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button type="button" class="al-btn al-btn--secondary" mat-dialog-close>{{ (canCost ? 'common.cancel' : 'common.close') | translate }}</button>
+    @if (canCost) {
+      <button type="button" class="al-btn al-btn--primary" (click)="save()" [disabled]="!preview() || purchases.saving()">
+        <mat-icon>check</mat-icon>{{ (p.status === 'COSTED' ? 'purchases.costs.update' : 'purchases.costs.save') | translate }}
+      </button>
+    }
+  </mat-dialog-actions>
+}

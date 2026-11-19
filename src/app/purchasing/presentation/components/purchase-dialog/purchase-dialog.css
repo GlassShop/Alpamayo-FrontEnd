@@ -1,0 +1,21 @@
+.pd-title { display: flex; align-items: center; gap: 8px; }
+.pd-content { display: flex; flex-direction: column; gap: 12px; }
+.pd-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; font-weight: 600; }
+.pd-by { margin: -6px 0 0; font-size: .8rem; }
+.pd-notes { margin: 0; padding: 8px 12px; font-size: .85rem; background: var(--al-surface-muted); border-radius: var(--al-radius); }
+.pd-costs { display: grid; grid-template-columns: 1fr 1.4fr 1.4fr; gap: 12px; padding-top: 4px; }
+.pd-money { display: flex; gap: 6px; }
+.pd-money .al-input { min-width: 0; }
+.pd-money .al-select { width: 110px; flex-shrink: 0; }
+.pd-lines { max-height: 340px; overflow-y: auto; }
+.pd-name { display: block; font-weight: 600; font-size: .88rem; }
+.pd-variant { display: block; font-size: .75rem; color: var(--al-text-muted); }
+.pd-qty { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pd-price { width: 100px; text-align: right; background: var(--al-surface); }
+.pd-figure, .pd-unit { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pd-figure small { display: block; }
+.pd-unit { font-weight: 700; }
+.pd-total-label { font-weight: 600; }
+.pd-total { font-weight: 700; white-space: nowrap; }
+.pd-note { margin: 0; font-size: .82rem; }
+@media (max-width: 700px) { .pd-costs { grid-template-columns: 1fr; } }

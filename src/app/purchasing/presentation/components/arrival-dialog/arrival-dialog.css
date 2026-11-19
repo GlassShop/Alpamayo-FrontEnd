@@ -1,0 +1,34 @@
+.ad-title { display: flex; align-items: center; gap: 8px; }
+.ad-content { display: flex; flex-direction: column; gap: 14px; }
+.ad-grid { display: grid; grid-template-columns: 2fr 1fr 1.4fr; gap: 12px; }
+.ad-search { display: flex; flex-direction: column; gap: 6px; }
+.ad-results { list-style: none; margin: 0; padding: 4px; max-height: 220px; overflow-y: auto; border: 1px solid var(--al-divider); border-radius: var(--al-radius); background: var(--al-surface); }
+.ad-result {
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 8px; border: 0; background: transparent;
+  text-align: left; font: inherit; font-size: .85rem; cursor: pointer; border-radius: var(--al-radius);
+}
+.ad-result:hover, .ad-result:focus-visible { background: var(--al-primary-soft); outline: none; }
+.ad-result mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--al-primary); }
+.ad-result small { color: var(--al-text-muted); }
+.ad-lines { flex-shrink: 0; max-height: 300px; overflow: auto; }
+.ad-name { display: block; font-weight: 600; font-size: .88rem; }
+.ad-variant { display: block; font-size: .75rem; color: var(--al-text-muted); }
+.ad-num { width: 80px; text-align: right; background: var(--al-surface); }
+.ad-pack { display: flex; align-items: center; gap: 6px; }
+.ad-kind { width: auto; min-width: 88px; padding-right: 24px; background-color: var(--al-surface); }
+.ad-times { color: var(--al-text-muted); }
+.ad-size { width: 70px; }
+.ad-total { margin: -4px 0 0; font-weight: 600; text-align: right; }
+.ad-empty { margin: 0; font-size: .85rem; }
+@media (max-width: 600px) {
+  .ad-grid { grid-template-columns: 1fr; }
+  /* Each line becomes a small card: name and remove on top, packs and units below. */
+  .ad-lines .al-table, .ad-lines tbody { display: block; min-width: 0; }
+  .ad-lines thead { display: none; }
+  .ad-lines tr { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--al-divider); }
+  .ad-lines .al-table td { display: block; padding: 0; border: 0; }
+  .ad-lines td:nth-child(2), .ad-lines td:nth-child(3) { grid-column: 1 / -1; }
+  .ad-lines td:nth-child(4) { grid-column: 2; grid-row: 1; }
+  .ad-units { display: flex !important; align-items: center; justify-content: space-between; }
+  .ad-units::before { content: attr(data-label); font-size: .8rem; color: var(--al-text-muted); }
+}

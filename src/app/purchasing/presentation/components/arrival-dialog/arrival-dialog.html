@@ -1,0 +1,91 @@
+<h2 mat-dialog-title class="ad-title"><mat-icon>local_shipping</mat-icon>{{ 'purchases.arrival.title' | translate }}</h2>
+<mat-dialog-content class="ad-content">
+  <div class="ad-grid">
+    <label class="al-field"><span class="al-label">{{ 'purchases.supplier' | translate }}</span>
+      <input class="al-input" list="ad-suppliers" [value]="supplier()" (input)="text('supplier', $event)"
+             [placeholder]="'purchases.arrival.supplier-example' | translate"/>
+      <datalist id="ad-suppliers">@for (s of purchases.suppliers(); track s) { <option [value]="s"></option> }</datalist>
+    </label>
+    <label class="al-field"><span class="al-label">{{ 'purchases.date' | translate }}</span>
+      <input class="al-input" type="date" [value]="date()" (input)="text('date', $event)"/></label>
+    <label class="al-field"><span class="al-label">{{ 'purchases.site' | translate }}</span>
+      <select class="al-select" (change)="onSite($event)">
+        @for (site of inventory.sites(); track site.id) { <option [value]="site.id" [selected]="site.id === siteId()">{{ site.name }}</option> }
+      </select>
+    </label>
+  </div>
+
+  <div class="ad-search">
+    <label class="al-field"><span class="al-label">{{ 'purchases.arrival.add-item' | translate }}</span>
+      <input class="al-input" type="search" [value]="search()" (input)="text('search', $event)"
+             [placeholder]="'purchases.arrival.search' | translate"/></label>
+    @if (results().length) {
+      <ul class="ad-results" role="listbox" [attr.aria-label]="'purchases.arrival.add-item' | translate">
+        @for (r of results(); track r.item.id) {
+          <li role="option" aria-selected="false">
+            <button type="button" class="ad-result" (click)="add(r)">
+              <mat-icon>add</mat-icon>
+              <span><strong>{{ r.name }}</strong>@if (r.variant) { <small> · {{ r.variant }}</small> }</span>
+            </button>
+          </li>
+        }
+      </ul>
+    } @else if (search().trim().length >= 2) {
+      <span class="al-hint">{{ 'purchases.arrival.no-results' | translate }}</span>
+    }
+  </div>
+
+  @if (lines().length) {
+    <div class="al-table-wrapper ad-lines">
+      <table class="al-table">
+        <thead>
+          <tr>
+            <th>{{ 'inventory.item.label' | translate }}</th>
+            <th>{{ 'purchases.arrival.packs' | translate }}</th>
+            <th class="al-num">{{ 'inventory.stock.units' | translate }}</th>
+            <th><span class="sr-only">{{ 'inventory.actions' | translate }}</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (line of lines(); track line.row.item.id) {
+            <tr>
+              <td><span class="ad-name">{{ line.row.name }}</span>@if (line.row.variant) { <span class="ad-variant">{{ line.row.variant }}</span> }</td>
+              <td>
+                <div class="ad-pack">
+                  <input class="al-input ad-num" type="number" min="1" step="1" [value]="line.packs ?? ''" (input)="onNumber(line.row.item.id, 'packs', $event)"
+                         [attr.aria-label]="'purchases.arrival.packs-count' | translate" placeholder="0"/>
+                  <select class="al-select ad-kind" (change)="onPackKind(line.row.item.id, $event)" [attr.aria-label]="'purchases.arrival.pack-kind' | translate">
+                    @for (kind of packKinds; track kind) { <option [value]="kind" [selected]="kind === line.packKind">{{ ('inventory.pack.' + kind) | translate }}</option> }
+                  </select>
+                  <span class="ad-times">×</span>
+                  <input class="al-input ad-num ad-size" type="number" min="1" step="1" [value]="line.unitsPerPack ?? ''" (input)="onNumber(line.row.item.id, 'unitsPerPack', $event)"
+                         [attr.aria-label]="'purchases.arrival.units-per-pack' | translate" [placeholder]="'purchases.arrival.units-short' | translate"/>
+                </div>
+              </td>
+              <td class="al-num ad-units" [attr.data-label]="'inventory.stock.units' | translate">
+                @if (inPacks(line)) { <strong>{{ units(line) ?? '—' }}</strong> }
+                @else {
+                  <input class="al-input ad-num" type="number" min="1" step="1" [value]="line.quantity ?? ''" (input)="onNumber(line.row.item.id, 'quantity', $event)"
+                         [attr.aria-label]="'inventory.stock.units' | translate"/>
+                }
+              </td>
+              <td><button type="button" class="al-icon-btn al-icon-btn--danger" (click)="remove(line.row.item.id)" [attr.aria-label]="'purchases.arrival.remove' | translate"><mat-icon>close</mat-icon></button></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="ad-total">{{ 'purchases.arrival.total' | translate: {units: totalUnits()} }}</p>
+  } @else {
+    <p class="al-muted ad-empty">{{ 'purchases.arrival.empty' | translate }}</p>
+  }
+
+  <label class="al-field"><span class="al-label">{{ 'inventory.stock.notes' | translate }} ({{ 'agenda.optional' | translate }})</span>
+    <input class="al-input" maxlength="200" [value]="notes()" (input)="text('notes', $event)" [placeholder]="'purchases.arrival.notes-example' | translate"/></label>
+  <p class="al-hint">{{ 'purchases.arrival.hint' | translate }}</p>
+  @if (problem(); as error) { <p class="al-error-text" role="alert">{{ error | translate }}</p> }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button type="button" class="al-btn al-btn--secondary" mat-dialog-close>{{ 'common.cancel' | translate }}</button>
+  <button type="button" class="al-btn al-btn--primary" (click)="save()" [disabled]="purchases.saving()"><mat-icon>check</mat-icon>{{ 'purchases.arrival.save' | translate }}</button>
+</mat-dialog-actions>

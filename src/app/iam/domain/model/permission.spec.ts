@@ -12,6 +12,7 @@ const matrix: Record<Permission, Record<Role, boolean>> = {
   'visits.edit-all':     {CEO: true, SELLER: false, WAREHOUSE: false},
   'technicians.manage':  {CEO: true, SELLER: false, WAREHOUSE: false},
   'inventory':           {CEO: true, SELLER: true,  WAREHOUSE: true},
+  'costs.manage':        {CEO: true, SELLER: false, WAREHOUSE: false},
   'settings':            {CEO: true, SELLER: true,  WAREHOUSE: true},
 };
 
