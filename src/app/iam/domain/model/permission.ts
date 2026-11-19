@@ -15,9 +15,10 @@ export type Permission =
   | 'agenda'              // see the agenda and schedule technical visits
   | 'visits.edit-all'     // change visits scheduled by other users
   | 'technicians.manage'  // register and edit technicians
+  | 'inventory'           // see stock per site, count it, adjust it and add items
   | 'settings';           // interface preferences
 
-const EVERYONE: readonly Permission[] = ['quote', 'catalog.view', 'catalog.add-product', 'agenda', 'settings'];
+const EVERYONE: readonly Permission[] = ['quote', 'catalog.view', 'catalog.add-product', 'agenda', 'inventory', 'settings'];
 
 /**
  * Sellers and warehouse staff share the same permissions for now; only their
