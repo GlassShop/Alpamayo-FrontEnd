@@ -1,5 +1,7 @@
 import {Component, computed, inject, Input} from '@angular/core';
-import {Router, RouterLink, RouterLinkActive} from '@angular/router';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {NavigationEnd, Router, RouterLink} from '@angular/router';
+import {filter, map} from 'rxjs';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {TranslatePipe} from '@ngx-translate/core';
@@ -13,28 +15,29 @@ interface NavOption {
   icon: string;
   /** Permission the signed-in user needs to see the entry. */
   permission: Permission;
-  /** Highlight only on an exact URL match (e.g. /catalogo vs /catalogo/precios). */
-  exact?: boolean;
+  /** Other pages of the same section, which keep the entry highlighted. */
+  alsoActiveOn?: readonly string[];
 }
 
 /** Every section of the app; each user only sees the ones their role allows. */
 const NAV_OPTIONS: readonly NavOption[] = [
-  {link: '/cotizador',        labelKey: 'nav.quote',    icon: 'calculate',    permission: 'quote'},
-  {link: '/cotizaciones',     labelKey: 'nav.quotes',   icon: 'description',  permission: 'quote'},
-  {link: '/agenda',           labelKey: 'nav.agenda',   icon: 'calendar_month', permission: 'agenda'},
-  {link: '/catalogo',         labelKey: 'nav.catalog',  icon: 'window',       permission: 'catalog.view', exact: true},
-  {link: '/catalogo/precios', labelKey: 'nav.prices',   icon: 'price_change', permission: 'prices.manage'},
-  {link: '/inventario',       labelKey: 'nav.inventory', icon: 'inventory_2', permission: 'inventory', exact: true},
-  {link: '/compras',          labelKey: 'nav.purchases', icon: 'local_shipping', permission: 'inventory'},
-  {link: '/inventario/costos', labelKey: 'nav.costs',    icon: 'paid',         permission: 'costs.manage'},
-  {link: '/usuarios',         labelKey: 'nav.users',    icon: 'group',        permission: 'users.manage'},
-  {link: '/configuracion',    labelKey: 'nav.settings', icon: 'settings',     permission: 'settings'},
+  {link: '/cotizador',     labelKey: 'nav.quote',     icon: 'calculate',      permission: 'quote', alsoActiveOn: ['/cotizaciones']},
+  {link: '/agenda',        labelKey: 'nav.agenda',    icon: 'calendar_month', permission: 'agenda'},
+  {link: '/catalogo',      labelKey: 'nav.catalog',   icon: 'window',         permission: 'catalog.view'},
+  {link: '/inventario',    labelKey: 'nav.inventory', icon: 'inventory_2',    permission: 'inventory'},
+  {link: '/configuracion', labelKey: 'nav.settings',  icon: 'settings',       permission: 'settings', alsoActiveOn: ['/usuarios']},
 ];
+
+/** True when `url` is `path` or one of its sub-pages ("/inventario/compras" is under "/inventario"). */
+function isUnder(url: string, path: string): boolean {
+  const clean = url.split(/[?#]/)[0];
+  return clean === path || clean.startsWith(path + '/');
+}
 
 /** Side navigation with the sections allowed for the signed-in user's role. */
 @Component({
   selector: 'app-seller-sidebar',
-  imports: [RouterLink, RouterLinkActive, MatIconModule, MatTooltipModule, TranslatePipe],
+  imports: [RouterLink, MatIconModule, MatTooltipModule, TranslatePipe],
   templateUrl: './seller-sidebar.html',
   styleUrl: './seller-sidebar.css',
   host: {'[class.sidebar-collapsed]': 'collapsed'}
@@ -44,6 +47,10 @@ export class SellerSidebar {
 
   readonly iamStore = inject(IamStore);
   private readonly router = inject(Router);
+
+  private readonly url = toSignal(
+    this.router.events.pipe(filter(e => e instanceof NavigationEnd), map(e => e.urlAfterRedirects)),
+    {initialValue: this.router.url});
 
   readonly options = computed(() => {
     this.iamStore.currentUser(); // re-evaluate when the user changes
@@ -60,6 +67,11 @@ export class SellerSidebar {
     const words = (this.iamStore.currentUsername() ?? '').trim().split(/\s+/).filter(Boolean);
     return (words.length > 1 ? words[0][0] + words[1][0] : (words[0] ?? '').slice(0, 2)).toUpperCase() || '—';
   });
+
+  isActive(option: NavOption): boolean {
+    const url = this.url();
+    return [option.link, ...(option.alsoActiveOn ?? [])].some(path => isUnder(url, path));
+  }
 
   signOut(): void {
     this.iamStore.signOut();

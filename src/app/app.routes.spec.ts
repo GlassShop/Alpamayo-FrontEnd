@@ -47,8 +47,8 @@ describe('app routes', () => {
       await router.navigateByUrl('/'); // settle the post-sign-in navigation
     });
 
-    it('opens the quoter, saved quotes, the agenda, the catalog and the settings', async () => {
-      for (const url of ['/cotizador', '/cotizaciones', '/agenda', '/catalogo', '/configuracion']) {
+    it('opens the quoter, saved quotes, the agenda, the catalog, the inventory, purchases and the settings', async () => {
+      for (const url of ['/cotizador', '/cotizaciones', '/agenda', '/catalogo', '/inventario', '/inventario/compras', '/configuracion']) {
         await router.navigateByUrl(url);
         expect(router.url).toBe(url);
       }
@@ -57,8 +57,16 @@ describe('app routes', () => {
     it('is sent to the quoter when opening CEO-only pages', async () => {
       await router.navigateByUrl('/usuarios');
       expect(router.url).toBe('/cotizador');
+    });
+
+    it('takes old links of merged pages to their new place', async () => {
+      await router.navigateByUrl('/compras');
+      expect(router.url).toBe('/inventario/compras');
+      await router.navigateByUrl('/inventario/costos');
+      expect(router.url).toBe('/inventario');
+      // The catalog ignores the edit mode for roles without prices.manage.
       await router.navigateByUrl('/catalogo/precios');
-      expect(router.url).toBe('/cotizador');
+      expect(router.url).toBe('/catalogo?editar=precios');
     });
 
     it('cannot go back to the sign-in page while signed in', async () => {
@@ -80,12 +88,12 @@ describe('app routes', () => {
   });
 
   describe('as the CEO', () => {
-    it('opens prices, users and the agenda', async () => {
+    it('opens price editing, users and the agenda', async () => {
       signInAs('CEO');
       await router.navigateByUrl('/agenda');
       expect(router.url).toBe('/agenda');
-      await router.navigateByUrl('/catalogo/precios');
-      expect(router.url).toBe('/catalogo/precios');
+      await router.navigateByUrl('/catalogo?editar=precios');
+      expect(router.url).toBe('/catalogo?editar=precios');
       await router.navigateByUrl('/usuarios');
       expect(router.url).toBe('/usuarios');
     });

@@ -12,8 +12,8 @@
   @for (option of options(); track option.link) {
     <a class="nav-item"
        [routerLink]="option.link"
-       routerLinkActive="nav-item--active"
-       [routerLinkActiveOptions]="{exact: !!option.exact}"
+       [class.nav-item--active]="isActive(option)"
+       [attr.aria-current]="isActive(option) ? 'page' : null"
        [matTooltip]="collapsed ? (option.labelKey | translate) : ''"
        matTooltipPosition="right"
        [attr.aria-label]="collapsed ? (option.labelKey | translate) : null">
