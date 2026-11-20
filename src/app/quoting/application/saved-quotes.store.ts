@@ -7,7 +7,8 @@ import {isValidDocument} from '../domain/model/document-id';
 /** Why saving or loading failed. Values are translation key suffixes. */
 export type SavedQuotesError =
   | 'load' | 'not-found' | 'save' | 'incomplete'
-  | 'invalid-document' | 'missing-name' | 'invalid-advance' | 'terms-not-accepted' | 'totals-mismatch';
+  | 'invalid-document' | 'missing-name' | 'invalid-advance' | 'terms-not-accepted' | 'totals-mismatch'
+  | 'discount-too-high';
 
 /** Normalised text for searching: lower case, no accents. */
 const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -100,10 +101,17 @@ export class SavedQuotesStore {
       },
       error: (e: unknown) => {
         this.savingSignal.set(false);
-        this.errorSignal.set(e instanceof HttpErrorResponse && e.status === 422 ? 'totals-mismatch' : 'save');
+        this.errorSignal.set(saveError(e));
       }
     });
   }
 
   clearError(): void { this.errorSignal.set(null); }
+}
+
+/** Prices changed meanwhile (422), or the CEO lowered the maximum discount meanwhile; anything else is a plain failure. */
+function saveError(e: unknown): SavedQuotesError {
+  if (!(e instanceof HttpErrorResponse)) return 'save';
+  if (e.status === 422) return 'totals-mismatch';
+  return e.error?.code === 'discount-too-high' ? 'discount-too-high' : 'save';
 }

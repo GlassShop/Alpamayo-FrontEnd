@@ -8,7 +8,7 @@ import {QuoteDraftSnapshot, SavedQuote} from '../domain/model/saved-quote.entity
 const snapshot: QuoteDraftSnapshot = {
   customer: {docType: 'DNI', docNumber: '45678912', name: 'Cliente Demo'},
   paymentMethod: 'CASH', advance: 100, termsAccepted: true,
-  priceList: {id: 1, name: 'Pública'}, currency: 'PEN', lines: [], extras: [],
+  priceList: {id: 1, name: 'Pública'}, currency: 'PEN', lines: [], products: [], extras: [],
   total: 477.78, subtotal: 404.9, igv: 72.88, balance: 377.78,
 };
 
@@ -21,6 +21,7 @@ const quote = (id: number, sellerId: number, name: string, createdAt: string): S
 class FakeQuotesApi {
   stored = [quote(1, 2, 'Constructora Ñandú', '2026-11-10T10:00:00Z'), quote(2, 3, 'Juan Pérez', '2026-11-12T10:00:00Z')];
   failWith: number | null = null;
+  failCode: string | null = null;
   sent: unknown[] = [];
   getAll(): Observable<SavedQuote[]> { return of(this.stored); }
   getById(id: number): Observable<SavedQuote> {
@@ -31,7 +32,9 @@ class FakeQuotesApi {
   update(id: number, s: QuoteDraftSnapshot): Observable<SavedQuote> { return this.answer(['update', id, s], {...this.stored[0], ...s}); }
   private answer(call: unknown, result: SavedQuote): Observable<SavedQuote> {
     this.sent.push(call);
-    return this.failWith ? throwError(() => new HttpErrorResponse({status: this.failWith!})) : of(result);
+    return this.failWith
+      ? throwError(() => new HttpErrorResponse({status: this.failWith!, error: this.failCode ? {code: this.failCode} : null}))
+      : of(result);
   }
 }
 
@@ -89,6 +92,13 @@ describe('SavedQuotesStore', () => {
     api.failWith = 422;
     store.save(snapshot, null, () => undefined);
     expect(store.error()).toBe('totals-mismatch');
+  });
+
+  it('explains a discount the server no longer allows', () => {
+    api.failWith = 400;
+    api.failCode = 'discount-too-high';
+    store.save(snapshot, null, () => undefined);
+    expect(store.error()).toBe('discount-too-high');
   });
 
   it('opens one quote, or reports that it does not exist', () => {
