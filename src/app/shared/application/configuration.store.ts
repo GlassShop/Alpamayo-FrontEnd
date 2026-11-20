@@ -6,10 +6,9 @@ const LANG_KEY = 'alpamayo.lang';
 @Injectable({providedIn: 'root'})
 export class ConfigurationStore {
   private readonly translate = inject(TranslateService);
-  private readonly activeLangSignal = signal(this.resolveInitialLang());
-
-  readonly activeLang = this.activeLangSignal.asReadonly();
   readonly availableLangs = ['es', 'en'] as const;
+  private readonly activeLangSignal = signal(this.resolveInitialLang());
+  readonly activeLang = this.activeLangSignal.asReadonly();
 
   constructor() {
     this.translate.addLangs([...this.availableLangs]);
