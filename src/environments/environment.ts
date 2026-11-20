@@ -23,5 +23,6 @@ export const environment = {
   stockLevelsEndpointPath: '/stock-levels',
   stockMovementsEndpointPath: '/stock-movements',
   purchasesEndpointPath: '/purchases',
-  costSettingsEndpointPath: '/cost-settings'
+  costSettingsEndpointPath: '/cost-settings',
+  saleSettingsEndpointPath: '/sale-settings'
 };

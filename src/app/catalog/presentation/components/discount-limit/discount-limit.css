@@ -1,0 +1,7 @@
+:host { display: block; margin-bottom: 16px; }
+.dl-card { padding: 16px 20px; }
+.dl-input { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.dl-input .al-input { width: 110px; text-align: right; }
+.dl-input span { margin-right: 6px; font-weight: 700; color: var(--al-text-muted); }
+.dl-hint { margin: 8px 0 0; }
+.dl-card .al-error-text { margin: 6px 0 0; }

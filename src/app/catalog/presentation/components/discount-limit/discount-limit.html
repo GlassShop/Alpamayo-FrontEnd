@@ -1,0 +1,22 @@
+<section class="al-card dl-card">
+  <form class="dl-form" (submit)="$event.preventDefault(); save()">
+    <div class="al-field dl-field">
+      <label class="al-label" for="dl-max">{{ 'catalog.discount.label' | translate }}</label>
+      <div class="dl-input">
+        <input class="al-input" id="dl-max" type="number" min="0" max="100" step="0.5" inputmode="decimal"
+               [value]="draft()" (input)="onInput($event)" [placeholder]="'catalog.discount.placeholder' | translate"
+               aria-describedby="dl-hint"/>
+        <span aria-hidden="true">%</span>
+        <button type="submit" class="al-btn al-btn--primary" [disabled]="settings.saving()"><mat-icon>check</mat-icon>{{ 'common.save' | translate }}</button>
+        @if (settings.maxDiscountPercent() !== null) {
+          <button type="button" class="al-btn al-btn--secondary" (click)="clear()" [disabled]="settings.saving()">{{ 'catalog.discount.off' | translate }}</button>
+        }
+      </div>
+    </div>
+  </form>
+  <p class="al-hint dl-hint" id="dl-hint">
+    @if (settings.maxDiscountPercent(); as max) { {{ 'catalog.discount.hint' | translate: {max} }} }
+    @else { {{ 'catalog.discount.hint-off' | translate }} }
+  </p>
+  @if (settings.error(); as error) { <p class="al-error-text" role="alert">{{ error | translate }}</p> }
+</section>

@@ -11,19 +11,21 @@ import {PriceHistoryPanel} from '../../components/price-history-panel/price-hist
 import {ProductTable} from '../../components/product-table/product-table';
 import {ProductPriceHistoryPanel} from '../../components/product-price-history-panel/product-price-history-panel';
 import {CatalogTab} from '../../catalog-tabs';
+import {DiscountLimit} from '../discount-limit/discount-limit';
 
 /**
  * The catalog in "Editar precios" mode (CEO, permission `prices.manage`):
  * sets the price per square foot of every glass type in every price list,
  * creates price lists, sets the public price of the other products
  * (aluminium, accessories, acrylics…) and reviews both price histories, for
- * the tab chosen in the catalog. New glass types and products are added in
+ * the tab chosen in the catalog. Above it, the maximum discount sellers may
+ * give on a quote. New glass types and products are added in
  * the normal mode by any role.
  */
 @Component({
   selector: 'app-price-editor',
   imports: [ReactiveFormsModule, TranslatePipe, MatIconModule, MatTooltipModule, PriceHistoryPanel, ProductTable,
-    ProductPriceHistoryPanel],
+    ProductPriceHistoryPanel, DiscountLimit],
   templateUrl: './price-editor.html',
   styleUrl: './price-editor.css'
 })
