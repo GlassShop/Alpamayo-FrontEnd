@@ -668,6 +668,7 @@ server.post('/quotes', (req, res) => {
   const quote = {
     id, number: `COT-${String(id).padStart(6, '0')}`, createdAt: now, updatedAt: now,
     seller: {id: req.currentUser.id, fullName: req.currentUser.fullName}, ...quoteFields(req.body),
+    status: 'OPEN', sale: null, cancelledSales: [],
   };
   quotes().push(quote).write();
   res.status(201).json(quote);
@@ -676,6 +677,7 @@ server.post('/quotes', (req, res) => {
 server.put('/quotes/:id', (req, res) => {
   const existing = quotes().find({id: Number(req.params.id)}).value();
   if (!existing || !canSee(req.currentUser, existing)) return res.status(404).json({code: 'not-found'});
+  if (existing.status === 'SOLD') return res.status(409).json({code: 'sold'});
   const problem = quoteProblem(req.body, req.currentUser);
   if (problem) return res.status(problem === 'totals-mismatch' ? 422 : 400).json({code: problem});
   const updated = {...existing, ...quoteFields(req.body), updatedAt: new Date().toISOString()};
@@ -683,6 +685,76 @@ server.put('/quotes/:id', (req, res) => {
   res.json(updated);
 });
 
+// ── sales ────────────────────────────────────────────────────────────────
+// Marking a quote as sold takes the units of every product line out of one
+// site (glass and extras never touch the stock). Everything is checked
+// first and applied together, so the stock never goes negative and a failed
+// sale changes nothing. Only the CEO annuls a sale, with a reason: the units
+// go back to the site and the quote is open again. Mirror of sale-plan.ts.
+const MAX_CANCEL_REASON = 200;
+const sameText = (a, b) => trimmed(a).toLowerCase() === trimmed(b).toLowerCase();
+
+function moveStock(itemId, siteId, delta, kind, reason, quoteId, user, at) {
+  const level = findLevel(itemId, siteId);
+  const saved = {...level, quantity: (level?.quantity ?? 0) + delta};
+  db.get('stock-levels').find({id: level.id}).assign(saved).write();
+  db.get('stock-movements').push({
+    id: nextId('stock-movements'), itemId, siteId, kind, delta, quantityAfter: saved.quantity, reason, quoteId, at, by: actor(user),
+  }).write();
+  return saved;
+}
+
+server.post('/quotes/:id/sale', (req, res) => {
+  const quote = quotes().find({id: Number(req.params.id)}).value();
+  if (!quote || !canSee(req.currentUser, quote)) return res.status(404).json({code: 'not-found'});
+  if (quote.status === 'SOLD') return res.status(409).json({code: 'sold'});
+  const {siteId, lines} = req.body ?? {};
+  const site = db.get('sites').find({id: siteId}).value();
+  const products = quote.products ?? [];
+  if (!site || !Array.isArray(lines) || lines.length !== products.length) return res.status(400).json({code: 'invalid-sale'});
+  // Every product line, once, with an item of that product in that colour.
+  const byIndex = new Map(lines.map(l => [l.productIndex, l.itemId]));
+  const needed = new Map();
+  for (const [index, product] of products.entries()) {
+    const item = db.get('inventory-items').find({id: byIndex.get(index)}).value();
+    if (!item || item.productId !== product.productId || !sameText(item.color, product.color)) return res.status(400).json({code: 'invalid-sale'});
+    needed.set(item.id, (needed.get(item.id) ?? 0) + product.quantity);
+  }
+  for (const [itemId, quantity] of needed) {
+    const level = findLevel(itemId, siteId);
+    if (level?.quantity === null || level?.quantity === undefined || level.quantity < quantity) return res.status(409).json({code: 'stock-problem'});
+  }
+  const at = new Date().toISOString();
+  const levels = [...needed].map(([itemId, quantity]) =>
+    moveStock(itemId, siteId, -quantity, 'SALE', `Venta ${quote.number}`, quote.id, req.currentUser, at));
+  const sale = {
+    siteId, siteName: site.name, at, by: actor(req.currentUser),
+    lines: products.map((p, productIndex) => ({productIndex, itemId: byIndex.get(productIndex), quantity: p.quantity})),
+  };
+  const updated = {...quote, status: 'SOLD', sale, cancelledSales: quote.cancelledSales ?? [], updatedAt: at};
+  quotes().find({id: quote.id}).assign(updated).write();
+  res.status(201).json({quote: updated, levels});
+});
+
+server.post('/quotes/:id/sale/cancel', (req, res) => {
+  if (req.currentUser.role !== 'CEO') return res.status(403).json({code: 'forbidden'});
+  const quote = quotes().find({id: Number(req.params.id)}).value();
+  if (!quote) return res.status(404).json({code: 'not-found'});
+  if (quote.status !== 'SOLD' || !quote.sale) return res.status(409).json({code: 'not-sold'});
+  const reason = trimmed(req.body?.reason).slice(0, MAX_CANCEL_REASON);
+  if (!reason) return res.status(400).json({code: 'missing-reason'});
+  const at = new Date().toISOString();
+  const returned = new Map();
+  for (const line of quote.sale.lines) returned.set(line.itemId, (returned.get(line.itemId) ?? 0) + line.quantity);
+  const levels = [...returned].map(([itemId, quantity]) =>
+    moveStock(itemId, quote.sale.siteId, quantity, 'SALE_CANCEL', `Anulación de venta ${quote.number}: ${reason}`, quote.id, req.currentUser, at));
+  const cancelled = {...quote.sale, cancelledAt: at, cancelledBy: actor(req.currentUser), reason};
+  const updated = {...quote, status: 'OPEN', sale: null, cancelledSales: [...(quote.cancelledSales ?? []), cancelled], updatedAt: at};
+  quotes().find({id: quote.id}).assign(updated).write();
+  res.json({quote: updated, levels});
+});
+
+server.all(['/quotes/:id/sale', '/quotes/:id/sale/cancel'], (req, res) => res.status(405).json({code: 'not-allowed'}));
 server.all(['/quotes', '/quotes/:id'], (req, res) => res.status(405).json({code: 'not-allowed'}));
 
 // ── agenda: technicians and visits ───────────────────────────────────────
