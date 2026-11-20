@@ -1,14 +1,20 @@
 import {computed, inject, Injectable, signal} from '@angular/core';
+import {Observable} from 'rxjs';
 import {HttpErrorResponse} from '@angular/common/http';
-import {QuotesApi} from '../infrastructure/quotes-api';
-import {QuoteDraftSnapshot, SavedQuote} from '../domain/model/saved-quote.entity';
+import {QuotesApi, SellCommand, StockChangeResult} from '../infrastructure/quotes-api';
+import {QuoteDraftSnapshot, QuoteStatus, SavedQuote} from '../domain/model/saved-quote.entity';
 import {isValidDocument} from '../domain/model/document-id';
 
 /** Why saving or loading failed. Values are translation key suffixes. */
 export type SavedQuotesError =
   | 'load' | 'not-found' | 'save' | 'incomplete'
   | 'invalid-document' | 'missing-name' | 'invalid-advance' | 'terms-not-accepted' | 'totals-mismatch'
-  | 'discount-too-high';
+  | 'discount-too-high'
+  // Sales
+  | 'sold' | 'stock-changed' | 'sale' | 'missing-reason';
+
+/** Filter of the list by state. */
+export type StatusFilter = 'ALL' | QuoteStatus;
 
 /** Normalised text for searching: lower case, no accents. */
 const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -30,6 +36,7 @@ export class SavedQuotesStore {
   readonly search = signal('');
   /** Seller id to filter by (CEO only), or null for everyone. */
   readonly sellerFilter = signal<number | null>(null);
+  readonly statusFilter = signal<StatusFilter>('ALL');
 
   readonly loading = this.loadingSignal.asReadonly();
   readonly saving = this.savingSignal.asReadonly();
@@ -37,13 +44,15 @@ export class SavedQuotesStore {
   /** Quote opened in the print view. */
   readonly current = this.currentSignal.asReadonly();
 
-  /** Newest first, filtered by the search text and the seller filter. */
+  /** Newest first, filtered by the search text, the seller and the state. */
   readonly quotes = computed(() => {
     const q = fold(this.search().trim());
     const seller = this.sellerFilter();
+    const status = this.statusFilter();
     return [...this.quotesSignal()]
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       .filter(quote => seller === null || quote.seller.id === seller)
+      .filter(quote => status === 'ALL' || quote.status === status)
       .filter(quote => !q || [quote.number, quote.customer.name, quote.customer.docNumber].some(t => fold(t).includes(q)));
   });
 
@@ -106,12 +115,55 @@ export class SavedQuotesStore {
     });
   }
 
+  /**
+   * Marks a quote as sold from a site. `onDone` receives the stock levels the
+   * server changed, so the inventory can show them at once.
+   */
+  sell(id: number, command: SellCommand, onDone: (result: StockChangeResult) => void): void {
+    if (!Number.isInteger(command.siteId)) { this.errorSignal.set('sale'); return; }
+    this.changeSale(this.api.sell(id, command), onDone);
+  }
+
+  /** Annuls a sale (CEO); the reason is required. */
+  cancelSale(id: number, reason: string, onDone: (result: StockChangeResult) => void): void {
+    const clean = reason.trim();
+    if (!clean) { this.errorSignal.set('missing-reason'); return; }
+    this.changeSale(this.api.cancelSale(id, clean), onDone);
+  }
+
   clearError(): void { this.errorSignal.set(null); }
+
+  private changeSale(request$: Observable<StockChangeResult>, onDone: (result: StockChangeResult) => void): void {
+    this.savingSignal.set(true);
+    this.errorSignal.set(null);
+    request$.subscribe({
+      next: result => {
+        this.quotesSignal.update(list => list.map(q => q.id === result.quote.id ? result.quote : q));
+        if (this.currentSignal()?.id === result.quote.id) this.currentSignal.set(result.quote);
+        this.savingSignal.set(false);
+        onDone(result);
+      },
+      error: (e: unknown) => {
+        this.savingSignal.set(false);
+        this.errorSignal.set(saleError(e));
+      }
+    });
+  }
 }
 
-/** Prices changed meanwhile (422), or the CEO lowered the maximum discount meanwhile; anything else is a plain failure. */
+/** Prices changed meanwhile (422), the CEO lowered the maximum discount, or the quote was sold meanwhile. */
 function saveError(e: unknown): SavedQuotesError {
   if (!(e instanceof HttpErrorResponse)) return 'save';
   if (e.status === 422) return 'totals-mismatch';
+  if (e.error?.code === 'sold') return 'sold';
   return e.error?.code === 'discount-too-high' ? 'discount-too-high' : 'save';
+}
+
+/** Someone sold or annulled it meanwhile, or the stock changed since the dialog was opened. */
+function saleError(e: unknown): SavedQuotesError {
+  const code = e instanceof HttpErrorResponse ? e.error?.code : null;
+  if (code === 'sold' || code === 'not-sold') return 'sold';
+  if (code === 'stock-problem') return 'stock-changed';
+  if (code === 'missing-reason') return 'missing-reason';
+  return 'sale';
 }

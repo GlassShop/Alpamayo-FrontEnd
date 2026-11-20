@@ -2,7 +2,7 @@ import {TestBed} from '@angular/core/testing';
 import {HttpErrorResponse} from '@angular/common/http';
 import {Observable, of, throwError} from 'rxjs';
 import {SavedQuotesStore} from './saved-quotes.store';
-import {QuotesApi} from '../infrastructure/quotes-api';
+import {QuotesApi, SellCommand, StockChangeResult} from '../infrastructure/quotes-api';
 import {QuoteDraftSnapshot, SavedQuote} from '../domain/model/saved-quote.entity';
 
 const snapshot: QuoteDraftSnapshot = {
@@ -16,7 +16,11 @@ const quote = (id: number, sellerId: number, name: string, createdAt: string): S
   ...snapshot, id, number: `COT-${String(id).padStart(6, '0')}`, createdAt, updatedAt: createdAt,
   seller: {id: sellerId, fullName: sellerId === 2 ? 'Ana' : 'Luis'},
   customer: {...snapshot.customer, name},
+  status: 'OPEN', sale: null, cancelledSales: [],
 });
+
+const level = {id: 9, itemId: 1, siteId: 1, quantity: 2, inTransit: false, notes: ''};
+const sale = {siteId: 1, siteName: 'Principal', at: '2026-11-20T10:00:00Z', by: {id: 2, fullName: 'Ana'}, lines: []};
 
 class FakeQuotesApi {
   stored = [quote(1, 2, 'Constructora Ñandú', '2026-11-10T10:00:00Z'), quote(2, 3, 'Juan Pérez', '2026-11-12T10:00:00Z')];
@@ -30,7 +34,14 @@ class FakeQuotesApi {
   }
   create(s: QuoteDraftSnapshot): Observable<SavedQuote> { return this.answer(['create', s], {...quote(3, 2, s.customer.name, '2026-11-18T10:00:00Z'), ...s}); }
   update(id: number, s: QuoteDraftSnapshot): Observable<SavedQuote> { return this.answer(['update', id, s], {...this.stored[0], ...s}); }
-  private answer(call: unknown, result: SavedQuote): Observable<SavedQuote> {
+  sell(id: number, command: SellCommand): Observable<StockChangeResult> {
+    const sold = {...this.stored.find(q => q.id === id)!, status: 'SOLD' as const, sale};
+    return this.answer(['sell', id, command], {quote: sold, levels: [level]});
+  }
+  cancelSale(id: number, reason: string): Observable<StockChangeResult> {
+    return this.answer(['cancel', id, reason], {quote: {...this.stored.find(q => q.id === id)!, status: 'OPEN'}, levels: [level]});
+  }
+  private answer<T>(call: unknown, result: T): Observable<T> {
     this.sent.push(call);
     return this.failWith
       ? throwError(() => new HttpErrorResponse({status: this.failWith!, error: this.failCode ? {code: this.failCode} : null}))
@@ -106,5 +117,50 @@ describe('SavedQuotesStore', () => {
     expect(store.current()?.number).toBe('COT-000002');
     store.open(99);
     expect(store.error()).toBe('not-found');
+  });
+
+  describe('sales', () => {
+    it('marks a quote as sold, updates the list and the open quote, and hands over the stock levels', () => {
+      store.open(1);
+      const done = vi.fn();
+      store.sell(1, {siteId: 1, lines: []}, done);
+      expect(api.sent).toEqual([['sell', 1, {siteId: 1, lines: []}]]);
+      expect(store.current()?.status).toBe('SOLD');
+      expect(store.quotes().find(q => q.id === 1)?.status).toBe('SOLD');
+      expect(done).toHaveBeenCalledWith(expect.objectContaining({levels: [level]}));
+    });
+
+    it('filters the list by state', () => {
+      store.sell(1, {siteId: 1, lines: []}, () => undefined);
+      store.statusFilter.set('SOLD');
+      expect(store.quotes().map(q => q.id)).toEqual([1]);
+      store.statusFilter.set('OPEN');
+      expect(store.quotes().map(q => q.id)).toEqual([2]);
+    });
+
+    it('explains when the stock changed since the dialog was opened', () => {
+      api.failWith = 409;
+      api.failCode = 'stock-problem';
+      store.sell(1, {siteId: 1, lines: []}, () => undefined);
+      expect(store.error()).toBe('stock-changed');
+    });
+
+    it('explains when the quote was sold meanwhile, also when trying to save it', () => {
+      api.failWith = 409;
+      api.failCode = 'sold';
+      store.sell(1, {siteId: 1, lines: []}, () => undefined);
+      expect(store.error()).toBe('sold');
+      store.save(snapshot, 1, () => undefined);
+      expect(store.error()).toBe('sold');
+    });
+
+    it('requires a reason to annul a sale', () => {
+      store.cancelSale(1, '   ', () => undefined);
+      expect(store.error()).toBe('missing-reason');
+      expect(api.sent).toEqual([]);
+      store.cancelSale(1, ' Cliente devolvió todo ', () => undefined);
+      expect(api.sent).toEqual([['cancel', 1, 'Cliente devolvió todo']]);
+      expect(store.quotes().find(q => q.id === 1)?.status).toBe('OPEN');
+    });
   });
 });

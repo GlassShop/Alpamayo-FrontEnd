@@ -42,6 +42,9 @@ function fakeIam() {
   return {currentUser: user, can: (p: string) => p === 'prices.manage' && user()?.role === 'CEO'};
 }
 
+/** Sale state of a quote that was never sold. */
+const OPEN = {status: 'OPEN' as const, sale: null, cancelledSales: []};
+
 function memoryStorage(): Storage {
   const data = new Map<string, string>();
   return {
@@ -228,7 +231,7 @@ describe('QuotingStore', () => {
     it('reloads a saved quote for editing and warns when current prices changed', () => {
       addLaminadoCase1();
       const snapshot = store.toSnapshot(details)!;
-      const saved = {...snapshot, id: 7, number: 'COT-000007', createdAt: '', updatedAt: '', seller: {id: 2, fullName: 'Ana'}};
+      const saved = {...snapshot, id: 7, number: 'COT-000007', createdAt: '', updatedAt: '', seller: {id: 2, fullName: 'Ana'}, ...OPEN};
       store.clear();
       store.loadForEditing(saved);
       expect(store.editing()).toMatchObject({id: 7, number: 'COT-000007', savedTotal: 477.78});
@@ -262,7 +265,7 @@ describe('QuotingStore', () => {
       const glass = addLaminadoCase1();
       store.updateLine(glass, {adjustedPrice: 7.5});
       store.updateProduct(store.addProduct(10, '', 1)!, {adjustedPrice: 80});
-      const saved = {...store.toSnapshot(details)!, id: 8, number: 'COT-000008', createdAt: '', updatedAt: '', seller: {id: 2, fullName: 'Ana'}};
+      const saved = {...store.toSnapshot(details)!, id: 8, number: 'COT-000008', createdAt: '', updatedAt: '', seller: {id: 2, fullName: 'Ana'}, ...OPEN};
       store.clear();
       store.loadForEditing(saved);
       expect(store.lines()[0].adjustedPrice).toBe(7.5);

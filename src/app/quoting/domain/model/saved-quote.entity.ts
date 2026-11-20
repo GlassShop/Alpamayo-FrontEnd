@@ -64,6 +64,33 @@ export interface QuoteDetails {
   notes?: string;
 }
 
+/** OPEN: still a proposal, it can be edited. SOLD: the goods left the shop; it cannot be edited. */
+export type QuoteStatus = 'OPEN' | 'SOLD';
+
+/** Units of one inventory item that left with the sale, for one product line of the quote. */
+export interface SaleLine {
+  /** Position of the product in `products`. */
+  productIndex: number;
+  itemId: number;
+  quantity: number;
+}
+
+/** Who sold the quote, when, and from which site the goods left. */
+export interface QuoteSale {
+  siteId: number;
+  siteName: string;
+  at: string;
+  by: {id: number; fullName: string};
+  lines: SaleLine[];
+}
+
+/** A sale the CEO annulled: the stock went back and the quote was reopened. */
+export interface CancelledSale extends QuoteSale {
+  cancelledAt: string;
+  cancelledBy: {id: number; fullName: string};
+  reason: string;
+}
+
 /**
  * A saved quote. Prices and totals are a snapshot: what was promised to the
  * customer does not change if the CEO changes prices later.
@@ -86,10 +113,17 @@ export interface SavedQuote extends QuoteDetails {
   igv: number;
   /** total − advance. */
   balance: number;
+  /** OPEN in quotes saved before sales existed. */
+  status: QuoteStatus;
+  /** Set while the quote is SOLD. */
+  sale: QuoteSale | null;
+  /** Sales annulled by the CEO, oldest first. */
+  cancelledSales: CancelledSale[];
 }
 
-/** Body sent to create or update a quote (the server assigns id, number, seller and dates). */
-export type QuoteDraftSnapshot = Omit<SavedQuote, 'id' | 'number' | 'createdAt' | 'updatedAt' | 'seller'>;
+/** Body sent to create or update a quote (the server assigns id, number, seller, dates and the sale state). */
+export type QuoteDraftSnapshot = Omit<SavedQuote,
+  'id' | 'number' | 'createdAt' | 'updatedAt' | 'seller' | 'status' | 'sale' | 'cancelledSales'>;
 
 /**
  * Amount taken off the catalog prices, in soles (0 when nothing was lowered).
