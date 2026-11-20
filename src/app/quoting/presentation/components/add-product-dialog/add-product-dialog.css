@@ -1,0 +1,15 @@
+.ap-title { display: flex; align-items: center; gap: 8px; }
+.ap-content { display: flex; flex-direction: column; gap: 14px; }
+.ap-product { display: flex; flex-direction: column; gap: 2px; margin: 0; }
+.ap-product .al-muted { font-size: .85rem; font-variant-numeric: tabular-nums; }
+.ap-note { margin: 0; font-size: .82rem; }
+.ap-invalid { border-color: var(--al-primary); }
+.ap-loading { display: flex; align-items: center; gap: 6px; margin: 0; font-size: .85rem; }
+.ap-stock ul { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 0; padding: 0; }
+.ap-stock li {
+  display: flex; align-items: center; gap: 8px; padding: 6px 10px; font-size: .85rem;
+  border: 1px solid var(--al-divider); border-radius: var(--al-radius); background: var(--al-field);
+}
+.ap-stock strong { font-variant-numeric: tabular-nums; }
+.ap-stepper { max-width: 180px; }
+.ap-total { margin: 0; font-size: .95rem; font-variant-numeric: tabular-nums; }

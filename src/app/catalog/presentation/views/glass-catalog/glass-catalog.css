@@ -19,4 +19,26 @@
 .gc-thickness { flex: 0 0 140px !important; min-width: 0 !important; }
 .gc-add { flex-shrink: 0; }
 .gc-hint { margin: 0; font-size: .8rem; }
-@media (max-width: 640px) { .gc-thickness { flex: 1 1 auto !important; } .gc-add { width: 100%; } }
+.gc-quote-cell { width: 1%; white-space: nowrap; }
+.gc-quote { height: 32px; padding: 0 10px; font-size: .78rem; }
+.gc-quote mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+/* Quote being built: stays at the bottom while browsing the catalog. */
+.gc-cart {
+  position: sticky; bottom: 16px; z-index: 5; display: flex; align-items: center; gap: 12px;
+  margin-top: 24px; padding: 10px 12px 10px 16px;
+  color: var(--al-text); background: var(--al-surface);
+  border: 1px solid var(--al-border); border-left: 4px solid var(--al-primary); border-radius: var(--al-radius);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .12);
+}
+.gc-cart > mat-icon { color: var(--al-primary); }
+.gc-cart-text { flex: 1; font-size: .9rem; }
+.gc-cart-text strong { margin-left: 6px; font-size: 1rem; font-variant-numeric: tabular-nums; }
+.gc-cart-open { flex-shrink: 0; }
+.gc-cart-open mat-icon { margin: 0 -2px 0 4px; }
+
+@media (max-width: 640px) {
+  .gc-thickness { flex: 1 1 auto !important; } .gc-add { width: 100%; }
+  .gc-quote-label { display: none; }
+  .gc-cart { flex-wrap: wrap; } .gc-cart-open { width: 100%; justify-content: center; }
+}

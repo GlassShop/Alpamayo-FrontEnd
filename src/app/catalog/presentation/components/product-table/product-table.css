@@ -13,6 +13,9 @@
 .pt-cell { display: inline-flex; align-items: center; justify-content: flex-end; }
 .pt-input { width: 110px; text-align: right; background: var(--al-surface); }
 .pt-gap { display: inline-block; width: 34px; flex-shrink: 0; }
+.pt-add-cell { width: 1%; white-space: nowrap; }
+.pt-add { height: 32px; padding: 0 10px; font-size: .78rem; }
+.pt-add mat-icon { font-size: 18px; width: 18px; height: 18px; }
 .pt-empty { text-align: center; color: var(--al-text-muted); padding: 24px !important; }
 .pt-more { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 20px; border-top: 1px solid var(--al-divider); font-size: .85rem; }
-@media (max-width: 600px) { .pt-search { min-width: 0; width: 100%; } }
+@media (max-width: 600px) { .pt-search { min-width: 0; width: 100%; } .pt-add-label { display: none; } }

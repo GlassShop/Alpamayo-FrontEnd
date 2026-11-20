@@ -8,11 +8,11 @@ import {SavedQuotesStore} from '../../../application/saved-quotes.store';
 import {QuotingStore} from '../../../application/quoting.store';
 import {IamStore} from '../../../../iam/application/iam.store';
 import {CatalogStore} from '../../../../catalog/application/catalog.store';
-import {SavedQuote} from '../../../domain/model/saved-quote.entity';
+import {quoteDiscount, SavedQuote} from '../../../domain/model/saved-quote.entity';
 
 /**
  * "Mis cotizaciones": each user sees their own saved quotes; the CEO sees
- * every quote and can filter by seller.
+ * every quote, can filter by seller and sees how much was discounted.
  */
 @Component({
   selector: 'app-saved-quotes',
@@ -27,6 +27,8 @@ export class SavedQuotes implements OnInit {
   private readonly catalog = inject(CatalogStore);
   private readonly router = inject(Router);
   private readonly translate = inject(TranslateService);
+  /** Soles taken off the catalog prices; shown to the CEO. */
+  readonly discount = quoteDiscount;
 
   ngOnInit(): void {
     this.store.clearError();
@@ -43,7 +45,7 @@ export class SavedQuotes implements OnInit {
 
   /** Opens the quote in the quoter. Asks first if there is an unsaved quote in progress. */
   edit(quote: SavedQuote): void {
-    const busy = this.quoting.lines().length + this.quoting.extras().length > 0 && this.quoting.editing()?.id !== quote.id;
+    const busy = this.quoting.rowCount() > 0 && this.quoting.editing()?.id !== quote.id;
     if (busy && !globalThis.confirm?.(this.translate.instant('quotes.list.confirm-replace'))) return;
     this.store.open(quote.id, full => {
       this.quoting.loadForEditing(full);

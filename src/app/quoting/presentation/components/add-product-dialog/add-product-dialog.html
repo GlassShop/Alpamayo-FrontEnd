@@ -1,0 +1,59 @@
+<h2 mat-dialog-title class="ap-title"><mat-icon>add_shopping_cart</mat-icon>{{ 'quotes.products.add-title' | translate }}</h2>
+<form (submit)="$event.preventDefault(); add()">
+<mat-dialog-content class="ap-content">
+  @if (product(); as p) {
+    <p class="ap-product">
+      <strong>{{ label() }}</strong>
+      <span class="al-muted">
+        @if (p.publicPrice !== null) { S/ {{ p.publicPrice | number:'1.2-2' }} / {{ unitKey() | translate }} }
+        @else { {{ 'catalog.prices.unset' | translate }} }
+      </span>
+    </p>
+    @if (p.publicPrice === null) {
+      <p class="al-alert al-alert--info ap-note" role="note"><mat-icon>info</mat-icon>{{ 'quotes.products.no-price-hint' | translate }}</p>
+    }
+  }
+
+  @if (!inventory.loaded()) {
+    <p class="al-muted ap-loading"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</p>
+  } @else if (colors().length) {
+    <label class="al-field">
+      <span class="al-label">{{ 'quotes.products.color' | translate }}</span>
+      <select class="al-select" (change)="onColor($event)" [class.ap-invalid]="submitted() && needsColor()">
+        <option value="" [selected]="!color()" disabled>{{ 'quotes.products.choose-color' | translate }}</option>
+        @for (c of colors(); track c) { <option [value]="c" [selected]="c === color()">{{ c }}</option> }
+      </select>
+      @if (submitted() && needsColor()) { <span class="al-error-text">{{ 'quotes.products.color-required' | translate }}</span> }
+    </label>
+  }
+
+  @if (inventory.loaded() && (!colors().length || color())) {
+    <div class="ap-stock" aria-live="polite">
+      <span class="al-label">{{ 'quotes.products.stock' | translate }}</span>
+      <ul>
+        @for (s of stock(); track s.siteId) {
+          <li><span>{{ s.name }}</span><strong>{{ s.quantity ?? ('inventory.status.UNKNOWN' | translate) }}</strong></li>
+        }
+      </ul>
+    </div>
+  }
+
+  <div class="al-field">
+    <label class="al-label" for="ap-qty">{{ 'quoting.quantity' | translate }} ({{ unitKey() | translate }})</label>
+    <div class="al-stepper ap-stepper">
+      <button type="button" class="al-step" (click)="step(-1)" [attr.aria-label]="'quoting.less' | translate">−</button>
+      <input class="al-input" id="ap-qty" type="number" min="1" step="1" inputmode="numeric" [value]="quantity() ?? ''" (input)="onQuantity($event)"/>
+      <button type="button" class="al-step" (click)="step(1)" [attr.aria-label]="'quoting.more' | translate">+</button>
+    </div>
+    @if (submitted() && !validQuantity()) { <span class="al-error-text">{{ 'quotes.products.whole-quantity' | translate }}</span> }
+  </div>
+
+  @if (total(); as t) {
+    <p class="ap-total">{{ 'quoting.total' | translate }}: <strong>S/ {{ t | number:'1.2-2' }}</strong></p>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button type="button" class="al-btn al-btn--secondary" mat-dialog-close>{{ 'common.cancel' | translate }}</button>
+  <button type="submit" class="al-btn al-btn--primary"><mat-icon>add</mat-icon>{{ 'quotes.products.add' | translate }}</button>
+</mat-dialog-actions>
+</form>

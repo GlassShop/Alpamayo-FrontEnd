@@ -75,9 +75,23 @@
             <td class="al-num">{{ line.total | number:'1.2-2' }}</td>
           </tr>
         }
-        @for (extra of quote.extras; track $index) {
+        @for (product of quote.products; track $index) {
           <tr>
             <td>{{ quote.lines.length + $index + 1 }}</td>
+            <td>
+              <strong>{{ product.description }}</strong>
+              <span class="qp-detail">
+                @if (product.color) { {{ product.color }} · }{{ ('catalog.products.unit.' + product.saleUnit) | translate }}
+              </span>
+            </td>
+            <td class="al-num">{{ product.quantity }}</td>
+            <td class="al-num">{{ product.unitPrice | number:'1.2-2' }}</td>
+            <td class="al-num">{{ product.total | number:'1.2-2' }}</td>
+          </tr>
+        }
+        @for (extra of quote.extras; track $index) {
+          <tr>
+            <td>{{ quote.lines.length + quote.products.length + $index + 1 }}</td>
             <td><strong>{{ extra.description }}</strong></td>
             <td class="al-num">{{ extra.quantity }}</td>
             <td class="al-num">{{ extra.unitPrice | number:'1.2-2' }}</td>

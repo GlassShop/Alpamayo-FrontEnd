@@ -139,6 +139,23 @@
           </label>
         </div>
 
+        @if (selectedGlassPrice(); as catalogPrice) {
+          <div class="qb-row qb-row--final">
+            <label class="al-field qb-final">
+              <span class="al-label">{{ 'quoting.final-price' | translate }}</span>
+              <input class="al-input" type="number" min="0.01" step="0.01" inputmode="decimal"
+                     [class.qb-final--adjusted]="draftPreview()?.adjusted" [class.qb-final--error]="draftPreview()?.issue === 'below-limit'"
+                     [placeholder]="catalogPrice | number:'1.2-2'" [value]="finalPrice()?.toFixed(2) ?? ''" (change)="onFinalPrice($event)"
+                     aria-describedby="qb-final-hint"/>
+            </label>
+            <span class="al-hint qb-final-hint" id="qb-final-hint">
+              @if (quoting.unlimitedDiscount()) { {{ 'quotes.limit.none' | translate }} }
+              @else if (quoting.maxDiscountPercent() === 0) { {{ 'quotes.limit.not-set' | translate }} }
+              @else { {{ 'quotes.limit.max' | translate: {percent: quoting.maxDiscountPercent(), min: (draftPreview()?.minPrice | number:'1.2-2')} }} }
+            </span>
+          </div>
+        }
+
         @if (draftPreview(); as draft) {
           <div class="qb-preview" aria-live="polite">
             @if (draft.roundedWidthCm && draft.roundedHeightCm) {
@@ -154,6 +171,9 @@
               @if (draft.total !== null) {
                 <!-- ((ancho × alto / 900) × precio pie²) × cantidad -->
                 <span class="qb-formula">(({{ draft.roundedWidthCm }} × {{ draft.roundedHeightCm }} ÷ 900) × S/ {{ draft.pricePerSqFt | number:'1.2-2' }}) × {{ draft.line.quantity }} = S/ {{ draft.total | number:'1.2-2' }}</span>
+                @if (draft.issue === 'below-limit') {
+                  <span class="al-error-text">{{ 'quotes.below-limit' | translate: {min: (draft.minPrice | number:'1.2-2')} }}</span>
+                }
               } @else if (submitted() && draft.issue) {
                 <span class="al-error-text">{{ 'quoting.issue.' + draft.issue | translate }}</span>
               }
@@ -216,7 +236,7 @@
 
       <div class="al-card-footer">
         <button class="al-btn al-btn--secondary" (click)="clearQuote()"
-                [disabled]="quoting.lines().length + quoting.extras().length === 0 && !quoting.editing()">
+                [disabled]="quoting.rowCount() === 0 && !quoting.editing()">
           <mat-icon>{{ quoting.editing() ? 'note_add' : 'delete_sweep' }}</mat-icon>
           {{ (quoting.editing() ? 'quotes.new-quote' : 'quoting.clear') | translate }}
         </button>
@@ -264,6 +284,14 @@
                 <td class="al-num">
                   @if (view.total !== null) { S/ {{ view.total | number:'1.2-2' }} }
                   @else { <span class="al-pill al-pill--warning" [matTooltip]="'quoting.issue.' + view.issue | translate">{{ 'quoting.no-price-short' | translate }}</span> }
+                  @if (view.issue === 'below-limit') {
+                    <span class="al-error-text qb-note">{{ 'quotes.below-limit' | translate: {min: (view.minPrice | number:'1.2-2')} }}</span>
+                  } @else if (adjustment(view); as note) {
+                    <span class="qb-note" [class.qb-note--down]="note.down"
+                          [matTooltip]="'quotes.catalog-price' | translate: {price: (view.catalogPricePerSqFt | number:'1.2-2')}">
+                      {{ note.key | translate: {percent: note.percent} }} · S/ {{ view.pricePerSqFt | number:'1.2-2' }}/pie²
+                    </span>
+                  }
                 </td>
                 <td class="al-num qb-line-actions">
                   <button class="al-icon-btn" (click)="edit(view)" [matTooltip]="'quoting.edit' | translate" [attr.aria-label]="'quoting.edit' | translate"><mat-icon>edit</mat-icon></button>
@@ -276,6 +304,9 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Catalog products at their public price -->
+      <app-quote-products/>
 
       <!-- Additional concepts: price typed by the seller -->
       <app-quote-extras/>

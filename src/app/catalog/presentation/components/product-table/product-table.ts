@@ -6,14 +6,17 @@ import {TranslatePipe} from '@ngx-translate/core';
 import {ProductsStore} from '../../../application/products.store';
 import {ProductPriceHistoryStore} from '../../../application/product-price-history.store';
 import {Product, ProductCategory, SALE_UNIT} from '../../../domain/model/product.entity';
+import {QUOTE_CART} from '../../../application/quote-cart';
+import {IamStore} from '../../../../iam/application/iam.store';
 
 /** Rows shown at once; the search narrows the list for long categories (accessories, traditional aluminium). */
 const PAGE_SIZE = 60;
 
 /**
- * Products of one category with their public price. Read-only in the
- * catalog; on the prices page (`editable`) the CEO types each price and it
- * is saved when the cell is left, with the reason typed on the page.
+ * Products of one category with their public price. In the catalog each row
+ * can be added to the quote being built; in "Editar precios" (`editable`) the
+ * CEO types each price and it is saved when the cell is left, with the reason
+ * typed on the page.
  */
 @Component({
   selector: 'app-product-table',
@@ -24,6 +27,9 @@ const PAGE_SIZE = 60;
 export class ProductTable {
   readonly products = inject(ProductsStore);
   readonly history = inject(ProductPriceHistoryStore);
+  /** Present on the catalog route: rows get an "Agregar" button that adds the product to the quote being built. */
+  readonly cart = inject(QUOTE_CART, {optional: true});
+  private readonly iam = inject(IamStore);
 
   readonly category = input.required<ProductCategory>();
   readonly editable = input(false);
@@ -37,6 +43,8 @@ export class ProductTable {
 
   readonly unitKey = computed(() => `catalog.products.unit.${SALE_UNIT[this.category()]}`);
   readonly isSeries = computed(() => this.category() === 'ALUMINUM_SERIES');
+  /** Selling from the catalog: not while editing prices, and only for whoever may quote. */
+  readonly canAdd = computed(() => !!this.cart && !this.editable() && this.iam.can('quote'));
 
   readonly filtered = computed(() => {
     const term = this.search().trim().toLowerCase();

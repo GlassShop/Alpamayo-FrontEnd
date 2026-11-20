@@ -46,6 +46,7 @@
             <th>{{ 'quotes.customer' | translate }}</th>
             @if (iam.can('quotes.view-all')) { <th>{{ 'quotes.seller' | translate }}</th> }
             <th class="al-num">{{ 'quotes.total' | translate }}</th>
+            @if (iam.can('quotes.view-all')) { <th class="al-num">{{ 'quotes.list.discount' | translate }}</th> }
             <th class="al-num">{{ 'quotes.advance' | translate }}</th>
             <th class="al-num">{{ 'quotes.balance' | translate }}</th>
             <th class="al-num"><span class="sr-only">{{ 'quoting.col-actions' | translate }}</span></th>
@@ -62,6 +63,12 @@
               </td>
               @if (iam.can('quotes.view-all')) { <td>{{ quote.seller.fullName }}</td> }
               <td class="al-num">S/ {{ quote.total | number:'1.2-2' }}</td>
+              @if (iam.can('quotes.view-all')) {
+                <td class="al-num">
+                  @if (discount(quote); as off) { <span class="sl-discount" [matTooltip]="'quotes.list.discount-hint' | translate">− S/ {{ off | number:'1.2-2' }}</span> }
+                  @else { <span class="al-muted">—</span> }
+                </td>
+              }
               <td class="al-num">S/ {{ quote.advance | number:'1.2-2' }}</td>
               <td class="al-num">
                 @if (quote.balance > 0) { <strong>S/ {{ quote.balance | number:'1.2-2' }}</strong> }
@@ -85,7 +92,7 @@
               </td>
             </tr>
           } @empty {
-            <tr><td [attr.colspan]="iam.can('quotes.view-all') ? 8 : 7" class="sl-empty">
+            <tr><td [attr.colspan]="iam.can('quotes.view-all') ? 9 : 7" class="sl-empty">
               {{ (store.search() ? 'quotes.list.no-results' : 'quotes.list.empty') | translate }}
             </td></tr>
           }

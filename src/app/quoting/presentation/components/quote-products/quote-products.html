@@ -1,0 +1,96 @@
+<div class="qp-head">
+  <h3><mat-icon>view_week</mat-icon>{{ 'quotes.products.title' | translate }}</h3>
+  <span class="al-muted">{{ 'quotes.products.hint' | translate }}</span>
+</div>
+
+<div class="qp-search">
+  <label class="qp-search-field">
+    <mat-icon aria-hidden="true">search</mat-icon>
+    <span class="sr-only">{{ 'quotes.products.search' | translate }}</span>
+    <input class="al-input" type="search" [value]="search()" (input)="onSearch($event)" autocomplete="off"
+           [placeholder]="'quotes.products.search' | translate" aria-controls="qp-results"/>
+  </label>
+  @if (search().trim().length >= 2) {
+    <ul class="qp-results" id="qp-results" role="list">
+      @for (r of results(); track r.product.id) {
+        <li>
+          <button type="button" class="qp-result" (click)="choose(r.product.id)">
+            <span class="qp-result-name">{{ r.label }}</span>
+            <span class="qp-result-meta">
+              @if (r.product.seriesId) { {{ products.seriesName(r.product.seriesId) }} · }
+              @if (r.product.publicPrice !== null) { S/ {{ r.product.publicPrice | number:'1.2-2' }} / {{ r.unitKey | translate }} }
+              @else { <span class="al-pill al-pill--warning">{{ 'catalog.prices.unset' | translate }}</span> }
+            </span>
+            <mat-icon aria-hidden="true">add</mat-icon>
+          </button>
+        </li>
+      } @empty {
+        <li class="qp-no-results al-muted">{{ (products.loaded() ? 'catalog.products.empty' : 'common.loading') | translate }}</li>
+      }
+    </ul>
+  }
+</div>
+
+@if (quoting.productViews().length) {
+  <div class="al-table-wrapper">
+    <table class="al-table qp-table">
+      <thead>
+        <tr>
+          <th>{{ 'catalog.products.product' | translate }}</th>
+          <th class="al-num">{{ 'quoting.col-qty' | translate }}</th>
+          <th class="al-num">{{ 'quotes.unit-price' | translate }} (S/)</th>
+          <th class="al-num">{{ 'quoting.col-total' | translate }}</th>
+          <th class="al-num"><span class="sr-only">{{ 'quoting.col-actions' | translate }}</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (view of quoting.productViews(); track view.line.id) {
+          <tr>
+            <td>
+              <span class="qp-name">{{ view.label || ('quotes.products.unknown' | translate) }}</span>
+              <span class="al-muted qp-variant">
+                @if (view.line.color) { {{ view.line.color }} · }
+                @if (view.saleUnit) { {{ ('catalog.products.unit.' + view.saleUnit) | translate }} }
+              </span>
+            </td>
+            <td class="al-num">
+              <input class="al-input qp-qty" type="number" min="1" step="1" inputmode="numeric" [value]="view.line.quantity"
+                     (input)="onQuantity(view.line.id, $event)" [attr.aria-label]="('quoting.quantity' | translate) + ': ' + view.label"/>
+            </td>
+            <td class="al-num">
+              @if (view.catalogPrice !== null) {
+                <div class="qp-price">
+                  <input class="al-input qp-price-input" type="number" min="0.01" step="0.01" inputmode="decimal"
+                         [class.qp-price-input--adjusted]="view.adjusted" [class.qp-price-input--error]="view.issue === 'below-limit'"
+                         [value]="view.unitPrice?.toFixed(2)" (change)="onPrice(view, $event)"
+                         [attr.aria-label]="('quotes.final-price' | translate) + ': ' + view.label"/>
+                  @if (view.adjusted) {
+                    <button type="button" class="al-icon-btn" (click)="resetPrice(view.line.id)"
+                            [matTooltip]="'quotes.catalog-price' | translate: {price: (view.catalogPrice | number:'1.2-2')}"
+                            [attr.aria-label]="'quotes.reset-price' | translate"><mat-icon>undo</mat-icon></button>
+                  }
+                </div>
+                @if (view.issue === 'below-limit') {
+                  <span class="al-error-text qp-msg">{{ 'quotes.below-limit' | translate: {min: (view.minPrice | number:'1.2-2')} }}</span>
+                } @else if (adjustment(view); as note) {
+                  <span class="qp-msg" [class.qp-msg--down]="note.down">{{ note.key | translate: {percent: note.percent} }}</span>
+                }
+              } @else {
+                <span class="al-pill al-pill--warning" [matTooltip]="'quotes.products.no-price-hint' | translate">{{ 'quoting.no-price-short' | translate }}</span>
+              }
+            </td>
+            <td class="al-num qp-total">
+              @if (view.total !== null) { S/ {{ view.total | number:'1.2-2' }} } @else { — }
+            </td>
+            <td class="al-num">
+              <button type="button" class="al-icon-btn al-icon-btn--danger" (click)="quoting.removeProduct(view.line.id)"
+                      [matTooltip]="'quoting.remove' | translate" [attr.aria-label]="('quoting.remove' | translate) + ' ' + view.label">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

@@ -39,6 +39,7 @@
           <th>{{ 'catalog.products.product' | translate }}</th>
           <th>{{ (isSeries() ? 'catalog.products.series' : category() === 'ALUMINUM_TRADITIONAL' ? 'catalog.products.weight' : 'catalog.products.brand') | translate }}</th>
           <th class="al-num">{{ 'catalog.products.public-price' | translate }} <span class="pt-unit">/ {{ unitKey() | translate }}</span></th>
+          @if (canAdd()) { <th class="al-num"><span class="sr-only">{{ 'catalog.add-to-quote' | translate }}</span></th> }
         </tr>
       </thead>
       <tbody>
@@ -72,9 +73,17 @@
                 <span class="al-muted">{{ 'catalog.prices.unset' | translate }}</span>
               }
             </td>
+            @if (canAdd()) {
+              <td class="al-num pt-add-cell">
+                <button type="button" class="al-btn al-btn--secondary pt-add" (click)="cart!.addProduct(product.id)"
+                        [attr.aria-label]="('catalog.add-to-quote' | translate) + ': ' + product.name">
+                  <mat-icon>add_shopping_cart</mat-icon><span class="pt-add-label">{{ 'catalog.add' | translate }}</span>
+                </button>
+              </td>
+            }
           </tr>
         } @empty {
-          <tr><td colspan="4" class="pt-empty">{{ 'catalog.products.empty' | translate }}</td></tr>
+          <tr><td [attr.colspan]="canAdd() ? 5 : 4" class="pt-empty">{{ 'catalog.products.empty' | translate }}</td></tr>
         }
       </tbody>
     </table>

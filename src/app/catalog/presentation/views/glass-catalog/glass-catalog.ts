@@ -12,6 +12,7 @@ import {ProductTable} from '../../components/product-table/product-table';
 import {NewProductForm} from '../../components/new-product-form/new-product-form';
 import {PriceEditor} from '../../components/price-editor/price-editor';
 import {CatalogTab, catalogTabs} from '../../catalog-tabs';
+import {QUOTE_CART} from '../../../application/quote-cart';
 
 /** `?editar=precios` opens the catalog in price editing mode (CEO). */
 const EDIT_PARAM = 'editar';
@@ -23,6 +24,8 @@ const EDIT_PRICES = 'precios';
  * public price. Staff with `catalog.add-product` can add glass types and
  * products; they stay "Sin precio" until the CEO prices them. The CEO
  * switches the same page to "Editar precios" instead of opening another one.
+ * The catalog also sells: products are added to the quote being built and a
+ * bar at the bottom shows how it is going.
  */
 @Component({
   selector: 'app-glass-catalog',
@@ -36,8 +39,12 @@ export class GlassCatalog implements OnInit {
   readonly iam = inject(IamStore);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  /** Provided by quoting on the catalog route; without it the catalog only shows prices. */
+  readonly cart = inject(QUOTE_CART, {optional: true});
 
   readonly canEditPrices = this.iam.can('prices.manage');
+  /** Selling from the catalog: add products, quote a glass, see the quote being built. */
+  readonly canQuote = computed(() => !!this.cart && !this.editing() && this.iam.can('quote'));
   readonly editing = signal(this.canEditPrices && this.route.snapshot.queryParamMap.get(EDIT_PARAM) === EDIT_PRICES);
   readonly tab = signal<CatalogTab>('GLASS');
   /** While editing, each product tab shows how many products still have no price. */

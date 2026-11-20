@@ -9,7 +9,7 @@ const pageNotFound  = () => import('./shared/presentation/views/page-not-found/p
 const appShell      = () => import('./shared/presentation/components/app-shell/app-shell').then(m => m.AppShell);
 const configuration = () => import('./shared/presentation/views/configuration/configuration').then(m => m.Configuration);
 const quoteBuilder  = () => import('./quoting/presentation/views/quote-builder/quote-builder').then(m => m.QuoteBuilder);
-const catalog       = () => import('./catalog/presentation/views/glass-catalog/glass-catalog').then(m => m.GlassCatalog);
+const catalogSection = () => import('./quoting/presentation/catalog-section.routes').then(m => m.catalogSectionRoutes);
 const usersAdmin    = () => import('./iam/presentation/views/users-admin/users-admin').then(m => m.UsersAdmin);
 const savedQuotes   = () => import('./quoting/presentation/views/saved-quotes/saved-quotes').then(m => m.SavedQuotes);
 const quotePrint    = () => import('./quoting/presentation/views/quote-print/quote-print').then(m => m.QuotePrint);
@@ -60,9 +60,9 @@ export const routes: Routes = [
         ]
       },
       { path: 'agenda',   loadComponent: agenda,  title: pageTitle('Agenda'),   data: needs('agenda') },
-      { path: 'catalogo', loadComponent: catalog, title: pageTitle('Catálogo'), data: needs('catalog.view'), pathMatch: 'full' },
       // Prices are edited in the catalog itself (CEO only).
       { path: 'catalogo/precios', redirectTo: () => inject(Router).createUrlTree(['/catalogo'], {queryParams: {editar: 'precios'}}) },
+      { path: 'catalogo', loadChildren: catalogSection },
       // Costs and purchases are part of the inventory now.
       { path: 'inventario/costos', redirectTo: '/inventario' },
       { path: 'compras', redirectTo: '/inventario/compras' },

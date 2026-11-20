@@ -67,6 +67,7 @@
             <th>{{ 'catalog.thickness' | translate }}</th>
             @for (list of catalog.priceLists(); track list.id) { <th class="al-num">{{ list.name }}</th> }
             <th>{{ 'catalog.status' | translate }}</th>
+            @if (canQuote()) { <th class="al-num"><span class="sr-only">{{ 'catalog.quote-glass' | translate }}</span></th> }
           </tr>
         </thead>
         <tbody>
@@ -92,6 +93,14 @@
                   <span class="al-pill al-pill--warning">{{ 'catalog.missing' | translate: { count: missingPrices(glass.id) } }}</span>
                 }
               </td>
+              @if (canQuote()) {
+                <td class="al-num gc-quote-cell">
+                  <button type="button" class="al-btn al-btn--secondary gc-quote" (click)="cart!.quoteGlass(glass.id)"
+                          [attr.aria-label]="('catalog.quote-glass' | translate) + ': ' + glass.name + ' ' + glass.thicknessMm + ' mm'">
+                    <mat-icon>calculate</mat-icon><span class="gc-quote-label">{{ 'catalog.quote-glass' | translate }}</span>
+                  </button>
+                </td>
+              }
             </tr>
           }
         </tbody>
@@ -120,3 +129,16 @@
 }
 }
 </div>
+
+@if (canQuote() && cart!.rowCount() > 0) {
+  <aside class="gc-cart" role="status" [attr.aria-label]="'catalog.cart.label' | translate">
+    <mat-icon aria-hidden="true">receipt_long</mat-icon>
+    <span class="gc-cart-text">
+      {{ 'catalog.cart.summary' | translate: {count: cart!.rowCount()} }}
+      <strong>S/ {{ cart!.total() | number:'1.2-2' }}</strong>
+    </span>
+    <button type="button" class="al-btn al-btn--primary gc-cart-open" (click)="cart!.open()">
+      {{ 'catalog.cart.open' | translate }}<mat-icon>arrow_forward</mat-icon>
+    </button>
+  </aside>
+}

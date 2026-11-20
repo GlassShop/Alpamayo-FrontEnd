@@ -38,6 +38,15 @@ label.qb-excel-btn:focus-within { outline: 2px solid var(--al-primary); outline-
 .qb-line-glass { font-weight: 600; }
 .qb-billed { display: block; font-size: .72rem; }
 .qb-ref { display: block; font-size: .75rem; }
+.qb-note { display: block; margin-top: 2px; font-size: .72rem; font-weight: 400; color: var(--al-text-muted); white-space: nowrap; }
+.qb-note--down { color: var(--al-warning); font-weight: 600; }
+
+/* ── final price typed by the seller ── */
+.qb-row--final { align-items: flex-end; }
+.qb-final { flex: 0 0 200px !important; }
+.qb-final--adjusted { border-color: var(--al-warning); background: var(--al-warning-soft); }
+.qb-final--error { border-color: var(--al-primary); }
+.qb-final-hint { flex: 1; padding-bottom: 10px; }
 
 /* ── summary ── */
 .qb-list-chip {
@@ -66,7 +75,8 @@ label.qb-excel-btn:focus-within { outline: 2px solid var(--al-primary); outline-
 }
 @media (max-width: 560px) {
   .qb-row { flex-direction: column; }
-  .qb-unit, .qb-qty { flex: 1 1 auto !important; }
+  .qb-unit, .qb-qty, .qb-final { flex: 1 1 auto !important; }
+  .qb-final-hint { padding-bottom: 0; }
   .qb-metrics { grid-template-columns: 1fr; gap: 20px; }
   .qb-total { align-items: flex-start; }
 }
