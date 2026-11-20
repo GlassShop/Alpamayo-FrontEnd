@@ -446,7 +446,11 @@
       "invalid-advance": "Advance must be between 0 and the total.",
       "terms-not-accepted": "The customer must accept the sale conditions.",
       "totals-mismatch": "Prices changed while quoting. Review the quote and save again.",
-      "discount-too-high": "A discount is above the maximum set by the CEO. Check the final prices and save again."
+      "discount-too-high": "A discount is above the maximum set by the CEO. Check the final prices and save again.",
+      "sold": "The quote was sold (or its sale annulled) meanwhile. Open it again.",
+      "stock-changed": "The stock changed while you were selling. Check the quantities and try again.",
+      "sale": "Could not record the sale. Please try again.",
+      "missing-reason": "Type the reason."
     },
     "final-price": "Final price",
     "catalog-price": "Catalog price: S/ {{price}}",
@@ -472,6 +476,40 @@
       "whole-quantity": "Type a whole quantity of 1 or more.",
       "no-price-hint": "This product has no price yet: you can add it, but the quote can be saved once the CEO prices it.",
       "unknown": "Product no longer in the catalog"
+    },
+    "sale": {
+      "mark": "Mark as sold",
+      "title": "Sell {{number}}",
+      "balance": "Balance due S/ {{amount}}",
+      "site": "Site the goods leave from",
+      "stock": "Stock",
+      "after": "Left",
+      "choose-item": "Choose the item",
+      "no-products": "This quote has no catalog products: no stock is taken.",
+      "untracked": "{{count}} glass line(s) or extra concepts do not take stock.",
+      "blocked": "Cannot sell: {{count}} product(s) without enough stock in this site. Fix it in Inventory (count, register a purchase or create the item) and try again.",
+      "go-inventory": "Go to Inventory",
+      "confirm": "Confirm sale",
+      "problem": {
+        "no-item": "Not in the inventory in this colour.",
+        "not-counted": "Never counted in this site.",
+        "not-enough": "Only {{have}} left; {{need}} sold."
+      },
+      "sold": "Sold",
+      "state": "State",
+      "filter": {
+        "ALL": "All",
+        "OPEN": "Open",
+        "SOLD": "Sold"
+      },
+      "sold-info": "Sold from {{site}} by {{by}} on {{date}}. It can no longer be edited.",
+      "cancelled-info": "Sale annulled by {{by}} on {{date}}: {{reason}}",
+      "cancel": "Annul sale",
+      "cancel-title": "Annul the sale of {{number}}",
+      "cancel-hint": "The units go back to the site they left from and the quote is open again.",
+      "cancel-reason": "Reason",
+      "cancel-example": "E.g. The customer returned the goods",
+      "cancel-confirm": "Annul sale"
     }
   },
   "agenda": {
@@ -679,7 +717,9 @@
       "kinds": {
         "COUNT": "Count",
         "ADJUSTMENT": "Entry / exit",
-        "PURCHASE": "Purchase"
+        "PURCHASE": "Purchase",
+        "SALE": "Sale",
+        "SALE_CANCEL": "Sale annulled"
       }
     },
     "error": {

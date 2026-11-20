@@ -446,7 +446,11 @@
       "invalid-advance": "«A cuenta» debe estar entre 0 y el total.",
       "terms-not-accepted": "El cliente debe aceptar las condiciones de venta.",
       "totals-mismatch": "Los precios cambiaron mientras cotizabas. Revisa la cotización y vuelve a guardar.",
-      "discount-too-high": "Una rebaja supera la rebaja máxima que fijó el CEO. Revisa los precios finales y vuelve a guardar."
+      "discount-too-high": "Una rebaja supera la rebaja máxima que fijó el CEO. Revisa los precios finales y vuelve a guardar.",
+      "sold": "La cotización ya fue vendida (o se anuló su venta) mientras tanto. Vuelve a abrirla.",
+      "stock-changed": "El stock cambió mientras vendías. Revisa las cantidades y vuelve a intentarlo.",
+      "sale": "No se pudo registrar la venta. Inténtalo de nuevo.",
+      "missing-reason": "Escribe el motivo."
     },
     "final-price": "Precio final",
     "catalog-price": "Precio de catálogo: S/ {{price}}",
@@ -472,6 +476,40 @@
       "whole-quantity": "Escribe una cantidad entera de 1 o más.",
       "no-price-hint": "Este producto aún no tiene precio: puedes agregarlo, pero la cotización se guardará cuando el CEO le ponga precio.",
       "unknown": "Producto que ya no está en el catálogo"
+    },
+    "sale": {
+      "mark": "Marcar como vendida",
+      "title": "Vender {{number}}",
+      "balance": "Por pagar S/ {{amount}}",
+      "site": "Sede de donde sale la mercadería",
+      "stock": "Stock",
+      "after": "Queda",
+      "choose-item": "Elige el artículo",
+      "no-products": "Esta cotización no tiene productos del catálogo: no se descuenta stock.",
+      "untracked": "{{count}} línea(s) de vidrio o conceptos adicionales no descuentan stock.",
+      "blocked": "No se puede vender: {{count}} producto(s) sin stock suficiente en esta sede. Corrígelo en Inventario (contar, registrar una compra o crear el artículo) y vuelve a intentarlo.",
+      "go-inventory": "Ir a Inventario",
+      "confirm": "Confirmar venta",
+      "problem": {
+        "no-item": "No está en el inventario en este color.",
+        "not-counted": "Nunca se contó en esta sede.",
+        "not-enough": "Solo hay {{have}}; se venden {{need}}."
+      },
+      "sold": "Vendida",
+      "state": "Estado",
+      "filter": {
+        "ALL": "Todas",
+        "OPEN": "Abiertas",
+        "SOLD": "Vendidas"
+      },
+      "sold-info": "Vendida desde {{site}} por {{by}} el {{date}}. Ya no se puede editar.",
+      "cancelled-info": "Venta anulada por {{by}} el {{date}}: {{reason}}",
+      "cancel": "Anular venta",
+      "cancel-title": "Anular la venta de {{number}}",
+      "cancel-hint": "Las unidades vuelven a la sede de donde salieron y la cotización queda abierta otra vez.",
+      "cancel-reason": "Motivo",
+      "cancel-example": "Ej. El cliente devolvió la mercadería",
+      "cancel-confirm": "Anular venta"
     }
   },
   "agenda": {
@@ -679,7 +717,9 @@
       "kinds": {
         "COUNT": "Conteo",
         "ADJUSTMENT": "Entrada / salida",
-        "PURCHASE": "Compra"
+        "PURCHASE": "Compra",
+        "SALE": "Venta",
+        "SALE_CANCEL": "Anulación de venta"
       }
     },
     "error": {
