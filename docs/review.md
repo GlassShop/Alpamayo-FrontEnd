@@ -121,7 +121,7 @@ Registro del trabajo hecho con Claude Code a partir de este prompt, actualizado 
 | 3. Inicio de sesión activo | Cumplido. Sesión de 8 horas, sin registro público | `src/app/iam` |
 | 4. Cada ruta protegida con guardia y rol | Cumplida. Guardia de sesión y guardia de permiso en todas las rutas | `src/app/app.routes.ts`, `iam/domain/model/permission.ts` |
 | 5. Código en inglés, textos en español con traducciones | Cumplida. Español e inglés | `public/i18n/es.json`, `en.json` |
-| 6. Pruebas en cada tienda y regla de cálculo | Cumplida. 241 pruebas automáticas, todas pasan | `npm test` |
+| 6. Pruebas en cada tienda y regla de cálculo | Cumplida. 275 pruebas automáticas, todas pasan | `npm test` |
 | 7. Un sprint por vez, con plan aprobado | Cumplida | Este registro |
 | 8. Preguntar lo que falta, no inventarlo | Cumplida. Las decisiones están abajo | Sección «Decisiones del negocio» |
 
@@ -249,6 +249,20 @@ Sprint corto para cerrar lo pendiente antes del cotizador de proyectos.
 - **Datos de demostración**: la API de prueba escribía en `db.json` los datos de la hoja de inventario cada vez que arrancaba, así que el archivo siempre quedaba con unas 10 000 líneas cambiadas y con datos de prueba mezclados. Ahora `db.json` ya trae esos datos (49 vidrios, 428 productos, 527 artículos y 2 sedes) y nada de prueba: encender la API no lo cambia.
 - Commits: `f431d90`, `3c4486f`, `c67f254`.
 
+### 14. La cotización como carrito
+
+El catálogo no solo muestra: también vende. Una cotización junta vidrios, productos del catálogo y conceptos adicionales, y se guarda todo junto al final.
+
+- **Agregar desde el Catálogo**: cada aluminio, accesorio o acrílico tiene **«+ Agregar»**. Se elige el **color** (de los que tiene el inventario para ese producto, con el stock de cada sede como referencia) y la **cantidad entera** (varillas, unidades o planchas). Cada vidrio tiene **«Cotizar»**, que abre el cotizador con ese vidrio elegido para poner las medidas. Abajo queda fija una barra: «Cotización: 3 artículo(s) · S/ 840.00 → Ver cotización».
+- **Agregar desde Cotizar**: sección «Productos del catálogo» con buscador (código o nombre, palabras en cualquier orden). El mismo producto en el mismo color **suma la cantidad** en vez de repetir la fila; en otro color es otra fila.
+- **Precio**: los productos van siempre al **precio público**, aunque los vidrios usen la lista Vidriero. Un producto sin precio se puede agregar, pero la cotización no se guarda hasta que el CEO le ponga precio.
+- **Precio final por línea**: en cada vidrio (precio por pie²) y en cada producto (precio unitario) se puede escribir un precio final. **Subirlo** siempre se puede. **Bajarlo** solo hasta la **rebaja máxima** que fija el CEO en «Editar precios»; mientras no la fije, es 0 %. El CEO no tiene límite. La línea rebajada se marca («Rebajado 10 %») y, si pasa el límite, dice el mínimo y no deja guardar. La API vuelve a revisarlo.
+- **Lo que se guarda**: el precio de catálogo y el final de cada línea. En la impresión el cliente ve **solo el precio final**; en «Guardadas» el CEO ve la columna **Rebaja** con lo que se bajó en soles.
+- **Borrador**: la cotización en curso se guarda en la sesión del navegador de cada usuario, así que se puede ir y volver entre Catálogo y Cotizar, o recargar, sin perder nada. Otro usuario en la misma pestaña no ve el borrador del anterior.
+- La cotización **no descuenta stock**: eso será «Marcar como vendida» (sprint 15).
+- El catálogo no depende del cotizador: Cotizar le entrega un puerto (`QUOTE_CART`) en su ruta, como Compras hace con los costos de Inventario.
+- Commits: `70e6162`, `0c73b91`, `73b226a`, `a89e610`, `e928042`.
+
 ## Decisiones del negocio
 
 Tomadas por Dylan durante los sprints. Si alguna cambia, hay que avisar antes de tocar el código.
@@ -279,13 +293,17 @@ Tomadas por Dylan durante los sprints. Si alguna cambia, hay que avisar antes de
 | Compras: sede | Cada compra llega a una sola sede; si un envío se reparte, se registran dos llegadas |
 | Margen mínimo | Lo fija el CEO; mientras no lo ponga, no hay aviso de margen bajo |
 | Menú | Una opción por tema (Cotizar, Agenda, Catálogo, Inventario, Ajustes); lo que es solo del CEO se muestra como columnas o modos según el rol, no como pantallas aparte |
+| Cotización | Vidrios + productos del catálogo + conceptos adicionales, guardados juntos; se agregan desde el Catálogo o desde Cotizar |
+| Productos en la cotización | Siempre a precio público; color elegido del inventario; cantidades enteras |
+| Precio final | Por línea. Subir siempre se puede; bajar, hasta la rebaja máxima que fija el CEO (sin fijar = 0 %); el CEO no tiene límite. Se guardan el precio de catálogo y el final; el cliente solo ve el final |
+| Stock y cotización | La cotización no toca el stock. Al marcarla como vendida (sprint 15) se descuentan solo los productos; el vidrio se corrige con conteos |
 
 ## Cómo probarlo
 
 ```bash
 npm ci
 npm run dev     # API de prueba (puerto 3000) + app (http://localhost:4200)
-npm test        # 241 pruebas automáticas
+npm test        # 275 pruebas automáticas
 npm run build   # build de producción sin errores ni advertencias
 ```
 
@@ -306,6 +324,8 @@ Usuarios de prueba (en `mock-api/README.md`): `ceo`, `vendedora` y `almacen`. Lo
 | Colores del historial de precios invertidos | Subida en verde, bajada en rojo |
 
 ## Lo que falta
+
+Siguiente: **sprint 15, «Marcar como vendida»** — elegir la sede de donde sale la mercadería y descontar el stock de los productos con un movimiento «Venta COT-…»; la cotización vendida ya no se edita. Después, el cotizador de proyectos.
 
 1. **Datos reales de la empresa** (solo Dylan): RUC, dirección y teléfono en `src/app/shared/domain/model/company-profile.ts`. Hoy la cotización impresa sale con datos de ejemplo.
 2. **Mantenimiento**: actualizar Angular, Vite y Vitest (`npm audit` marca 49 avisos que venían de la plantilla).
