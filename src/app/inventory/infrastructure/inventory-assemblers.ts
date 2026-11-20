@@ -69,6 +69,7 @@ export function toStockMovement(r: StockMovementResource): StockMovement {
   return {
     id: r.id, itemId: r.itemId, siteId: r.siteId, kind: r.kind, delta: Number(r.delta),
     quantityAfter: Number(r.quantityAfter), at: r.at, by: r.by, ...(r.reason ? {reason: r.reason} : {}),
-    ...(r.purchaseId ? {purchaseId: r.purchaseId} : {})
+    ...(r.purchaseId ? {purchaseId: r.purchaseId} : {}),
+    ...(r.quoteId ? {quoteId: r.quoteId} : {})
   };
 }

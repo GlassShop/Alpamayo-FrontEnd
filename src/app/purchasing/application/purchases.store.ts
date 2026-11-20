@@ -58,7 +58,7 @@ export class PurchasesStore {
     if (problem) { this.errorSignal.set(problem); return; }
     this.save(this.api.registerArrival(command), ({purchase, levels}) => {
       this.purchasesSignal.update(list => [...list, purchase]);
-      this.inventory.applyPurchaseLevels(levels);
+      this.inventory.applyRecordedLevels(levels);
     });
   }
 
