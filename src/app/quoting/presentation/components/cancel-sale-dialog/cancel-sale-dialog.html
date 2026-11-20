@@ -1,0 +1,22 @@
+<h2 mat-dialog-title class="cs-title"><mat-icon>undo</mat-icon>{{ 'quotes.sale.cancel-title' | translate: {number: quote.number} }}</h2>
+<form (submit)="$event.preventDefault(); confirm()">
+<mat-dialog-content class="cs-content">
+  @if (quote.sale; as sale) {
+    <p class="cs-info">{{ 'quotes.sale.sold-info' | translate: {site: sale.siteName, by: sale.by.fullName, date: (sale.at | date:'dd/MM/yyyy HH:mm')} }}</p>
+  }
+  <p class="cs-info">{{ 'quotes.sale.cancel-hint' | translate }}</p>
+  <label class="al-field">
+    <span class="al-label">{{ 'quotes.sale.cancel-reason' | translate }}</span>
+    <textarea class="al-input cs-reason" id="cs-reason" rows="3" [attr.maxlength]="maxReason" [value]="reason()" (input)="onReason($event)"
+              [placeholder]="'quotes.sale.cancel-example' | translate"></textarea>
+    @if (submitted() && !reason().trim()) { <span class="al-error-text">{{ 'quotes.error.missing-reason' | translate }}</span> }
+  </label>
+  @if (store.error(); as error) {
+    @if (error !== 'missing-reason') { <p class="al-error-text" role="alert">{{ ('quotes.error.' + error) | translate }}</p> }
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button type="button" class="al-btn al-btn--secondary" mat-dialog-close>{{ 'common.cancel' | translate }}</button>
+  <button type="submit" class="al-btn al-btn--primary" [disabled]="store.saving()"><mat-icon>undo</mat-icon>{{ 'quotes.sale.cancel-confirm' | translate }}</button>
+</mat-dialog-actions>
+</form>

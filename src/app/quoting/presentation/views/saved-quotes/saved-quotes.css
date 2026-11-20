@@ -10,5 +10,6 @@ a.al-btn, a.al-icon-btn { text-decoration: none; }
 .sl-customer { display: block; font-weight: 600; }
 .sl-doc { display: block; font-size: .75rem; }
 .sl-actions { white-space: nowrap; }
+.sl-state { margin-left: 6px; }
 .sl-discount { color: var(--al-warning); font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .sl-empty { text-align: center; color: var(--al-text-muted); padding: 32px !important; }

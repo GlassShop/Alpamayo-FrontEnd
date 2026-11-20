@@ -1,6 +1,7 @@
 :host { display: block; max-width: 900px; }
 a.al-btn { text-decoration: none; }
 .qp-toolbar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.qp-sold { margin-bottom: 16px; }
 
 .qp-doc {
   background: #fff; color: #111; border: 1px solid var(--al-border); padding: 32px;

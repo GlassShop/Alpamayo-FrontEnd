@@ -1,0 +1,87 @@
+<h2 mat-dialog-title class="sell-title"><mat-icon>point_of_sale</mat-icon>{{ 'quotes.sale.title' | translate: {number: quote.number} }}</h2>
+<mat-dialog-content class="sell-content">
+  <p class="sell-customer">
+    <strong>{{ quote.customer.name }}</strong>
+    <span class="al-muted">· S/ {{ quote.total | number:'1.2-2' }}</span>
+    @if (quote.balance > 0) {
+      <span class="al-pill al-pill--warning">{{ 'quotes.sale.balance' | translate: {amount: (quote.balance | number:'1.2-2')} }}</span>
+    }
+  </p>
+
+  @if (!inventory.loaded()) {
+    <p class="al-muted sell-loading"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</p>
+  } @else {
+    <label class="al-field sell-site">
+      <span class="al-label">{{ 'quotes.sale.site' | translate }}</span>
+      <select class="al-select" id="sell-site" (change)="onSite($event)">
+        @for (site of inventory.sites(); track site.id) {
+          <option [value]="site.id" [selected]="site.id === siteId()">{{ site.name }}</option>
+        }
+      </select>
+    </label>
+
+    @if (quote.products.length) {
+      <div class="al-table-wrapper">
+        <table class="al-table sell-table">
+          <thead>
+            <tr>
+              <th>{{ 'catalog.products.product' | translate }}</th>
+              <th class="al-num">{{ 'quoting.col-qty' | translate }}</th>
+              <th class="al-num">{{ 'quotes.sale.stock' | translate }}</th>
+              <th class="al-num">{{ 'quotes.sale.after' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (line of plan(); track line.productIndex) {
+              <tr [class.sell-row--problem]="line.problem">
+                <td>
+                  <span class="sell-name">{{ line.product.description }}</span>
+                  @if (line.product.color) { <span class="al-muted sell-variant">{{ line.product.color }}</span> }
+                  @if (line.candidates.length > 1) {
+                    <select class="al-select sell-item" (change)="onItem(line.productIndex, $event)"
+                            [attr.aria-label]="('quotes.sale.choose-item' | translate) + ': ' + line.product.description">
+                      <option value="" [selected]="line.itemId === null" disabled>{{ 'quotes.sale.choose-item' | translate }}</option>
+                      @for (item of line.candidates; track item.id) {
+                        <option [value]="item.id" [selected]="item.id === line.itemId">{{ itemLabel(item) }}</option>
+                      }
+                    </select>
+                  }
+                  @if (line.problem && line.problem !== 'choose-item') {
+                    <span class="al-error-text sell-problem">{{ ('quotes.sale.problem.' + line.problem) | translate: {have: line.before, need: line.product.quantity} }}</span>
+                  }
+                </td>
+                <td class="al-num">{{ line.product.quantity }}</td>
+                <td class="al-num">{{ line.before ?? '—' }}</td>
+                <td class="al-num sell-after" [class.sell-after--bad]="line.after !== null && line.after < 0">{{ line.after ?? '—' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <p class="al-muted sell-note">{{ 'quotes.sale.no-products' | translate }}</p>
+    }
+
+    @if (untracked) {
+      <p class="al-muted sell-note"><mat-icon>info</mat-icon>{{ 'quotes.sale.untracked' | translate: {count: untracked} }}</p>
+    }
+
+    @if (problems()) {
+      <div class="al-alert al-alert--error sell-blocked" role="alert">
+        <mat-icon>block</mat-icon>
+        <span>{{ 'quotes.sale.blocked' | translate: {count: problems()} }}</span>
+        <a class="al-btn al-btn--secondary" routerLink="/inventario" mat-dialog-close>{{ 'quotes.sale.go-inventory' | translate }}</a>
+      </div>
+    }
+  }
+
+  @if (store.error(); as error) {
+    <p class="al-error-text" role="alert">{{ ('quotes.error.' + error) | translate }}</p>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button type="button" class="al-btn al-btn--secondary" mat-dialog-close>{{ 'common.cancel' | translate }}</button>
+  <button type="button" class="al-btn al-btn--primary" (click)="confirm()" [disabled]="!sellable() || store.saving()">
+    <mat-icon>check</mat-icon>{{ 'quotes.sale.confirm' | translate }}
+  </button>
+</mat-dialog-actions>

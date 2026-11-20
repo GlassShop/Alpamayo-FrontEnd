@@ -1,0 +1,15 @@
+.sell-title { display: flex; align-items: center; gap: 8px; }
+.sell-content { display: flex; flex-direction: column; gap: 14px; }
+.sell-customer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; font-variant-numeric: tabular-nums; }
+.sell-loading, .sell-note { display: flex; align-items: center; gap: 6px; margin: 0; font-size: .85rem; }
+.sell-note mat-icon { font-size: 18px; width: 18px; height: 18px; }
+.sell-site { max-width: 320px; }
+.sell-name { display: block; font-weight: 600; }
+.sell-variant { display: block; font-size: .78rem; }
+.sell-item { margin-top: 6px; height: 34px; max-width: 260px; }
+.sell-problem { display: block; margin-top: 4px; }
+.sell-row--problem td { background: var(--al-primary-soft); }
+.sell-after { font-weight: 700; font-variant-numeric: tabular-nums; }
+.sell-after--bad { color: var(--al-primary-strong); }
+.sell-blocked { margin: 0; }
+.sell-blocked a { flex-shrink: 0; }

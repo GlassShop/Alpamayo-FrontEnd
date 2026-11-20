@@ -7,11 +7,13 @@ import {SavedQuotesStore} from '../../../application/saved-quotes.store';
 import {QuotingStore} from '../../../application/quoting.store';
 import {CatalogStore} from '../../../../catalog/application/catalog.store';
 import {COMPANY_PROFILE} from '../../../../shared/domain/model/company-profile';
+import {QuoteActions} from '../../quote-actions';
 
 /**
  * Printable quote for the customer. "Imprimir / Guardar PDF" uses the
  * browser's print dialog, where "Save as PDF" produces the file to send.
  * Shows the frozen prices of the saved quote, never current catalog prices.
+ * Above the document (never printed): the sale state and its actions.
  */
 @Component({
   selector: 'app-quote-print',
@@ -26,6 +28,7 @@ export class QuotePrint implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   readonly company = COMPANY_PROFILE;
+  readonly actions = inject(QuoteActions);
 
   /** Last day the quote is valid. */
   readonly validUntil = computed(() => {
@@ -45,7 +48,7 @@ export class QuotePrint implements OnInit {
 
   edit(): void {
     const quote = this.store.current();
-    if (!quote) return;
+    if (!quote || !this.actions.canEdit(quote)) return;
     this.quoting.loadForEditing(quote);
     this.router.navigate(['/cotizador']).then();
   }

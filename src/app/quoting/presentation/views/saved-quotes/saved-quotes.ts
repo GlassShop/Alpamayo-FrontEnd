@@ -4,7 +4,8 @@ import {Router, RouterLink} from '@angular/router';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
-import {SavedQuotesStore} from '../../../application/saved-quotes.store';
+import {SavedQuotesStore, StatusFilter} from '../../../application/saved-quotes.store';
+import {QuoteActions} from '../../quote-actions';
 import {QuotingStore} from '../../../application/quoting.store';
 import {IamStore} from '../../../../iam/application/iam.store';
 import {CatalogStore} from '../../../../catalog/application/catalog.store';
@@ -13,6 +14,7 @@ import {quoteDiscount, SavedQuote} from '../../../domain/model/saved-quote.entit
 /**
  * "Mis cotizaciones": each user sees their own saved quotes; the CEO sees
  * every quote, can filter by seller and sees how much was discounted.
+ * Open quotes are edited or marked as sold; the CEO may annul a sale.
  */
 @Component({
   selector: 'app-saved-quotes',
@@ -29,6 +31,12 @@ export class SavedQuotes implements OnInit {
   private readonly translate = inject(TranslateService);
   /** Soles taken off the catalog prices; shown to the CEO. */
   readonly discount = quoteDiscount;
+  readonly actions = inject(QuoteActions);
+  readonly statuses: readonly StatusFilter[] = ['ALL', 'OPEN', 'SOLD'];
+
+  onStatus(event: Event): void {
+    this.store.statusFilter.set((event.target as HTMLSelectElement).value as StatusFilter);
+  }
 
   ngOnInit(): void {
     this.store.clearError();
@@ -45,6 +53,7 @@ export class SavedQuotes implements OnInit {
 
   /** Opens the quote in the quoter. Asks first if there is an unsaved quote in progress. */
   edit(quote: SavedQuote): void {
+    if (!this.actions.canEdit(quote)) return;
     const busy = this.quoting.rowCount() > 0 && this.quoting.editing()?.id !== quote.id;
     if (busy && !globalThis.confirm?.(this.translate.instant('quotes.list.confirm-replace'))) return;
     this.store.open(quote.id, full => {

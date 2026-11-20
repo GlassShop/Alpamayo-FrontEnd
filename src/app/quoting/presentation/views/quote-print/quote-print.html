@@ -1,16 +1,37 @@
 <div class="qp-toolbar no-print">
   <a class="al-btn al-btn--secondary" routerLink="/cotizaciones"><mat-icon>arrow_back</mat-icon>{{ 'quotes.print-view.back' | translate }}</a>
-  @if (store.current()) {
-    <button class="al-btn al-btn--secondary" (click)="edit()"><mat-icon>edit</mat-icon>{{ 'quotes.list.edit' | translate }}</button>
-    <a class="al-btn al-btn--secondary" routerLink="/agenda" [queryParams]="{cotizacion: store.current()!.id}"><mat-icon>event</mat-icon>{{ 'agenda.schedule-visit' | translate }}</a>
+  @if (store.current(); as current) {
+    @if (actions.canEdit(current)) {
+      <button class="al-btn al-btn--secondary" (click)="edit()"><mat-icon>edit</mat-icon>{{ 'quotes.list.edit' | translate }}</button>
+    }
+    <a class="al-btn al-btn--secondary" routerLink="/agenda" [queryParams]="{cotizacion: current.id}"><mat-icon>event</mat-icon>{{ 'agenda.schedule-visit' | translate }}</a>
+    @if (actions.canSell(current)) {
+      <button class="al-btn al-btn--secondary" (click)="actions.sell(current)"><mat-icon>point_of_sale</mat-icon>{{ 'quotes.sale.mark' | translate }}</button>
+    }
+    @if (actions.canCancelSale(current)) {
+      <button class="al-btn al-btn--secondary" (click)="actions.cancelSale(current)"><mat-icon>undo</mat-icon>{{ 'quotes.sale.cancel' | translate }}</button>
+    }
     <button class="al-btn al-btn--primary" (click)="print()"><mat-icon>print</mat-icon>{{ 'quotes.print' | translate }}</button>
   }
 </div>
 
-@if (store.error(); as error) {
-  <div class="al-alert al-alert--error no-print" role="alert"><mat-icon>error_outline</mat-icon><span>{{ 'quotes.error.' + error | translate }}</span></div>
+@if (store.error() === 'load' || store.error() === 'not-found') {
+  <div class="al-alert al-alert--error no-print" role="alert"><mat-icon>error_outline</mat-icon><span>{{ 'quotes.error.' + store.error() | translate }}</span></div>
 } @else if (store.loading()) {
   <section class="al-card no-print"><div class="al-empty"><mat-icon>hourglass_empty</mat-icon>{{ 'common.loading' | translate }}</div></section>
+}
+
+@if (store.current()?.sale; as sale) {
+  <div class="al-alert al-alert--success no-print qp-sold" role="status">
+    <mat-icon>point_of_sale</mat-icon>
+    <span>{{ 'quotes.sale.sold-info' | translate: {site: sale.siteName, by: sale.by.fullName, date: (sale.at | date:'dd/MM/yyyy HH:mm')} }}</span>
+  </div>
+}
+@for (cancelled of store.current()?.cancelledSales ?? []; track cancelled.cancelledAt) {
+  <div class="al-alert al-alert--info no-print qp-sold" role="note">
+    <mat-icon>undo</mat-icon>
+    <span>{{ 'quotes.sale.cancelled-info' | translate: {by: cancelled.cancelledBy.fullName, date: (cancelled.cancelledAt | date:'dd/MM/yyyy HH:mm'), reason: cancelled.reason} }}</span>
+  </div>
 }
 
 @if (store.current(); as quote) {
