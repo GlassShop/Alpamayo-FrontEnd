@@ -110,7 +110,7 @@ El sprint 1 empezó el 17 de noviembre y hoy es 18. Si el servidor todavía no e
 
 # Lo que se hizo
 
-Registro del trabajo hecho con Claude Code a partir de este prompt, actualizado al 18 de noviembre de 2026. Es solo frontend: el servidor real se construye aparte, y mientras tanto la app trabaja contra un servidor de prueba local (`mock-api/`) que imita la API.
+Registro del trabajo hecho con Claude Code a partir de este prompt, actualizado al 20 de noviembre de 2026. Es solo frontend: el servidor real se construye aparte, y mientras tanto la app trabaja contra un servidor de prueba local (`mock-api/`) que imita la API.
 
 ## Estado de las reglas que no se negocian
 
@@ -121,7 +121,7 @@ Registro del trabajo hecho con Claude Code a partir de este prompt, actualizado 
 | 3. Inicio de sesión activo | Cumplido. Sesión de 8 horas, sin registro público | `src/app/iam` |
 | 4. Cada ruta protegida con guardia y rol | Cumplida. Guardia de sesión y guardia de permiso en todas las rutas | `src/app/app.routes.ts`, `iam/domain/model/permission.ts` |
 | 5. Código en inglés, textos en español con traducciones | Cumplida. Español e inglés | `public/i18n/es.json`, `en.json` |
-| 6. Pruebas en cada tienda y regla de cálculo | Cumplida. 233 pruebas automáticas, todas pasan | `npm test` |
+| 6. Pruebas en cada tienda y regla de cálculo | Cumplida. 241 pruebas automáticas, todas pasan | `npm test` |
 | 7. Un sprint por vez, con plan aprobado | Cumplida | Este registro |
 | 8. Preguntar lo que falta, no inventarlo | Cumplida. Las decisiones están abajo | Sección «Decisiones del negocio» |
 
@@ -238,6 +238,16 @@ El menú pasó de 10 opciones a 5 (4 para Vendedora y Almacén). Las páginas qu
 
 - Los costos llegan a Inventario por un puerto (`INVENTORY_COSTS`) que Compras provee en sus rutas: Inventario no depende de Compras y, sin el puerto o sin permiso, no muestra montos.
 - En la tabla de stock el código pasó debajo del nombre para que entren las columnas del CEO.
+- Commits: `2ce5c16`, `632feef`, `fb03b8d`, `ad45d9f`, `e5b5126`, `767e9d6`, `c6be569`.
+
+### 13. Orden antes de los proyectos
+
+Sprint corto para cerrar lo pendiente antes del cotizador de proyectos.
+
+- **Idioma guardado**: al volver a abrir la app con un idioma elegido antes, el store de configuración fallaba porque leía la lista de idiomas antes de crearla. Se corrigió y ahora tiene pruebas.
+- **Nombres**: el marco de la app y el menú lateral sirven a todos los roles, así que `SellerShell` y `SellerSidebar` pasaron a llamarse `AppShell` y `AppSidebar`. Se borraron `feature-placeholder`, `language-switcher` y las carpetas vacías de `sellers`, que venían de la plantilla y no se usaban.
+- **Datos de demostración**: la API de prueba escribía en `db.json` los datos de la hoja de inventario cada vez que arrancaba, así que el archivo siempre quedaba con unas 10 000 líneas cambiadas y con datos de prueba mezclados. Ahora `db.json` ya trae esos datos (49 vidrios, 428 productos, 527 artículos y 2 sedes) y nada de prueba: encender la API no lo cambia.
+- Commits: `f431d90`, `3c4486f`, `c67f254`.
 
 ## Decisiones del negocio
 
@@ -275,11 +285,11 @@ Tomadas por Dylan durante los sprints. Si alguna cambia, hay que avisar antes de
 ```bash
 npm ci
 npm run dev     # API de prueba (puerto 3000) + app (http://localhost:4200)
-npm test        # 237 pruebas automáticas
+npm test        # 241 pruebas automáticas
 npm run build   # build de producción sin errores ni advertencias
 ```
 
-Usuarios de prueba (en `mock-api/README.md`): `ceo`, `vendedora` y `almacen`. Los datos de demostración están en `mock-api/db.json` (cotización COT-000001, técnicos y visitas) y en `mock-api/inventory-seed.json` (vidrios, productos, artículos y stock de la hoja de inventario).
+Usuarios de prueba (en `mock-api/README.md`): `ceo`, `vendedora` y `almacen`. Los datos de demostración están en `mock-api/db.json`: cotización COT-000001, técnicos, visitas y, ya cargados, los vidrios, productos, artículos y stock de la hoja de inventario (`mock-api/inventory-seed.json`). Lo que se haga en la app queda guardado en `db.json`; para volver a los datos de demostración: `git checkout mock-api/db.json` con la API apagada.
 
 ## Problemas encontrados y cómo se resolvieron
 
@@ -291,12 +301,14 @@ Usuarios de prueba (en `mock-api/README.md`): `ceo`, `vendedora` y `almacen`. Lo
 | «Port already in use» al encender | Había otra copia encendida; se documentó en el README |
 | La búsqueda por DNI devolvía la dirección vacía | Al combinar datos de cotizaciones anteriores solo se usan los campos llenos |
 | Un commit de datos de prueba borró la cotización de demostración | Se restauró (`a7bdd8d`); antes de reemplazar `db.json` se revisa el historial |
+| Al encender la API, `db.json` quedaba con unas 10 000 líneas cambiadas | `db.json` ya trae los datos de la hoja; arrancar no lo cambia (sprint 13) |
+| La app fallaba al abrirse con un idioma guardado | El store crea la lista de idiomas antes de leerla (sprint 13) |
 | Colores del historial de precios invertidos | Subida en verde, bajada en rojo |
 
 ## Lo que falta
 
 1. **Datos reales de la empresa** (solo Dylan): RUC, dirección y teléfono en `src/app/shared/domain/model/company-profile.ts`. Hoy la cotización impresa sale con datos de ejemplo.
-2. **Mantenimiento**: actualizar Angular, Vite y Vitest (`npm audit` marca 49 avisos que venían de la plantilla); renombrar `SellerShell` y borrar los componentes que no se usan (`feature-placeholder`, `language-switcher`).
+2. **Mantenimiento**: actualizar Angular, Vite y Vitest (`npm audit` marca 49 avisos que venían de la plantilla).
 3. **Pruebas de punta a punta** de los recorridos de la demo: iniciar sesión con cada rol, cotizar, guardar e imprimir, cambiar un precio y verlo en el historial, agendar y editar una visita.
 4. **Preparar la demo del 23 de diciembre**: datos de demostración creíbles y una guía corta de qué mostrar y en qué orden.
 5. **Dependencia del servidor** (no es trabajo del frontend): el servidor real debe ofrecer los mismos endpoints que `mock-api/server.cjs`, incluida la consulta a RENIEC/SUNAT. Cuando exista, basta con cambiar `apiBaseUrl` en `src/environments/environment.ts`.
