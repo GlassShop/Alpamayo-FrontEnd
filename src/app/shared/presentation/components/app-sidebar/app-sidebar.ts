@@ -36,13 +36,13 @@ function isUnder(url: string, path: string): boolean {
 
 /** Side navigation with the sections allowed for the signed-in user's role. */
 @Component({
-  selector: 'app-seller-sidebar',
+  selector: 'app-sidebar',
   imports: [RouterLink, MatIconModule, MatTooltipModule, TranslatePipe],
-  templateUrl: './seller-sidebar.html',
-  styleUrl: './seller-sidebar.css',
+  templateUrl: './app-sidebar.html',
+  styleUrl: './app-sidebar.css',
   host: {'[class.sidebar-collapsed]': 'collapsed'}
 })
-export class SellerSidebar {
+export class AppSidebar {
   @Input() collapsed = false;
 
   readonly iamStore = inject(IamStore);

@@ -3,16 +3,16 @@ import {Router, RouterOutlet} from '@angular/router';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {SellerSidebar} from '../seller-sidebar/seller-sidebar';
+import {AppSidebar} from '../app-sidebar/app-sidebar';
 
 /** Application frame: side navigation, top bar and routed content. */
 @Component({
-  selector: 'app-seller-shell',
-  imports: [RouterOutlet, MatIconModule, MatButtonModule, MatTooltipModule, SellerSidebar],
-  templateUrl: './seller-shell.html',
-  styleUrl: './seller-shell.css'
+  selector: 'app-shell',
+  imports: [RouterOutlet, MatIconModule, MatButtonModule, MatTooltipModule, AppSidebar],
+  templateUrl: './app-shell.html',
+  styleUrl: './app-shell.css'
 })
-export class SellerShell {
+export class AppShell {
   private readonly router = inject(Router);
   readonly collapsed = signal(false);
 

@@ -6,7 +6,7 @@ import {SectionLayout, SectionTab} from './shared/presentation/components/sectio
 import {pageTitle} from './shared/presentation/page-title';
 
 const pageNotFound  = () => import('./shared/presentation/views/page-not-found/page-not-found').then(m => m.PageNotFound);
-const appShell      = () => import('./shared/presentation/components/seller-shell/seller-shell').then(m => m.SellerShell);
+const appShell      = () => import('./shared/presentation/components/app-shell/app-shell').then(m => m.AppShell);
 const configuration = () => import('./shared/presentation/views/configuration/configuration').then(m => m.Configuration);
 const quoteBuilder  = () => import('./quoting/presentation/views/quote-builder/quote-builder').then(m => m.QuoteBuilder);
 const catalog       = () => import('./catalog/presentation/views/glass-catalog/glass-catalog').then(m => m.GlassCatalog);
