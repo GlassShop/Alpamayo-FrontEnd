@@ -153,7 +153,9 @@ server.use((req, res, next) => {
     req.path.startsWith('/product-price-history') ||
     // Purchase costs and margins: only the CEO types or reads them.
     /^\/purchases\/\d+\/costs/.test(req.path) ||
-    req.path.startsWith('/cost-settings');
+    req.path.startsWith('/cost-settings') ||
+    // Everyone reads the maximum discount (sellers need it); only the CEO sets it.
+    (writes && req.path.startsWith('/sale-settings'));
   if (ceoOnly && !isCeo) return res.status(403).json({code: 'forbidden'});
   next();
 });
@@ -582,36 +584,67 @@ server.put('/cost-settings', (req, res) => {
 });
 server.all('/cost-settings', (req, res) => res.status(405).json({code: 'not-allowed'}));
 
+// Most a seller may lower a catalog price on a quote, in %; null (not set) allows no discount.
+const maxDiscountPercent = () => db.get('sale-settings').value()?.maxDiscountPercent ?? null;
+server.get('/sale-settings', (req, res) => res.json({maxDiscountPercent: maxDiscountPercent()}));
+server.put('/sale-settings', (req, res) => {
+  const {maxDiscountPercent: value} = req.body ?? {};
+  if (value !== null && !(typeof value === 'number' && value >= 0 && value <= 100)) {
+    return res.status(400).json({code: 'invalid-discount'});
+  }
+  db.set('sale-settings', {maxDiscountPercent: value}).write();
+  res.json({maxDiscountPercent: value});
+});
+server.all('/sale-settings', (req, res) => res.status(405).json({code: 'not-allowed'}));
+
 // ── quotes ───────────────────────────────────────────────────────────────
 // Sellers and warehouse staff see only their own quotes; the CEO sees all.
-// Totals and glass prices are re-checked so a client cannot tamper with them.
+// Totals and catalog prices are re-checked so a client cannot tamper with
+// them, and so is the final price typed by a seller: never below the CEO's
+// maximum discount (the CEO has no limit). Mirror of price-adjustment.ts.
 const PAYMENT_METHODS = ['CASH', 'YAPE', 'PLIN', 'CARD'];
+const SALE_UNITS = {ALUMINUM_SERIES: 'BAR', ALUMINUM_TRADITIONAL: 'BAR', ACCESSORY: 'UNIT', OTHER: 'SHEET'};
 const quotes = () => db.get('quotes');
 const canSee = (user, quote) => user.role === 'CEO' || quote.seller.id === user.id;
 
-function quoteProblem(body) {
-  const {customer, paymentMethod, priceList, lines = [], extras = [], total, advance, termsAccepted} = body ?? {};
+function allowedPrice(catalogPrice, finalPrice, user) {
+  if (!(finalPrice > 0)) return false;
+  if (user.role === 'CEO' || finalPrice >= catalogPrice) return true;
+  return finalPrice >= Math.ceil(catalogPrice * (100 - (maxDiscountPercent() ?? 0)) - 1e-6) / 100;
+}
+
+function quoteProblem(body, user) {
+  const {customer, paymentMethod, priceList, lines = [], products = [], extras = [], total, advance, termsAccepted} = body ?? {};
   if (!customer?.name?.trim() || !['DNI', 'RUC'].includes(customer?.docType) || !/^\d{8}$|^\d{11}$/.test(customer?.docNumber ?? '')) return 'invalid-customer';
   if (!PAYMENT_METHODS.includes(paymentMethod)) return 'invalid-payment';
-  if (lines.length + extras.length === 0) return 'empty';
+  if (lines.length + products.length + extras.length === 0) return 'empty';
   if (termsAccepted !== true) return 'terms-not-accepted';
   for (const line of lines) {
     const price = db.get('prices').find({glassTypeId: line.glassTypeId, priceListId: priceList?.id}).value();
+    const catalogPrice = line.catalogPricePerSqFt ?? line.pricePerSqFt;
     const expected = round2(((line.billedWidthCm * line.billedHeightCm / 900) * line.pricePerSqFt) * line.quantity);
-    if (!price || price.pricePerSqFt !== line.pricePerSqFt || expected !== round2(line.total)) return 'totals-mismatch';
+    if (!price || price.pricePerSqFt !== catalogPrice || expected !== round2(line.total)) return 'totals-mismatch';
+    if (!allowedPrice(catalogPrice, line.pricePerSqFt, user)) return 'discount-too-high';
+  }
+  for (const line of products) {
+    const product = db.get('products').find({id: line.productId}).value();
+    if (!product || product.publicPrice === null || product.publicPrice !== line.catalogUnitPrice) return 'totals-mismatch';
+    if (!Number.isInteger(line.quantity) || line.quantity < 1) return 'invalid-quantity';
+    if (line.saleUnit !== SALE_UNITS[product.category] || round2(line.unitPrice * line.quantity) !== round2(line.total)) return 'totals-mismatch';
+    if (!allowedPrice(line.catalogUnitPrice, line.unitPrice, user)) return 'discount-too-high';
   }
   for (const extra of extras) {
     if (!String(extra.description ?? '').trim() || round2(extra.quantity * extra.unitPrice) !== round2(extra.total)) return 'totals-mismatch';
   }
-  const sum = round2([...lines, ...extras].reduce((acc, l) => acc + l.total, 0));
+  const sum = round2([...lines, ...products, ...extras].reduce((acc, l) => acc + l.total, 0));
   if (sum !== round2(total)) return 'totals-mismatch';
   if (!(advance >= 0 && advance <= total)) return 'invalid-advance';
   return null;
 }
 
 function quoteFields(body) {
-  const {customer, paymentMethod, priceList, currency, lines = [], extras = [], total, subtotal, igv, advance, termsAccepted, notes} = body;
-  return {customer, paymentMethod, priceList, currency: currency ?? 'PEN', lines, extras,
+  const {customer, paymentMethod, priceList, currency, lines = [], products = [], extras = [], total, subtotal, igv, advance, termsAccepted, notes} = body;
+  return {customer, paymentMethod, priceList, currency: currency ?? 'PEN', lines, products, extras,
     total: round2(total), subtotal: round2(subtotal), igv: round2(igv), advance: round2(advance),
     balance: round2(total - advance), termsAccepted, ...(notes ? {notes} : {})};
 }
@@ -627,7 +660,7 @@ server.get('/quotes/:id', (req, res) => {
 });
 
 server.post('/quotes', (req, res) => {
-  const problem = quoteProblem(req.body);
+  const problem = quoteProblem(req.body, req.currentUser);
   if (problem) return res.status(problem === 'totals-mismatch' ? 422 : 400).json({code: problem});
   const all = quotes().value();
   const id = all.reduce((max, q) => Math.max(max, q.id), 0) + 1;
@@ -643,7 +676,7 @@ server.post('/quotes', (req, res) => {
 server.put('/quotes/:id', (req, res) => {
   const existing = quotes().find({id: Number(req.params.id)}).value();
   if (!existing || !canSee(req.currentUser, existing)) return res.status(404).json({code: 'not-found'});
-  const problem = quoteProblem(req.body);
+  const problem = quoteProblem(req.body, req.currentUser);
   if (problem) return res.status(problem === 'totals-mismatch' ? 422 : 400).json({code: problem});
   const updated = {...existing, ...quoteFields(req.body), updatedAt: new Date().toISOString()};
   quotes().find({id: existing.id}).assign(updated).write();
