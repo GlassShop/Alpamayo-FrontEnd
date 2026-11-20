@@ -8,6 +8,7 @@ const matrix: Record<Permission, Record<Role, boolean>> = {
   'prices.manage':       {CEO: true, SELLER: false, WAREHOUSE: false},
   'users.manage':        {CEO: true, SELLER: false, WAREHOUSE: false},
   'quotes.view-all':     {CEO: true, SELLER: false, WAREHOUSE: false},
+  'sales.cancel':        {CEO: true, SELLER: false, WAREHOUSE: false},
   'agenda':              {CEO: true, SELLER: true,  WAREHOUSE: true},
   'visits.edit-all':     {CEO: true, SELLER: false, WAREHOUSE: false},
   'technicians.manage':  {CEO: true, SELLER: false, WAREHOUSE: false},
