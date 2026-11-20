@@ -42,7 +42,8 @@
     "saving": "Saving…",
     "retry": "Retry",
     "close": "Close",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "save": "Save"
   },
   "catalog": {
     "title": "Catalog",
@@ -155,7 +156,27 @@
       "clear-reason": "Clear reason"
     },
     "edit-prices": "Edit prices",
-    "done-editing": "Finish editing"
+    "done-editing": "Finish editing",
+    "add": "Add",
+    "add-to-quote": "Add to quote",
+    "quote-glass": "Quote",
+    "cart": {
+      "label": "Quote in progress",
+      "summary": "Quote: {{count}} item(s) ·",
+      "open": "View quote"
+    },
+    "discount": {
+      "label": "Maximum discount for sellers and warehouse",
+      "placeholder": "No discount",
+      "off": "Remove discount",
+      "hint": "On a quote they may lower each price by up to {{max}} %. You have no limit.",
+      "hint-off": "Without a maximum discount, sellers and warehouse cannot lower prices; they can only raise them.",
+      "error": {
+        "load": "Could not load the maximum discount.",
+        "save": "Could not save the maximum discount. Please try again.",
+        "invalid": "The maximum discount must be between 0 and 100 %."
+      }
+    }
   },
   "quoting": {
     "search-placeholder": "Search glass by name, thickness or color...",
@@ -174,7 +195,8 @@
     "issue": {
       "missing-measures": "Enter width and height",
       "invalid-quantity": "Quantity must be a whole number above zero",
-      "no-price": "The CEO has not set a price in this list"
+      "no-price": "The CEO has not set a price in this list",
+      "below-limit": "The price is below the allowed discount"
     },
     "total-square-feet": "Total ft²",
     "subtotal": "Subtotal before IGV",
@@ -252,7 +274,8 @@
         "no-header": "No measures table found. The Excel needs \"Tipo de vidrio\", \"Ancho\" and \"Alto\" columns; use the template.",
         "empty": "The Excel has no rows with measures."
       }
-    }
+    },
+    "final-price": "Final price per ft² (optional)"
   },
   "forms": {
     "error": {
@@ -397,7 +420,9 @@
       "edit": "Edit",
       "empty": "No saved quotes yet.",
       "no-results": "No quote matches the search.",
-      "confirm-replace": "You have an unsaved quote in the quoter. Replace it with the selected one?"
+      "confirm-replace": "You have an unsaved quote in the quoter. Replace it with the selected one?",
+      "discount": "Discount",
+      "discount-hint": "Amount taken off the catalog prices"
     },
     "print-view": {
       "back": "Back",
@@ -420,7 +445,33 @@
       "missing-name": "Customer name is missing.",
       "invalid-advance": "Advance must be between 0 and the total.",
       "terms-not-accepted": "The customer must accept the sale conditions.",
-      "totals-mismatch": "Prices changed while quoting. Review the quote and save again."
+      "totals-mismatch": "Prices changed while quoting. Review the quote and save again.",
+      "discount-too-high": "A discount is above the maximum set by the CEO. Check the final prices and save again."
+    },
+    "final-price": "Final price",
+    "catalog-price": "Catalog price: S/ {{price}}",
+    "reset-price": "Back to the catalog price",
+    "below-limit": "Minimum S/ {{min}}",
+    "discounted": "Discounted {{percent}} %",
+    "raised": "Raised {{percent}} %",
+    "limit": {
+      "none": "Type a price to lower or raise it; you have no limit.",
+      "not-set": "You may raise the price. To lower it, the CEO must set the maximum discount.",
+      "max": "You may lower it by up to {{percent}} % (minimum S/ {{min}}) or raise it."
+    },
+    "products": {
+      "title": "Catalog products",
+      "hint": "Aluminium, accessories and acrylics at the public price, in whole units.",
+      "search": "Search a product by code or name…",
+      "add-title": "Add to quote",
+      "add": "Add",
+      "color": "Colour",
+      "choose-color": "Choose a colour",
+      "color-required": "Choose the colour.",
+      "stock": "Stock per site (reference)",
+      "whole-quantity": "Type a whole quantity of 1 or more.",
+      "no-price-hint": "This product has no price yet: you can add it, but the quote can be saved once the CEO prices it.",
+      "unknown": "Product no longer in the catalog"
     }
   },
   "agenda": {

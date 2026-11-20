@@ -42,7 +42,8 @@
     "saving": "Guardando…",
     "retry": "Reintentar",
     "close": "Cerrar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "save": "Guardar"
   },
   "catalog": {
     "title": "Catálogo",
@@ -155,7 +156,27 @@
       "clear-reason": "Quitar motivo"
     },
     "edit-prices": "Editar precios",
-    "done-editing": "Terminar edición"
+    "done-editing": "Terminar edición",
+    "add": "Agregar",
+    "add-to-quote": "Agregar a la cotización",
+    "quote-glass": "Cotizar",
+    "cart": {
+      "label": "Cotización en curso",
+      "summary": "Cotización: {{count}} artículo(s) ·",
+      "open": "Ver cotización"
+    },
+    "discount": {
+      "label": "Rebaja máxima de vendedoras y almacén",
+      "placeholder": "Sin rebaja",
+      "off": "Quitar rebaja",
+      "hint": "En una cotización pueden bajar cada precio hasta {{max}} %. Tú no tienes límite.",
+      "hint-off": "Sin rebaja máxima, vendedoras y almacén no pueden bajar precios; solo subirlos.",
+      "error": {
+        "load": "No se pudo cargar la rebaja máxima.",
+        "save": "No se pudo guardar la rebaja máxima. Inténtalo de nuevo.",
+        "invalid": "La rebaja máxima debe estar entre 0 y 100 %."
+      }
+    }
   },
   "quoting": {
     "search-placeholder": "Buscar vidrio por nombre, espesor o color...",
@@ -174,7 +195,8 @@
     "issue": {
       "missing-measures": "Ingresa ancho y alto",
       "invalid-quantity": "La cantidad debe ser un entero mayor que cero",
-      "no-price": "El CEO no fijó precio en esta lista"
+      "no-price": "El CEO no fijó precio en esta lista",
+      "below-limit": "El precio está por debajo de la rebaja permitida"
     },
     "total-square-feet": "Total pie²",
     "subtotal": "Subtotal sin IGV",
@@ -252,7 +274,8 @@
         "no-header": "No se encontró la tabla de medidas. El Excel debe tener columnas «Tipo de vidrio», «Ancho» y «Alto»; usa la plantilla.",
         "empty": "El Excel no tiene filas con medidas."
       }
-    }
+    },
+    "final-price": "Precio final por pie² (opcional)"
   },
   "forms": {
     "error": {
@@ -397,7 +420,9 @@
       "edit": "Editar",
       "empty": "Aún no hay cotizaciones guardadas.",
       "no-results": "Ninguna cotización coincide con la búsqueda.",
-      "confirm-replace": "Tienes una cotización sin guardar en el cotizador. ¿Reemplazarla por la seleccionada?"
+      "confirm-replace": "Tienes una cotización sin guardar en el cotizador. ¿Reemplazarla por la seleccionada?",
+      "discount": "Rebaja",
+      "discount-hint": "Lo que se bajó de los precios de catálogo"
     },
     "print-view": {
       "back": "Volver",
@@ -420,7 +445,33 @@
       "missing-name": "Falta el nombre del cliente.",
       "invalid-advance": "«A cuenta» debe estar entre 0 y el total.",
       "terms-not-accepted": "El cliente debe aceptar las condiciones de venta.",
-      "totals-mismatch": "Los precios cambiaron mientras cotizabas. Revisa la cotización y vuelve a guardar."
+      "totals-mismatch": "Los precios cambiaron mientras cotizabas. Revisa la cotización y vuelve a guardar.",
+      "discount-too-high": "Una rebaja supera la rebaja máxima que fijó el CEO. Revisa los precios finales y vuelve a guardar."
+    },
+    "final-price": "Precio final",
+    "catalog-price": "Precio de catálogo: S/ {{price}}",
+    "reset-price": "Volver al precio de catálogo",
+    "below-limit": "Mínimo S/ {{min}}",
+    "discounted": "Rebajado {{percent}} %",
+    "raised": "Subido {{percent}} %",
+    "limit": {
+      "none": "Escribe un precio para rebajar o subir; no tienes límite.",
+      "not-set": "Puedes subir el precio. Para rebajarlo, el CEO debe fijar la rebaja máxima.",
+      "max": "Puedes rebajar hasta {{percent}} % (mínimo S/ {{min}}) o subir el precio."
+    },
+    "products": {
+      "title": "Productos del catálogo",
+      "hint": "Aluminios, accesorios y acrílicos al precio público, en unidades enteras.",
+      "search": "Buscar producto por código o nombre…",
+      "add-title": "Agregar a la cotización",
+      "add": "Agregar",
+      "color": "Color",
+      "choose-color": "Elige un color",
+      "color-required": "Elige el color.",
+      "stock": "Stock por sede (referencia)",
+      "whole-quantity": "Escribe una cantidad entera de 1 o más.",
+      "no-price-hint": "Este producto aún no tiene precio: puedes agregarlo, pero la cotización se guardará cuando el CEO le ponga precio.",
+      "unknown": "Producto que ya no está en el catálogo"
     }
   },
   "agenda": {
