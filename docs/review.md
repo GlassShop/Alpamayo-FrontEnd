@@ -121,7 +121,7 @@ Registro del trabajo hecho con Claude Code a partir de este prompt, actualizado 
 | 3. Inicio de sesión activo | Cumplido. Sesión de 8 horas, sin registro público | `src/app/iam` |
 | 4. Cada ruta protegida con guardia y rol | Cumplida. Guardia de sesión y guardia de permiso en todas las rutas | `src/app/app.routes.ts`, `iam/domain/model/permission.ts` |
 | 5. Código en inglés, textos en español con traducciones | Cumplida. Español e inglés | `public/i18n/es.json`, `en.json` |
-| 6. Pruebas en cada tienda y regla de cálculo | Cumplida. 275 pruebas automáticas, todas pasan | `npm test` |
+| 6. Pruebas en cada tienda y regla de cálculo | Cumplida. 291 pruebas automáticas, todas pasan | `npm test` |
 | 7. Un sprint por vez, con plan aprobado | Cumplida | Este registro |
 | 8. Preguntar lo que falta, no inventarlo | Cumplida. Las decisiones están abajo | Sección «Decisiones del negocio» |
 
@@ -263,6 +263,19 @@ El catálogo no solo muestra: también vende. Una cotización junta vidrios, pro
 - El catálogo no depende del cotizador: Cotizar le entrega un puerto (`QUOTE_CART`) en su ruta, como Compras hace con los costos de Inventario.
 - Commits: `70e6162`, `0c73b91`, `73b226a`, `a89e610`, `e928042`.
 
+### 15. Marcar como vendida
+
+Una cotización ahora es **Abierta** o **Vendida**. Venderla saca del stock los productos del catálogo; el vidrio y los conceptos adicionales no tocan el stock.
+
+- **Quién vende**: la autora de la cotización o el CEO, desde **Guardadas** (botón de caja) o desde la vista de impresión. Se puede vender con saldo **Por pagar** pendiente; el saldo sigue a la vista.
+- **Diálogo**: se elige **una sede**. Cada producto se enlaza a su artículo del inventario (producto + color) y muestra *stock → queda*. Si varios artículos sirven (por ejemplo, planchas de distinta medida), se elige ahí.
+- **Nunca negativo**: si un producto no está en el inventario en ese color, nunca se contó en esa sede o no alcanza («Solo hay 5; se venden 6»), la venta se **bloquea** y el diálogo lleva a Inventario para corregirlo. La API vuelve a revisarlo y aplica todo o nada.
+- **Movimientos**: cada artículo vendido deja un movimiento **«Venta»** (motivo «Venta COT-000003»), visible en el historial de Inventario. El stock en pantalla se actualiza al instante.
+- **Después de vender**: la cotización **no se edita** (sin botón Editar; la API responde 409). Sigue imprimiéndose. En Guardadas aparece la etiqueta **«Vendida»** y el filtro *Todas / Abiertas / Vendidas*; arriba del documento (no se imprime) se ve desde qué sede, quién y cuándo se vendió.
+- **Anular (solo CEO)**: «Anular venta» con **motivo obligatorio** devuelve las unidades a la sede con el movimiento **«Anulación de venta»** y la cotización vuelve a **Abierta**. Las anulaciones quedan listadas en la cotización.
+- La regla de venta es una función pura (`quoting/domain/services/sale-plan.ts`) con sus pruebas; la API de prueba la repite.
+- Commits: `42b5210`, `5f0bea8`, `72f895c`, `93fbfad`, `c465ce3`, `344f4ed`.
+
 ## Decisiones del negocio
 
 Tomadas por Dylan durante los sprints. Si alguna cambia, hay que avisar antes de tocar el código.
@@ -296,14 +309,16 @@ Tomadas por Dylan durante los sprints. Si alguna cambia, hay que avisar antes de
 | Cotización | Vidrios + productos del catálogo + conceptos adicionales, guardados juntos; se agregan desde el Catálogo o desde Cotizar |
 | Productos en la cotización | Siempre a precio público; color elegido del inventario; cantidades enteras |
 | Precio final | Por línea. Subir siempre se puede; bajar, hasta la rebaja máxima que fija el CEO (sin fijar = 0 %); el CEO no tiene límite. Se guardan el precio de catálogo y el final; el cliente solo ve el final |
-| Stock y cotización | La cotización no toca el stock. Al marcarla como vendida (sprint 15) se descuentan solo los productos; el vidrio se corrige con conteos |
+| Stock y cotización | La cotización no toca el stock. Al marcarla como vendida se descuentan solo los productos; el vidrio se corrige con conteos |
+| Venta | Desde una sola sede; la vende su autora o el CEO; se puede vender con saldo pendiente; sin stock suficiente (o sin artículo, o sin contar) se bloquea; vendida no se edita |
+| Anular venta | Solo el CEO, con motivo; el stock vuelve y la cotización queda abierta |
 
 ## Cómo probarlo
 
 ```bash
 npm ci
 npm run dev     # API de prueba (puerto 3000) + app (http://localhost:4200)
-npm test        # 275 pruebas automáticas
+npm test        # 291 pruebas automáticas
 npm run build   # build de producción sin errores ni advertencias
 ```
 
@@ -325,7 +340,7 @@ Usuarios de prueba (en `mock-api/README.md`): `ceo`, `vendedora` y `almacen`. Lo
 
 ## Lo que falta
 
-Siguiente: **sprint 15, «Marcar como vendida»** — elegir la sede de donde sale la mercadería y descontar el stock de los productos con un movimiento «Venta COT-…»; la cotización vendida ya no se edita. Después, el cotizador de proyectos.
+Siguiente: **el cotizador de proyectos** (ventanas por serie con precios al público más mano de obra). Antes hay que decidir cómo se calcula la mano de obra, si la instalación va aparte, las fórmulas de cada serie y si entran mamparas y puertas.
 
 1. **Datos reales de la empresa** (solo Dylan): RUC, dirección y teléfono en `src/app/shared/domain/model/company-profile.ts`. Hoy la cotización impresa sale con datos de ejemplo.
 2. **Mantenimiento**: actualizar Angular, Vite y Vitest (`npm audit` marca 49 avisos que venían de la plantilla).
